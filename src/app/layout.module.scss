@@ -1,0 +1,16 @@
+.pageRoot {
+  min-height: 100vh;
+  background: #fff;
+}
+
+.header {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.headerInner {
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: flex-end;
+}
