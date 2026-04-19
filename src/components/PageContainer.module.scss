@@ -1,0 +1,12 @@
+.container {
+  width: 100%;
+  max-width: var(--layout-width);
+  margin: 0 auto;
+  padding-inline: 1.5rem;
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding-inline: 1rem;
+  }
+}

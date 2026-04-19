@@ -6,6 +6,7 @@
   --card-bg: #e8f4f8;
   --card-border: #b8e0f0;
   --card-hover: #d4e9f0;
+  --layout-width: 42rem;
 }
 
 @media (prefers-color-scheme: dark) {

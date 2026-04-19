@@ -3,12 +3,11 @@
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: 3rem 1.5rem;
+  padding-block: 3rem;
 }
 
 .container {
   width: 100%;
-  max-width: 32rem;
 }
 
 .header {
@@ -145,6 +144,34 @@
 .field {
   display: grid;
   gap: 0.5rem;
+}
+
+.fieldHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.checkboxRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.8125rem;
+  color: #4b5563;
+}
+
+.checkboxRow input {
+  margin: 0;
+}
+
+.emptyValue {
+  padding: 0.875rem 1rem;
+  border: 1px dashed #d1d5db;
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+  background: #fff;
 }
 
 .secondaryButton,
@@ -303,7 +330,7 @@
 
 @media (max-width: 640px) {
   .wrapper {
-    padding: 1.5rem 1rem;
+    padding-block: 1.5rem;
   }
 
   .section {
@@ -312,6 +339,11 @@
 
   .selectRow {
     grid-template-columns: 1fr;
+  }
+
+  .fieldHeader {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .secondaryButton {

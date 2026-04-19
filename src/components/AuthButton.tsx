@@ -48,7 +48,7 @@ export default function AuthButton() {
           onClick={handleLogout}
           className={styles.button}
         >
-          Wyloguj
+          Sign Out
         </button>
       </div>
     )
@@ -59,7 +59,7 @@ export default function AuthButton() {
       onClick={() => router.push('/login')}
       className={styles.button}
     >
-      Zaloguj się
+      Sign In
     </button>
   )
 }

@@ -1,10 +1,11 @@
 import Link from 'next/link'
 import { routes } from '@/lib/routes'
+import PageContainer from '@/components/PageContainer'
 import styles from './page.module.scss'
 
 export default function Home() {
   return (
-    <div className={styles.container}>
+    <PageContainer className={styles.container}>
       <h1 className={styles.title}>Training Journal</h1>
       
       <div className={styles.list}>
@@ -40,6 +41,6 @@ export default function Home() {
           </Link>
         ))}
       </div>
-    </div>
+    </PageContainer>
   )
 }

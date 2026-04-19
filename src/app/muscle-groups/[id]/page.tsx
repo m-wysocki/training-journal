@@ -5,7 +5,8 @@ import { useParams, useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import * as Dialog from '@radix-ui/react-dialog'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
-import Link from 'next/link'
+import BackLink from '@/components/BackLink'
+import PageContainer from '@/components/PageContainer'
 import styles from './page.module.scss'
 
 type Exercise = {
@@ -74,14 +75,9 @@ export default function MuscleGroupPage() {
   )
 
   return (
-    <div className={styles.container}>
+    <PageContainer className={styles.container}>
         <div className={styles.header}>
-          <Link
-            href="/muscle-groups"
-            className={styles.backLink}
-          >
-            ← Back to Muscle Groups
-          </Link>
+          <BackLink href="/muscle-groups" label="← Back to Muscle Groups" />
           <h1 className={styles.title}>{group.name}</h1>
         </div>
 
@@ -181,6 +177,6 @@ export default function MuscleGroupPage() {
             </Dialog.Content>
           </Dialog.Portal>
         </Dialog.Root>
-    </div>
+    </PageContainer>
   )
 }

@@ -5,6 +5,8 @@ import { supabase } from '@/lib/supabase'
 import * as Dialog from '@radix-ui/react-dialog'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import Link from 'next/link'
+import BackLink from '@/components/BackLink'
+import PageContainer from '@/components/PageContainer'
 import styles from './page.module.scss'
 
 type MuscleGroup = {
@@ -51,10 +53,8 @@ export default function MuscleGroupsPage() {
   }
 
   return (
-    <div className={styles.container}>
-        <Link href="/" className={styles.backLink}>
-          ← Back to Home
-        </Link>
+    <PageContainer className={styles.container}>
+        <BackLink href="/" label="← Back to Home" />
         <div className={styles.topBar}>
           <h1 className={styles.title}>Muscle Groups</h1>
           <Dialog.Root open={open} onOpenChange={setOpen}>
@@ -159,6 +159,6 @@ export default function MuscleGroupsPage() {
             ))}
           </ul>
         )}
-    </div>
+    </PageContainer>
   )
 }

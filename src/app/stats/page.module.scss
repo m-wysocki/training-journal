@@ -1,0 +1,209 @@
+.wrapper {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-block: 3rem;
+}
+
+.container {
+  width: 100%;
+}
+
+.header {
+  margin-bottom: 1.5rem;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 300;
+  color: #000;
+}
+
+.description {
+  margin: 0.5rem 0 0;
+  color: #6b7280;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.controlsCard,
+.summaryCard,
+.breakdownCard {
+  border: 1px solid var(--card-border);
+  border-radius: 0.75rem;
+  background: var(--card-bg);
+}
+
+.controlsCard {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding: 1rem;
+}
+
+.controlsTop {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.weekButton {
+  padding: 0.625rem 0.875rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  color: #111827;
+  background: #fff;
+  cursor: pointer;
+}
+
+.weekButton:hover {
+  border-color: #9ca3af;
+}
+
+.weekPickerGroup {
+  display: grid;
+  gap: 0.5rem;
+  max-width: 14rem;
+}
+
+.label {
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+.input {
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  padding: 0.625rem 0.75rem;
+  font-size: 0.875rem;
+  color: #111827;
+  background: #fff;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.weekRange {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #4b5563;
+}
+
+.errorBox {
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  border-radius: 0.375rem;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+  background: #fef2f2;
+}
+
+.statsGrid {
+  display: grid;
+  gap: 1rem;
+}
+
+.summaryCard {
+  padding: 1rem;
+}
+
+.cardLabel {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.primaryStat {
+  margin: 0.5rem 0 0;
+  font-size: 2.25rem;
+  font-weight: 300;
+  color: #111827;
+}
+
+.cardHint {
+  margin: 0.5rem 0 0;
+  font-size: 0.875rem;
+  color: #4b5563;
+}
+
+.breakdownCard {
+  padding: 1rem;
+}
+
+.breakdownHeader {
+  display: grid;
+  gap: 0.25rem;
+  margin-bottom: 1rem;
+}
+
+.breakdownTitle {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #111827;
+}
+
+.breakdownDescription {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.breakdownList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.625rem;
+}
+
+.breakdownItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 0.875rem;
+  border: 1px solid #dbe4ea;
+  border-radius: 0.625rem;
+  background: #fff;
+}
+
+.muscleGroupName {
+  font-size: 0.9375rem;
+  color: #111827;
+}
+
+.muscleGroupValue {
+  font-size: 0.875rem;
+  color: #4b5563;
+}
+
+.emptyText {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+@media (max-width: 640px) {
+  .wrapper {
+    padding-block: 1.5rem;
+  }
+
+  .controlsTop {
+    flex-direction: column;
+  }
+
+  .weekPickerGroup {
+    max-width: none;
+  }
+
+  .breakdownItem {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

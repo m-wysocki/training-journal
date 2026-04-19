@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Link from "next/link";
 import "./globals.css";
 import AuthButton from "@/components/AuthButton";
 import styles from "./layout.module.scss";
@@ -30,7 +31,16 @@ export default function RootLayout({
         <div className={styles.pageRoot}>
           <header className={styles.header}>
             <div className={styles.headerInner}>
-              <AuthButton />
+              <Link href="/" className={styles.brand}>
+                <span className={styles.brandMark}>TJ</span>
+                <span className={styles.brandText}>Training Journal</span>
+              </Link>
+              <div className={styles.headerActions}>
+                <Link href="/completed-exercises/new" className={styles.headerLink}>
+                  Add Exercise
+                </Link>
+                <AuthButton />
+              </div>
             </div>
           </header>
           {children}

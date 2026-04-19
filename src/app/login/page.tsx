@@ -2,15 +2,14 @@
 
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
+import BackLink from '@/components/BackLink'
+import PageContainer from '@/components/PageContainer'
 import styles from './page.module.scss'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
-  const router = useRouter()
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -27,9 +26,10 @@ export default function LoginPage() {
 
       if (error) throw error
 
-      setMessage('Sprawdź swoją skrzynkę email - wysłaliśmy Ci magiczny link!')
-    } catch (error: any) {
-      setMessage(error.message || 'Wystąpił błąd podczas logowania')
+      setMessage('Check your inbox — we sent you a magic login link.')
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'An error occurred while signing in.'
+      setMessage(errorMessage)
     } finally {
       setLoading(false)
     }
@@ -37,17 +37,12 @@ export default function LoginPage() {
 
   return (
     <div className={styles.wrapper}>
-      <div className={styles.container}>
+      <PageContainer className={styles.container}>
         <div className={styles.header}>
-          <Link
-            href="/"
-            className={styles.backLink}
-          >
-            ← Back to Home
-          </Link>
-          <h1 className={styles.title}>Logowanie</h1>
+          <BackLink href="/" label="← Back to Home" />
+          <h1 className={styles.title}>Sign In</h1>
           <p className={styles.description}>
-            Wprowadź swój adres email, a wyślemy Ci magiczny link do logowania
+            Enter your email address and we&apos;ll send you a magic sign-in link.
           </p>
         </div>
 
@@ -61,7 +56,7 @@ export default function LoginPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="twoj@email.com"
+              placeholder="your@email.com"
               required
               className={styles.input}
             />
@@ -70,7 +65,7 @@ export default function LoginPage() {
           {message && (
             <div
               className={`${styles.message} ${
-                message.includes('błąd')
+                message.toLowerCase().includes('error')
                   ? styles.messageError
                   : styles.messageSuccess
               }`}
@@ -84,10 +79,10 @@ export default function LoginPage() {
             disabled={loading}
             className={styles.submit}
           >
-            {loading ? 'Wysyłanie...' : 'Wyślij magiczny link'}
+            {loading ? 'Sending...' : 'Send Magic Link'}
           </button>
         </form>
-      </div>
+      </PageContainer>
     </div>
   )
 }
