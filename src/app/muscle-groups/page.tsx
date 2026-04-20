@@ -18,12 +18,23 @@ export default function MuscleGroupsPage() {
   const [name, setName] = useState('')
   const [groups, setGroups] = useState<MuscleGroup[]>([])
   const [open, setOpen] = useState(false)
+  const [editOpen, setEditOpen] = useState(false)
+  const [editingGroup, setEditingGroup] = useState<MuscleGroup | null>(null)
+  const [editName, setEditName] = useState('')
+  const [message, setMessage] = useState('')
+  const [isError, setIsError] = useState(false)
 
   const fetchGroups = async () => {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('muscle_groups')
       .select('*')
       .order('created_at')
+
+    if (error) {
+      setIsError(true)
+      setMessage('Could not load muscle groups.')
+      return
+    }
 
     setGroups(data || [])
   }
@@ -33,22 +44,110 @@ export default function MuscleGroupsPage() {
       .from('muscle_groups')
       .select('*')
       .order('created_at')
-      .then(({ data }) => {
+      .then(({ data, error }) => {
+        if (error) {
+          setIsError(true)
+          setMessage('Could not load muscle groups.')
+          return
+        }
+
         setGroups(data || [])
       })
   }, [])
 
   const addGroup = async () => {
-    if (!name) return
+    const trimmedName = name.trim()
 
-    await supabase.from('muscle_groups').insert({ name })
+    if (!trimmedName) return
+
+    setMessage('')
+    setIsError(false)
+
+    const {
+      data: { session },
+    } = await supabase.auth.getSession()
+
+    if (!session) {
+      setIsError(true)
+      setMessage('Sign in before adding a muscle group.')
+      return
+    }
+
+    const { error } = await supabase.from('muscle_groups').insert({
+      name: trimmedName,
+      user_id: session.user.id,
+    })
+
+    if (error) {
+      setIsError(true)
+      setMessage(
+        error.message.includes('row-level security policy')
+          ? 'Could not add the muscle group because database access rules blocked it. Run the muscle_groups RLS policy in Supabase.'
+          : 'Could not add the muscle group.',
+      )
+      return
+    }
+
     setName('')
     setOpen(false)
+    setMessage(`Added muscle group: ${trimmedName}.`)
     fetchGroups()
   }
 
   const deleteGroup = async (id: string) => {
-    await supabase.from('muscle_groups').delete().eq('id', id)
+    setMessage('')
+    setIsError(false)
+
+    const { error } = await supabase.from('muscle_groups').delete().eq('id', id)
+
+    if (error) {
+      setIsError(true)
+      setMessage(
+        error.message.includes('row-level security policy')
+          ? 'Could not delete the muscle group because database access rules blocked it.'
+          : 'Could not delete the muscle group.',
+      )
+      return
+    }
+
+    fetchGroups()
+  }
+
+  const openEditGroup = (group: MuscleGroup) => {
+    setEditingGroup(group)
+    setEditName(group.name)
+    setEditOpen(true)
+    setMessage('')
+    setIsError(false)
+  }
+
+  const updateGroup = async () => {
+    const trimmedName = editName.trim()
+
+    if (!editingGroup || !trimmedName) return
+
+    setMessage('')
+    setIsError(false)
+
+    const { error } = await supabase
+      .from('muscle_groups')
+      .update({ name: trimmedName })
+      .eq('id', editingGroup.id)
+
+    if (error) {
+      setIsError(true)
+      setMessage(
+        error.message.includes('row-level security policy')
+          ? 'Could not update the muscle group because database access rules blocked it.'
+          : 'Could not update the muscle group.',
+      )
+      return
+    }
+
+    setEditOpen(false)
+    setEditingGroup(null)
+    setEditName('')
+    setMessage(`Updated muscle group: ${trimmedName}.`)
     fetchGroups()
   }
 
@@ -103,6 +202,12 @@ export default function MuscleGroupsPage() {
           </Dialog.Root>
         </div>
 
+        {message && (
+          <div className={isError ? styles.messageError : styles.messageSuccess}>
+            {message}
+          </div>
+        )}
+
         {groups.length === 0 ? (
           <div className={styles.emptyState}>
             <p className={styles.emptyText}>No muscle groups yet</p>
@@ -148,6 +253,12 @@ export default function MuscleGroupsPage() {
                     <DropdownMenu.Content className={styles.menuContent}>
                       <DropdownMenu.Item
                         className={styles.menuItem}
+                        onSelect={() => openEditGroup(g)}
+                      >
+                        Edit
+                      </DropdownMenu.Item>
+                      <DropdownMenu.Item
+                        className={styles.menuItemDanger}
                         onSelect={() => deleteGroup(g.id)}
                       >
                         Delete
@@ -159,6 +270,47 @@ export default function MuscleGroupsPage() {
             ))}
           </ul>
         )}
+
+        <Dialog.Root open={editOpen} onOpenChange={setEditOpen}>
+          <Dialog.Portal>
+            <Dialog.Overlay className={styles.overlay} />
+            <Dialog.Content className={styles.dialogContent}>
+              <Dialog.Title className={styles.dialogTitle}>
+                Edit Muscle Group
+              </Dialog.Title>
+              <Dialog.Description className={styles.dialogDescription}>
+                Update the muscle group name.
+              </Dialog.Description>
+              <div className={styles.dialogBody}>
+                <input
+                  className={styles.input}
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  placeholder="e.g. Arms"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      updateGroup()
+                    }
+                  }}
+                />
+                <div className={styles.dialogActions}>
+                  <Dialog.Close asChild>
+                    <button type="button" className={styles.ghostButton}>
+                      Cancel
+                    </button>
+                  </Dialog.Close>
+                  <button
+                    type="button"
+                    onClick={updateGroup}
+                    className={styles.primaryButton}
+                  >
+                    Save
+                  </button>
+                </div>
+              </div>
+            </Dialog.Content>
+          </Dialog.Portal>
+        </Dialog.Root>
     </PageContainer>
   )
 }

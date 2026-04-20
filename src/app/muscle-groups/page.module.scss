@@ -20,6 +20,26 @@
   margin-bottom: 2rem;
 }
 
+.messageSuccess,
+.messageError {
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+}
+
+.messageSuccess {
+  color: #166534;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+}
+
+.messageError {
+  color: #991b1b;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+}
+
 .title {
   margin: 0;
   font-size: 1.875rem;
@@ -84,10 +104,12 @@
 
 .input {
   width: 100%;
-  border: 0;
-  border-bottom: 1px solid #d1d5db;
-  padding: 0.5rem 0;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  padding: 0.625rem 0.75rem;
+  font-size: 0.875rem;
   color: #000;
+  background: #fff;
 }
 
 .input::placeholder {
@@ -96,7 +118,7 @@
 
 .input:focus {
   outline: none;
-  border-bottom-color: var(--primary);
+  border-color: var(--primary);
 }
 
 .dialogActions {
@@ -165,17 +187,12 @@
 }
 
 .menuTrigger {
-  opacity: 0;
   padding: 0.375rem;
   border: 0;
   border-radius: 0.375rem;
   background: transparent;
   cursor: pointer;
-  transition: opacity 0.2s ease, background-color 0.2s ease;
-}
-
-.listItem:hover .menuTrigger {
-  opacity: 1;
+  transition: background-color 0.2s ease;
 }
 
 .menuTrigger:hover {
@@ -200,11 +217,24 @@
   border-radius: 0.25rem;
   padding: 0.5rem 0.75rem;
   font-size: 0.875rem;
-  color: #dc2626;
+  color: #111827;
   cursor: pointer;
   outline: none;
 }
 
 .menuItem:hover {
+  background: #f3f4f6;
+}
+
+.menuItemDanger {
+  border-radius: 0.25rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  color: #dc2626;
+  cursor: pointer;
+  outline: none;
+}
+
+.menuItemDanger:hover {
   background: #fef2f2;
 }

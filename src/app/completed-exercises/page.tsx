@@ -14,14 +14,17 @@ type CompletedExerciseRow = {
   id: string
   exercise_id: string
   performed_at: string
-  sets: number
-  reps_per_set: number[]
+  sets: number | null
+  reps_per_set: number[] | null
   load_kg: number | null
+  distance_km: number | null
+  pace_min_per_km: number | null
   note: string | null
   exercise: {
     id: string
     name: string
     muscle_group_id: string
+    exercise_type: 'strength' | 'cardio'
     muscle_group: {
       name: string
     } | null
@@ -43,6 +46,40 @@ const formatDate = (date: string) =>
     year: 'numeric',
   }).format(parseDateOnly(date))
 
+const formatPace = (paceMinPerKm: number) => {
+  const totalSeconds = Math.round(paceMinPerKm * 60)
+  const minutes = Math.floor(totalSeconds / 60)
+  const seconds = totalSeconds % 60
+  return `${minutes}:${String(seconds).padStart(2, '0')} min/km`
+}
+
+const formatEntryDetails = (entry: CompletedExerciseRow) => {
+  if (entry.exercise?.exercise_type === 'cardio') {
+    const details = []
+
+    if (entry.distance_km !== null) {
+      details.push(`Distance: ${Number(entry.distance_km).toFixed(1)} km`)
+    }
+
+    if (entry.pace_min_per_km !== null) {
+      details.push(`Pace: ${formatPace(Number(entry.pace_min_per_km))}`)
+    }
+
+    return details.join(' | ')
+  }
+
+  const details = [
+    `Sets: ${entry.sets ?? '-'}`,
+    `Reps: ${entry.reps_per_set?.join(' / ') ?? '-'}`,
+  ]
+
+  if (entry.load_kg !== null) {
+    details.push(`Load: ${Number(entry.load_kg)} kg`)
+  }
+
+  return details.join(' | ')
+}
+
 export default function CompletedExercisesPage() {
   const router = useRouter()
   const [entries, setEntries] = useState<CompletedExerciseRow[]>([])
@@ -63,11 +100,14 @@ export default function CompletedExercisesPage() {
           sets,
           reps_per_set,
           load_kg,
+          distance_km,
+          pace_min_per_km,
           note,
           exercise:exercises (
             id,
             name,
             muscle_group_id,
+            exercise_type,
             muscle_group:muscle_groups (
               name
             )
@@ -222,8 +262,7 @@ export default function CompletedExercisesPage() {
                                 </p>
                               </div>
                               <p className={styles.entryDetails}>
-                                {`Sets: ${entry.sets} | Reps: ${entry.reps_per_set.join(' / ')}`}
-                                {entry.load_kg !== null ? ` | Load: ${Number(entry.load_kg)} kg` : ''}
+                                {formatEntryDetails(entry)}
                               </p>
                               {entry.note?.trim() ? (
                                 <p className={styles.entryNote}>{entry.note.trim()}</p>

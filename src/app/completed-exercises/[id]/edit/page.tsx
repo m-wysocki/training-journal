@@ -9,9 +9,11 @@ type CompletedExerciseRecord = {
   id: string
   exercise_id: string
   performed_at: string
-  sets: number
-  reps_per_set: number[]
+  sets: number | null
+  reps_per_set: number[] | null
   load_kg: number | null
+  distance_km: number | null
+  pace_min_per_km: number | null
   note: string | null
   exercise: {
     muscle_group_id: string
@@ -37,6 +39,8 @@ export default function EditCompletedExercisePage() {
           sets,
           reps_per_set,
           load_kg,
+          distance_km,
+          pace_min_per_km,
           note,
           exercise:exercises (
             muscle_group_id
@@ -61,6 +65,8 @@ export default function EditCompletedExercisePage() {
           sets: entry.sets,
           repsPerSet: entry.reps_per_set,
           loadKg: entry.load_kg === null ? null : Number(entry.load_kg),
+          distanceKm: entry.distance_km === null ? null : Number(entry.distance_km),
+          paceMinPerKm: entry.pace_min_per_km === null ? null : Number(entry.pace_min_per_km),
           note: entry.note ?? '',
           performedAt: entry.performed_at,
         })
@@ -95,6 +101,8 @@ export default function EditCompletedExercisePage() {
             sets: values.sets,
             reps_per_set: values.repsPerSet,
             load_kg: values.loadKg,
+            distance_km: values.distanceKm,
+            pace_min_per_km: values.paceMinPerKm,
             note: values.note,
             performed_at: values.performedAt,
           })

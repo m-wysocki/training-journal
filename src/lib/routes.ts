@@ -6,7 +6,7 @@ export const routes = [
   },
   {
     path: '/completed-exercises/new',
-    name: 'Add Exercise',
+    name: 'Log Exercise',
     description: 'Log a completed exercise',
   },
   {

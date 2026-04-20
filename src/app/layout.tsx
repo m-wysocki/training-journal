@@ -37,7 +37,7 @@ export default function RootLayout({
               </Link>
               <div className={styles.headerActions}>
                 <Link href="/completed-exercises/new" className={styles.headerLink}>
-                  Add Exercise
+                  Log Exercise
                 </Link>
                 <AuthButton />
               </div>

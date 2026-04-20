@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useCallback, useEffect, useState } from 'react'
+import { useParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import * as Dialog from '@radix-ui/react-dialog'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
@@ -12,6 +12,7 @@ import styles from './page.module.scss'
 type Exercise = {
   id: string
   name: string
+  exercise_type: 'strength' | 'cardio'
 }
 
 type MuscleGroup = {
@@ -22,14 +23,20 @@ type MuscleGroup = {
 
 export default function MuscleGroupPage() {
   const params = useParams()
-  const router = useRouter()
   const muscleGroupId = params.id as string
 
   const [group, setGroup] = useState<MuscleGroup | null>(null)
   const [newExercise, setNewExercise] = useState('')
+  const [newExerciseType, setNewExerciseType] = useState<'strength' | 'cardio'>('strength')
   const [open, setOpen] = useState(false)
+  const [editOpen, setEditOpen] = useState(false)
+  const [editingExercise, setEditingExercise] = useState<Exercise | null>(null)
+  const [editExerciseName, setEditExerciseName] = useState('')
+  const [editExerciseType, setEditExerciseType] = useState<'strength' | 'cardio'>('strength')
+  const [message, setMessage] = useState('')
+  const [isError, setIsError] = useState(false)
 
-  const fetchGroup = async () => {
+  const fetchGroup = useCallback(async () => {
     const { data } = await supabase
       .from('muscle_groups')
       .select(`
@@ -37,35 +44,136 @@ export default function MuscleGroupPage() {
         name,
         exercises (
           id,
-          name
+          name,
+          exercise_type
         )
       `)
       .eq('id', muscleGroupId)
       .single()
 
-    setGroup(data)
-  }
+    return data as MuscleGroup | null
+  }, [muscleGroupId])
 
   useEffect(() => {
-    fetchGroup()
-  }, [])
+    let isActive = true
 
-  const addExercise = async () => {
-    if (!newExercise.trim()) return
-
-    await supabase.from('exercises').insert({
-      name: newExercise,
-      muscle_group_id: muscleGroupId,
+    fetchGroup().then((data) => {
+      if (isActive) {
+        setGroup(data)
+      }
     })
 
+    return () => {
+      isActive = false
+    }
+  }, [fetchGroup])
+
+  const refreshGroup = async () => {
+    setGroup(await fetchGroup())
+  }
+
+  const addExercise = async () => {
+    const trimmedName = newExercise.trim()
+
+    if (!trimmedName) return
+
+    setMessage('')
+    setIsError(false)
+
+    const {
+      data: { session },
+    } = await supabase.auth.getSession()
+
+    if (!session) {
+      setIsError(true)
+      setMessage('Sign in before adding an exercise.')
+      return
+    }
+
+    const { error } = await supabase.from('exercises').insert({
+      name: trimmedName,
+      muscle_group_id: muscleGroupId,
+      exercise_type: newExerciseType,
+      user_id: session.user.id,
+    })
+
+    if (error) {
+      setIsError(true)
+      setMessage(
+        error.message.includes('row-level security policy')
+          ? 'Could not add the exercise because database access rules blocked it. Run the exercises RLS policy in Supabase.'
+          : 'Could not add the exercise.',
+      )
+      return
+    }
+
     setNewExercise('')
+    setNewExerciseType('strength')
     setOpen(false)
-    fetchGroup()
+    setMessage(`Added exercise: ${trimmedName}.`)
+    refreshGroup()
   }
 
   const deleteExercise = async (id: string) => {
-    await supabase.from('exercises').delete().eq('id', id)
-    fetchGroup()
+    setMessage('')
+    setIsError(false)
+
+    const { error } = await supabase.from('exercises').delete().eq('id', id)
+
+    if (error) {
+      setIsError(true)
+      setMessage(
+        error.message.includes('row-level security policy')
+          ? 'Could not delete the exercise because database access rules blocked it.'
+          : 'Could not delete the exercise.',
+      )
+      return
+    }
+
+    refreshGroup()
+  }
+
+  const openEditExercise = (exercise: Exercise) => {
+    setEditingExercise(exercise)
+    setEditExerciseName(exercise.name)
+    setEditExerciseType(exercise.exercise_type)
+    setEditOpen(true)
+    setMessage('')
+    setIsError(false)
+  }
+
+  const updateExercise = async () => {
+    const trimmedName = editExerciseName.trim()
+
+    if (!editingExercise || !trimmedName) return
+
+    setMessage('')
+    setIsError(false)
+
+    const { error } = await supabase
+      .from('exercises')
+      .update({
+        name: trimmedName,
+        exercise_type: editExerciseType,
+      })
+      .eq('id', editingExercise.id)
+
+    if (error) {
+      setIsError(true)
+      setMessage(
+        error.message.includes('row-level security policy')
+          ? 'Could not update the exercise because database access rules blocked it.'
+          : 'Could not update the exercise.',
+      )
+      return
+    }
+
+    setEditOpen(false)
+    setEditingExercise(null)
+    setEditExerciseName('')
+    setEditExerciseType('strength')
+    setMessage(`Updated exercise: ${trimmedName}.`)
+    refreshGroup()
   }
 
   if (!group) return (
@@ -81,6 +189,12 @@ export default function MuscleGroupPage() {
           <h1 className={styles.title}>{group.name}</h1>
         </div>
 
+        {message && (
+          <div className={isError ? styles.messageError : styles.messageSuccess}>
+            {message}
+          </div>
+        )}
+
         {group.exercises.length === 0 ? (
           <div className={styles.emptyState}>
             <p className={styles.emptyText}>No exercises yet</p>
@@ -92,7 +206,9 @@ export default function MuscleGroupPage() {
                 key={exercise.id}
                 className={styles.listItem}
               >
-                <span className={styles.exerciseName}>{exercise.name}</span>
+                <span className={styles.exerciseName}>
+                  {exercise.name} - {exercise.exercise_type === 'cardio' ? 'Cardio' : 'Strength'}
+                </span>
                 <DropdownMenu.Root>
                   <DropdownMenu.Trigger asChild>
                     <button
@@ -120,6 +236,12 @@ export default function MuscleGroupPage() {
                     <DropdownMenu.Content className={styles.menuContent}>
                       <DropdownMenu.Item
                         className={styles.menuItem}
+                        onSelect={() => openEditExercise(exercise)}
+                      >
+                        Edit
+                      </DropdownMenu.Item>
+                      <DropdownMenu.Item
+                        className={styles.menuItemDanger}
                         onSelect={() => deleteExercise(exercise.id)}
                       >
                         Delete
@@ -160,6 +282,14 @@ export default function MuscleGroupPage() {
                     }
                   }}
                 />
+                <select
+                  className={styles.input}
+                  value={newExerciseType}
+                  onChange={(e) => setNewExerciseType(e.target.value as 'strength' | 'cardio')}
+                >
+                  <option value="strength">Strength</option>
+                  <option value="cardio">Cardio</option>
+                </select>
                 <div className={styles.dialogActions}>
                   <Dialog.Close asChild>
                     <button className={styles.ghostButton}>
@@ -171,6 +301,55 @@ export default function MuscleGroupPage() {
                     className={styles.primaryButton}
                   >
                     Add
+                  </button>
+                </div>
+              </div>
+            </Dialog.Content>
+          </Dialog.Portal>
+        </Dialog.Root>
+
+        <Dialog.Root open={editOpen} onOpenChange={setEditOpen}>
+          <Dialog.Portal>
+            <Dialog.Overlay className={styles.overlay} />
+            <Dialog.Content className={styles.dialogContent}>
+              <Dialog.Title className={styles.dialogTitle}>
+                Edit Exercise
+              </Dialog.Title>
+              <Dialog.Description className={styles.dialogDescription}>
+                Update the exercise name and type.
+              </Dialog.Description>
+              <div className={styles.dialogBody}>
+                <input
+                  className={styles.input}
+                  placeholder="e.g. Biceps Curls"
+                  value={editExerciseName}
+                  onChange={(e) => setEditExerciseName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      updateExercise()
+                    }
+                  }}
+                />
+                <select
+                  className={styles.input}
+                  value={editExerciseType}
+                  onChange={(e) => setEditExerciseType(e.target.value as 'strength' | 'cardio')}
+                >
+                  <option value="strength">Strength</option>
+                  <option value="cardio">Cardio</option>
+                </select>
+                <div className={styles.dialogActions}>
+                  <Dialog.Close asChild>
+                    <button type="button" className={styles.ghostButton}>
+                      Cancel
+                    </button>
+                  </Dialog.Close>
+                  <button
+                    type="button"
+                    onClick={updateExercise}
+                    className={styles.primaryButton}
+                  >
+                    Save
                   </button>
                 </div>
               </div>

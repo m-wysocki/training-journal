@@ -1,13 +1,52 @@
+'use client'
+
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import type { User } from '@supabase/supabase-js'
 import { routes } from '@/lib/routes'
 import PageContainer from '@/components/PageContainer'
+import { supabase } from '@/lib/supabase'
 import styles from './page.module.scss'
 
 export default function Home() {
+  const [user, setUser] = useState<User | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null)
+      setLoading(false)
+    })
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null)
+      setLoading(false)
+    })
+
+    return () => subscription.unsubscribe()
+  }, [])
+
   return (
     <PageContainer className={styles.container}>
       <h1 className={styles.title}>Training Journal</h1>
-      
+
+      {!loading && !user ? (
+        <section className={styles.signedOutPanel}>
+          <h2 className={styles.signedOutTitle}>Sign in to see your training data</h2>
+          <p className={styles.signedOutText}>
+            Create an account or sign in to add muscle groups, log exercises, and review your workouts.
+          </p>
+          <Link href="/login" className={styles.signInLink}>
+            Sign In or Create Account
+          </Link>
+        </section>
+      ) : null}
+
+      {loading ? (
+        <p className={styles.loadingText}>Loading...</p>
+      ) : user ? (
       <div className={styles.list}>
         {routes.map((route) => (
           <Link
@@ -41,6 +80,7 @@ export default function Home() {
           </Link>
         ))}
       </div>
+      ) : null}
     </PageContainer>
   )
 }

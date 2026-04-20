@@ -14,18 +14,23 @@ type MuscleGroup = {
   name: string
 }
 
+export type ExerciseType = 'strength' | 'cardio'
+
 type Exercise = {
   id: string
   name: string
   muscle_group_id: string
+  exercise_type: ExerciseType
 }
 
 export type CompletedExerciseFormValues = {
   muscleGroupId: string
   exerciseId: string
-  sets: number
-  repsPerSet: number[]
+  sets: number | null
+  repsPerSet: number[] | null
   loadKg: number | null
+  distanceKm: number | null
+  paceMinPerKm: number | null
   note: string
   performedAt: string
 }
@@ -48,7 +53,23 @@ const MAX_REPS = 30
 const MIN_LOAD_KG = 2.5
 const MAX_LOAD_KG = 400
 const LOAD_STEP_KG = 0.5
+export const DEFAULT_LOAD_KG = 11.5
 const DEFAULT_REPS = 12
+const DEFAULT_DISTANCE_KM = 5
+const MIN_DISTANCE_KM = 0.1
+const MAX_DISTANCE_KM = 999
+const DISTANCE_STEP_KM = 0.1
+const DEFAULT_PACE_MIN_PER_KM = 6
+const MIN_PACE_MIN_PER_KM = 1
+const MAX_PACE_MIN_PER_KM = 60
+const PACE_STEP_MIN_PER_KM = 0.05
+
+const formatPace = (paceMinPerKm: number) => {
+  const totalSeconds = Math.round(paceMinPerKm * 60)
+  const minutes = Math.floor(totalSeconds / 60)
+  const seconds = totalSeconds % 60
+  return `${minutes}:${String(seconds).padStart(2, '0')} min/km`
+}
 
 export function CompletedExerciseForm({
   mode,
@@ -67,10 +88,13 @@ export function CompletedExerciseForm({
   const [selectedExerciseId, setSelectedExerciseId] = useState(initialValues.exerciseId)
   const [newMuscleGroupName, setNewMuscleGroupName] = useState('')
   const [newExerciseName, setNewExerciseName] = useState('')
-  const [sets, setSets] = useState(initialValues.sets)
-  const [repsPerSet, setRepsPerSet] = useState<number[]>(initialValues.repsPerSet)
-  const [loadKg, setLoadKg] = useState<number>(initialValues.loadKg ?? MIN_LOAD_KG)
+  const [newExerciseType, setNewExerciseType] = useState<ExerciseType>('strength')
+  const [sets, setSets] = useState(initialValues.sets ?? 3)
+  const [repsPerSet, setRepsPerSet] = useState<number[]>(initialValues.repsPerSet ?? [12, 12, 12])
+  const [loadKg, setLoadKg] = useState<number>(initialValues.loadKg ?? DEFAULT_LOAD_KG)
   const [hasLoad, setHasLoad] = useState(initialValues.loadKg !== null)
+  const [distanceKm, setDistanceKm] = useState(initialValues.distanceKm ?? DEFAULT_DISTANCE_KM)
+  const [paceMinPerKm, setPaceMinPerKm] = useState(initialValues.paceMinPerKm ?? DEFAULT_PACE_MIN_PER_KM)
   const [note, setNote] = useState(initialValues.note)
   const [performedAt, setPerformedAt] = useState(initialValues.performedAt)
   const [message, setMessage] = useState('')
@@ -86,7 +110,7 @@ export function CompletedExerciseForm({
 
     Promise.all([
       supabase.from('muscle_groups').select('id, name').order('created_at'),
-      supabase.from('exercises').select('id, name, muscle_group_id').order('created_at'),
+      supabase.from('exercises').select('id, name, muscle_group_id, exercise_type').order('created_at'),
     ]).then(([groupsResult, exercisesResult]) => {
       if (!isActive) return
 
@@ -109,6 +133,14 @@ export function CompletedExerciseForm({
     () => exercises.filter((exercise) => exercise.muscle_group_id === selectedMuscleGroupId),
     [exercises, selectedMuscleGroupId],
   )
+
+  const selectedExercise = useMemo(
+    () => exercises.find((exercise) => exercise.id === selectedExerciseId) ?? null,
+    [exercises, selectedExerciseId],
+  )
+
+  const selectedExerciseType = selectedExercise?.exercise_type ?? 'strength'
+  const isStrengthExercise = selectedExerciseType === 'strength'
 
   const handleSetsChange = (value: string) => {
     const parsed = Number(value)
@@ -149,9 +181,23 @@ export function CompletedExerciseForm({
     setMessage('')
     setIsError(false)
 
+    const {
+      data: { session },
+    } = await supabase.auth.getSession()
+
+    if (!session) {
+      setIsError(true)
+      setMessage('Sign in before adding a muscle group.')
+      setIsAddingMuscleGroup(false)
+      return
+    }
+
     const { data, error } = await supabase
       .from('muscle_groups')
-      .insert({ name: trimmedName })
+      .insert({
+        name: trimmedName,
+        user_id: session.user.id,
+      })
       .select('id, name')
       .single()
 
@@ -159,7 +205,11 @@ export function CompletedExerciseForm({
 
     if (error || !data) {
       setIsError(true)
-      setMessage('Could not add the muscle group.')
+      setMessage(
+        error?.message.includes('row-level security policy')
+          ? 'Could not add the muscle group because database access rules blocked it. Run the muscle_groups RLS policy in Supabase.'
+          : 'Could not add the muscle group.',
+      )
       return
     }
 
@@ -190,26 +240,44 @@ export function CompletedExerciseForm({
     setMessage('')
     setIsError(false)
 
+    const {
+      data: { session },
+    } = await supabase.auth.getSession()
+
+    if (!session) {
+      setIsError(true)
+      setMessage('Sign in before adding an exercise.')
+      setIsAddingExercise(false)
+      return
+    }
+
     const { data, error } = await supabase
       .from('exercises')
       .insert({
         name: trimmedName,
         muscle_group_id: selectedMuscleGroupId,
+        exercise_type: newExerciseType,
+        user_id: session.user.id,
       })
-      .select('id, name, muscle_group_id')
+      .select('id, name, muscle_group_id, exercise_type')
       .single()
 
     setIsAddingExercise(false)
 
     if (error || !data) {
       setIsError(true)
-      setMessage('Could not add the exercise.')
+      setMessage(
+        error?.message.includes('row-level security policy')
+          ? 'Could not add the exercise because database access rules blocked it. Run the exercises RLS policy in Supabase.'
+          : 'Could not add the exercise.',
+      )
       return
     }
 
     setExercises((current) => [...current, data])
     setSelectedExerciseId(data.id)
     setNewExerciseName('')
+    setNewExerciseType('strength')
     setIsExerciseDialogOpen(false)
     setMessage(`Added exercise: ${data.name}.`)
   }
@@ -226,18 +294,26 @@ export function CompletedExerciseForm({
     }
 
     const hasInvalidReps = repsPerSet.some((rep) => rep < MIN_REPS || rep > MAX_REPS)
-    const hasInvalidLoad =
-      hasLoad && (loadKg < MIN_LOAD_KG || !Number.isInteger(loadKg / LOAD_STEP_KG))
+    const hasInvalidLoad = hasLoad && (loadKg < MIN_LOAD_KG || !Number.isInteger(loadKg / LOAD_STEP_KG))
+    const hasInvalidDistance = distanceKm < MIN_DISTANCE_KM || distanceKm > MAX_DISTANCE_KM
+    const hasInvalidPace =
+      paceMinPerKm < MIN_PACE_MIN_PER_KM || paceMinPerKm > MAX_PACE_MIN_PER_KM
 
-    if (
+    if (isStrengthExercise && (
       sets < MIN_SETS ||
       sets > MAX_SETS ||
       hasInvalidReps ||
       repsPerSet.length !== sets ||
       hasInvalidLoad
-    ) {
+    )) {
       setIsError(true)
       setMessage('Check the allowed ranges for sets, reps, and load.')
+      return
+    }
+
+    if (!isStrengthExercise && (hasInvalidDistance || hasInvalidPace)) {
+      setIsError(true)
+      setMessage('Check the allowed ranges for distance and pace.')
       return
     }
 
@@ -246,9 +322,11 @@ export function CompletedExerciseForm({
     const result = await onSubmit({
       muscleGroupId: selectedMuscleGroupId,
       exerciseId: selectedExerciseId,
-      sets,
-      repsPerSet,
-      loadKg: hasLoad ? loadKg : null,
+      sets: isStrengthExercise ? sets : null,
+      repsPerSet: isStrengthExercise ? repsPerSet : null,
+      loadKg: isStrengthExercise && hasLoad ? loadKg : null,
+      distanceKm: isStrengthExercise ? null : distanceKm,
+      paceMinPerKm: isStrengthExercise ? null : paceMinPerKm,
       note: note.trim(),
       performedAt,
     })
@@ -410,6 +488,18 @@ export function CompletedExerciseForm({
                             }
                           }}
                         />
+                        <label htmlFor="newExerciseType" className={styles.label}>
+                          Type
+                        </label>
+                        <select
+                          id="newExerciseType"
+                          className={styles.select}
+                          value={newExerciseType}
+                          onChange={(e) => setNewExerciseType(e.target.value as ExerciseType)}
+                        >
+                          <option value="strength">Strength</option>
+                          <option value="cardio">Cardio</option>
+                        </select>
                         <div className={styles.dialogActions}>
                           <Dialog.Close asChild>
                             <button type="button" className={styles.ghostButton}>
@@ -437,75 +527,115 @@ export function CompletedExerciseForm({
             <div className={styles.sectionHeader}>
               <h2 className={styles.sectionTitle}>Workout Details</h2>
               <p className={styles.sectionDescription}>
-                Set the number of sets, reps, and load for this exercise.
+                {isStrengthExercise
+                  ? 'Set the number of sets, reps, and load for this exercise.'
+                  : 'Set the distance and pace for this cardio exercise.'}
               </p>
             </div>
 
             <div className={styles.sectionBody}>
-              <div className={styles.field}>
-                <label htmlFor="sets" className={styles.label}>
-                  Sets (1-5)
-                </label>
-                <NumericStepper
-                  id="sets"
-                  inputClassName={styles.input}
-                  value={sets}
-                  min={MIN_SETS}
-                  max={MAX_SETS}
-                  onChange={(value) => handleSetsChange(String(value))}
-                />
-              </div>
-
-              <div className={styles.field}>
-                <p className={styles.repsHeading}>Reps Per Set (1-30)</p>
-                <div className={styles.repsGrid}>
-                  {repsPerSet.map((rep, index) => (
-                    <div key={`rep-${index}`} className={styles.repField}>
-                      <label htmlFor={`rep-${index}`} className={styles.repLabel}>
-                        Set {index + 1}
-                      </label>
-                      <NumericStepper
-                        id={`rep-${index}`}
-                        inputClassName={styles.input}
-                        value={rep}
-                        min={MIN_REPS}
-                        max={MAX_REPS}
-                        onChange={(value) => handleRepChange(index, String(value))}
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className={styles.field}>
-                <div className={styles.fieldHeader}>
-                  <label htmlFor="loadKg" className={styles.label}>
-                    Load (kg)
-                  </label>
-                  <label className={styles.checkboxRow}>
-                    <input
-                      type="checkbox"
-                      checked={!hasLoad}
-                      onChange={(e) => setHasLoad(!e.target.checked)}
+              {isStrengthExercise ? (
+                <>
+                  <div className={styles.field}>
+                    <label htmlFor="sets" className={styles.label}>
+                      Sets (1-5)
+                    </label>
+                    <NumericStepper
+                      id="sets"
+                      inputClassName={styles.input}
+                      value={sets}
+                      min={MIN_SETS}
+                      max={MAX_SETS}
+                      onChange={(value) => handleSetsChange(String(value))}
                     />
-                    <span>No Load</span>
-                  </label>
+                  </div>
+
+                  <div className={styles.field}>
+                    <p className={styles.repsHeading}>Reps Per Set (1-30)</p>
+                    <div className={styles.repsGrid}>
+                      {repsPerSet.map((rep, index) => (
+                        <div key={`rep-${index}`} className={styles.repField}>
+                          <label htmlFor={`rep-${index}`} className={styles.repLabel}>
+                            Set {index + 1}
+                          </label>
+                          <NumericStepper
+                            id={`rep-${index}`}
+                            inputClassName={styles.input}
+                            value={rep}
+                            min={MIN_REPS}
+                            max={MAX_REPS}
+                            onChange={(value) => handleRepChange(index, String(value))}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className={styles.field}>
+                    <div className={styles.fieldHeader}>
+                      <label htmlFor="loadKg" className={styles.label}>
+                        Load (kg)
+                      </label>
+                      <label className={styles.checkboxRow}>
+                        <input
+                          type="checkbox"
+                          checked={!hasLoad}
+                          onChange={(e) => setHasLoad(!e.target.checked)}
+                        />
+                        <span>No Load</span>
+                      </label>
+                    </div>
+                    {hasLoad ? (
+                      <NumericStepper
+                        id="loadKg"
+                        inputClassName={styles.input}
+                        value={loadKg}
+                        min={MIN_LOAD_KG}
+                        max={MAX_LOAD_KG}
+                        step={LOAD_STEP_KG}
+                        onChange={setLoadKg}
+                        displayValue={`${loadKg.toFixed(1)} kg`}
+                      />
+                    ) : (
+                      <div className={styles.emptyValue}>This exercise will be saved without a load value.</div>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <div className={styles.metricsGrid}>
+                  <div className={styles.field}>
+                    <label htmlFor="distanceKm" className={styles.label}>
+                      Distance (km)
+                    </label>
+                    <NumericStepper
+                      id="distanceKm"
+                      inputClassName={styles.input}
+                      value={distanceKm}
+                      min={MIN_DISTANCE_KM}
+                      max={MAX_DISTANCE_KM}
+                      step={DISTANCE_STEP_KM}
+                      onChange={setDistanceKm}
+                      displayValue={`${distanceKm.toFixed(1)} km`}
+                    />
+                  </div>
+
+                  <div className={styles.field}>
+                    <label htmlFor="paceMinPerKm" className={styles.label}>
+                      Pace (min/km)
+                    </label>
+                    <NumericStepper
+                      id="paceMinPerKm"
+                      inputClassName={styles.input}
+                      value={paceMinPerKm}
+                      min={MIN_PACE_MIN_PER_KM}
+                      max={MAX_PACE_MIN_PER_KM}
+                      step={PACE_STEP_MIN_PER_KM}
+                      onChange={setPaceMinPerKm}
+                      displayValue={formatPace(paceMinPerKm)}
+                    />
+                  </div>
                 </div>
-                {hasLoad ? (
-                  <NumericStepper
-                    id="loadKg"
-                    inputClassName={styles.input}
-                    value={loadKg}
-                    min={MIN_LOAD_KG}
-                    max={MAX_LOAD_KG}
-                    step={LOAD_STEP_KG}
-                    onChange={setLoadKg}
-                    displayValue={`${loadKg.toFixed(1)} kg`}
-                  />
-                ) : (
-                  <div className={styles.emptyValue}>This exercise will be saved without a load value.</div>
-                )}
-              </div>
+              )}
             </div>
           </section>
 
