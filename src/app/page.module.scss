@@ -58,6 +58,29 @@
   color: #4b5563;
 }
 
+.pendingPanel {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1.25rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  background: #f9fafb;
+}
+
+.pendingTitle {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: #000;
+}
+
+.pendingText {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #4b5563;
+}
+
 .card {
   display: block;
   padding: 1rem;

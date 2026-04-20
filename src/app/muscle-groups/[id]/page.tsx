@@ -207,7 +207,7 @@ export default function MuscleGroupPage() {
                 className={styles.listItem}
               >
                 <span className={styles.exerciseName}>
-                  {exercise.name} - {exercise.exercise_type === 'cardio' ? 'Cardio' : 'Strength'}
+                  {exercise.name}
                 </span>
                 <DropdownMenu.Root>
                   <DropdownMenu.Trigger asChild>

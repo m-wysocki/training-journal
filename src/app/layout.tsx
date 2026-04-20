@@ -36,9 +36,6 @@ export default function RootLayout({
                 <span className={styles.brandText}>Training Journal</span>
               </Link>
               <div className={styles.headerActions}>
-                <Link href="/completed-exercises/new" className={styles.headerLink}>
-                  Log Exercise
-                </Link>
                 <AuthButton />
               </div>
             </div>

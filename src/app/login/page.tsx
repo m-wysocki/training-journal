@@ -7,16 +7,15 @@ import BackLink from '@/components/BackLink'
 import PageContainer from '@/components/PageContainer'
 import styles from './page.module.scss'
 
-type AuthMethod = 'magic' | 'password'
 type PasswordMode = 'sign-in' | 'sign-up'
 type MessageType = 'success' | 'error'
 
 export default function LoginPage() {
   const router = useRouter()
-  const [authMethod, setAuthMethod] = useState<AuthMethod>('magic')
   const [passwordMode, setPasswordMode] = useState<PasswordMode>('sign-in')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
   const [messageType, setMessageType] = useState<MessageType>('success')
@@ -26,28 +25,20 @@ export default function LoginPage() {
     setMessageType(nextType)
   }
 
-  const handleMagicLink = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setMessage('')
-
-    try {
-      const { error } = await supabase.auth.signInWithOtp({
-        email,
-        options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
-        },
-      })
-
-      if (error) throw error
-
-      showMessage('Check your inbox. We sent you a magic login link.', 'success')
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'An error occurred while signing in.'
-      showMessage(errorMessage, 'error')
-    } finally {
-      setLoading(false)
+  const handleFormKeyDown = (e: React.KeyboardEvent<HTMLFormElement>) => {
+    if (
+      e.key !== 'Enter' ||
+      e.shiftKey ||
+      e.metaKey ||
+      e.ctrlKey ||
+      e.altKey ||
+      e.nativeEvent.isComposing
+    ) {
+      return
     }
+
+    e.preventDefault()
+    e.currentTarget.requestSubmit()
   }
 
   const handlePasswordAuth = async (e: React.FormEvent) => {
@@ -63,6 +54,12 @@ export default function LoginPage() {
 
     try {
       if (passwordMode === 'sign-up') {
+        if (password !== confirmPassword) {
+          showMessage('Passwords must match.', 'error')
+          setLoading(false)
+          return
+        }
+
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
@@ -73,13 +70,26 @@ export default function LoginPage() {
 
         if (error) throw error
 
+        if (data.user?.email) {
+          await fetch('/api/auth/new-user', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              email: data.user.email,
+              userId: data.user.id,
+            }),
+          })
+        }
+
         if (data.session) {
           router.push('/')
           router.refresh()
           return
         }
 
-        showMessage('Account created. Check your inbox to confirm your email address.', 'success')
+        showMessage('Account created. Check your inbox to confirm your email address. Access starts after admin approval.', 'success')
         return
       }
 
@@ -107,60 +117,37 @@ export default function LoginPage() {
           <BackLink href="/" label="← Back to Home" />
           <h1 className={styles.title}>Sign In</h1>
           <p className={styles.description}>
-            Use a magic link or sign in with your email and password.
+            Sign in with your email and password or request a new account.
           </p>
         </div>
 
-        <div className={styles.methodTabs}>
+        <div className={styles.modeTabs}>
           <button
             type="button"
-            className={`${styles.methodTab} ${authMethod === 'magic' ? styles.methodTabActive : ''}`}
+            className={`${styles.modeTab} ${passwordMode === 'sign-in' ? styles.modeTabActive : ''}`}
             onClick={() => {
-              setAuthMethod('magic')
+              setPasswordMode('sign-in')
+              setConfirmPassword('')
               setMessage('')
             }}
           >
-            Magic Link
+            Sign In
           </button>
           <button
             type="button"
-            className={`${styles.methodTab} ${authMethod === 'password' ? styles.methodTabActive : ''}`}
+            className={`${styles.modeTab} ${passwordMode === 'sign-up' ? styles.modeTabActive : ''}`}
             onClick={() => {
-              setAuthMethod('password')
+              setPasswordMode('sign-up')
               setMessage('')
             }}
           >
-            Password
+            Create Account
           </button>
         </div>
 
-        {authMethod === 'password' && (
-          <div className={styles.modeTabs}>
-            <button
-              type="button"
-              className={`${styles.modeTab} ${passwordMode === 'sign-in' ? styles.modeTabActive : ''}`}
-              onClick={() => {
-                setPasswordMode('sign-in')
-                setMessage('')
-              }}
-            >
-              Sign In
-            </button>
-            <button
-              type="button"
-              className={`${styles.modeTab} ${passwordMode === 'sign-up' ? styles.modeTabActive : ''}`}
-              onClick={() => {
-                setPasswordMode('sign-up')
-                setMessage('')
-              }}
-            >
-              Create Account
-            </button>
-          </div>
-        )}
-
         <form
-          onSubmit={authMethod === 'magic' ? handleMagicLink : handlePasswordAuth}
+          onSubmit={handlePasswordAuth}
+          onKeyDown={handleFormKeyDown}
           className={styles.form}
         >
           <div>
@@ -178,23 +165,39 @@ export default function LoginPage() {
             />
           </div>
 
-          {authMethod === 'password' && (
+          <div>
+            <label htmlFor="password" className={styles.label}>
+              Password
+            </label>
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="At least 6 characters"
+              required
+              minLength={6}
+              className={styles.input}
+            />
+          </div>
+
+          {passwordMode === 'sign-up' ? (
             <div>
-              <label htmlFor="password" className={styles.label}>
-                Password
+              <label htmlFor="confirmPassword" className={styles.label}>
+                Repeat Password
               </label>
               <input
-                id="password"
+                id="confirmPassword"
                 type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="At least 6 characters"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Repeat your password"
                 required
                 minLength={6}
                 className={styles.input}
               />
             </div>
-          )}
+          ) : null}
 
           {message && (
             <div
@@ -211,9 +214,7 @@ export default function LoginPage() {
           >
             {loading
               ? 'Please wait...'
-              : authMethod === 'magic'
-                ? 'Send Magic Link'
-                : passwordMode === 'sign-up'
+              : passwordMode === 'sign-up'
                   ? 'Create Account'
                   : 'Sign In'}
           </button>
