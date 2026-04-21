@@ -10,13 +10,13 @@ import styles from './page.module.scss'
 type WeeklyEntry = {
   performed_at: string
   exercise: {
-    muscle_group: {
+    exercise_category: {
       name: string
     } | null
   } | null
 }
 
-type MuscleGroupStat = {
+type ExerciseCategoryStat = {
   name: string
   trainingDays: number
 }
@@ -96,7 +96,7 @@ export default function StatsPage() {
         `
           performed_at,
           exercise:exercises (
-            muscle_group:muscle_groups (
+            exercise_category:exercise_categories (
               name
             )
           )
@@ -126,14 +126,14 @@ export default function StatsPage() {
 
   const workoutDaysCount = useMemo(() => new Set(entries.map((entry) => entry.performed_at)).size, [entries])
 
-  const muscleGroupStats = useMemo<MuscleGroupStat[]>(() => {
+  const exerciseCategoryStats = useMemo<ExerciseCategoryStat[]>(() => {
     const groups = new Map<string, Set<string>>()
 
     entries.forEach((entry) => {
-      const muscleGroupName = entry.exercise?.muscle_group?.name || 'Unknown muscle group'
-      const current = groups.get(muscleGroupName) || new Set<string>()
+      const exerciseCategoryName = entry.exercise?.exercise_category?.name || 'Unknown exercise category'
+      const current = groups.get(exerciseCategoryName) || new Set<string>()
       current.add(entry.performed_at)
-      groups.set(muscleGroupName, current)
+      groups.set(exerciseCategoryName, current)
     })
 
     return Array.from(groups.entries())
@@ -151,7 +151,7 @@ export default function StatsPage() {
           <BackLink href="/" label="← Back to Home" />
           <h1 className={styles.title}>Statistics</h1>
           <p className={styles.description}>
-            Review your training week from Monday to Sunday and see how often you trained each muscle group.
+            Review your training week from Monday to Sunday and see how often you trained each exercise category.
           </p>
         </div>
 
@@ -201,22 +201,22 @@ export default function StatsPage() {
 
             <section className={styles.breakdownCard}>
               <div className={styles.breakdownHeader}>
-                <h2 className={styles.breakdownTitle}>Muscle Group Frequency</h2>
+                <h2 className={styles.breakdownTitle}>Exercise Category Frequency</h2>
                 <p className={styles.breakdownDescription}>
-                  Counted as distinct training days per muscle group within the week.
+                  Counted as distinct training days per exercise category within the week.
                 </p>
               </div>
 
               {loading ? (
                 <p className={styles.emptyText}>Loading statistics...</p>
-              ) : muscleGroupStats.length === 0 ? (
+              ) : exerciseCategoryStats.length === 0 ? (
                 <p className={styles.emptyText}>No workouts logged for this week.</p>
               ) : (
                 <ul className={styles.breakdownList}>
-                  {muscleGroupStats.map((stat) => (
+                  {exerciseCategoryStats.map((stat) => (
                     <li key={stat.name} className={styles.breakdownItem}>
-                      <span className={styles.muscleGroupName}>{stat.name}</span>
-                      <span className={styles.muscleGroupValue}>
+                      <span className={styles.exerciseCategoryName}>{stat.name}</span>
+                      <span className={styles.exerciseCategoryValue}>
                         {stat.trainingDays} {stat.trainingDays === 1 ? 'day' : 'days'}
                       </span>
                     </li>

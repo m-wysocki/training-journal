@@ -60,32 +60,32 @@ create policy user_access_authenticated_select
   to authenticated
   using (user_id = auth.uid());
 
-drop policy if exists muscle_groups_authenticated_select on public.muscle_groups;
-drop policy if exists muscle_groups_authenticated_insert on public.muscle_groups;
-drop policy if exists muscle_groups_authenticated_update on public.muscle_groups;
-drop policy if exists muscle_groups_authenticated_delete on public.muscle_groups;
+drop policy if exists exercise_categories_authenticated_select on public.exercise_categories;
+drop policy if exists exercise_categories_authenticated_insert on public.exercise_categories;
+drop policy if exists exercise_categories_authenticated_update on public.exercise_categories;
+drop policy if exists exercise_categories_authenticated_delete on public.exercise_categories;
 
-create policy muscle_groups_authenticated_select
-  on public.muscle_groups
+create policy exercise_categories_authenticated_select
+  on public.exercise_categories
   for select
   to authenticated
   using (user_id = auth.uid() and public.current_user_is_approved());
 
-create policy muscle_groups_authenticated_insert
-  on public.muscle_groups
+create policy exercise_categories_authenticated_insert
+  on public.exercise_categories
   for insert
   to authenticated
   with check (user_id = auth.uid() and public.current_user_is_approved());
 
-create policy muscle_groups_authenticated_update
-  on public.muscle_groups
+create policy exercise_categories_authenticated_update
+  on public.exercise_categories
   for update
   to authenticated
   using (user_id = auth.uid() and public.current_user_is_approved())
   with check (user_id = auth.uid() and public.current_user_is_approved());
 
-create policy muscle_groups_authenticated_delete
-  on public.muscle_groups
+create policy exercise_categories_authenticated_delete
+  on public.exercise_categories
   for delete
   to authenticated
   using (user_id = auth.uid() and public.current_user_is_approved());
@@ -110,9 +110,9 @@ create policy exercises_authenticated_insert
     and public.current_user_is_approved()
     and exists (
       select 1
-      from public.muscle_groups
-      where muscle_groups.id = exercises.muscle_group_id
-        and muscle_groups.user_id = auth.uid()
+      from public.exercise_categories
+      where exercise_categories.id = exercises.exercise_category_id
+        and exercise_categories.user_id = auth.uid()
     )
   );
 
@@ -126,9 +126,9 @@ create policy exercises_authenticated_update
     and public.current_user_is_approved()
     and exists (
       select 1
-      from public.muscle_groups
-      where muscle_groups.id = exercises.muscle_group_id
-        and muscle_groups.user_id = auth.uid()
+      from public.exercise_categories
+      where exercise_categories.id = exercises.exercise_category_id
+        and exercise_categories.user_id = auth.uid()
     )
   );
 

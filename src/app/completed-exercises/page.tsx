@@ -16,6 +16,7 @@ type CompletedExerciseRow = {
   performed_at: string
   sets: number | null
   reps_per_set: number[] | null
+  duration_per_set_seconds: number[] | null
   load_kg: number | null
   distance_km: number | null
   pace_min_per_km: number | null
@@ -23,9 +24,9 @@ type CompletedExerciseRow = {
   exercise: {
     id: string
     name: string
-    muscle_group_id: string
+    exercise_category_id: string
     exercise_type: 'strength' | 'cardio'
-    muscle_group: {
+    exercise_category: {
       name: string
     } | null
   } | null
@@ -33,7 +34,7 @@ type CompletedExerciseRow = {
 
 type DayGroup = {
   date: string
-  muscleGroups: {
+  exerciseCategories: {
     name: string
     entries: CompletedExerciseRow[]
   }[]
@@ -53,6 +54,15 @@ const formatPace = (paceMinPerKm: number) => {
   return `${minutes}:${String(seconds).padStart(2, '0')} min/km`
 }
 
+const formatDuration = (seconds: number) => {
+  if (seconds < 60) return `${seconds}s`
+
+  const minutes = Math.floor(seconds / 60)
+  const remainingSeconds = seconds % 60
+
+  return remainingSeconds === 0 ? `${minutes}m` : `${minutes}:${String(remainingSeconds).padStart(2, '0')}`
+}
+
 const formatEntryDetails = (entry: CompletedExerciseRow) => {
   if (entry.exercise?.exercise_type === 'cardio') {
     const details = []
@@ -70,8 +80,13 @@ const formatEntryDetails = (entry: CompletedExerciseRow) => {
 
   const details = [
     `Sets: ${entry.sets ?? '-'}`,
-    `Reps: ${entry.reps_per_set?.join(' / ') ?? '-'}`,
   ]
+
+  if (entry.duration_per_set_seconds?.length) {
+    details.push(`Time: ${entry.duration_per_set_seconds.map(formatDuration).join(' / ')}`)
+  } else {
+    details.push(`Reps: ${entry.reps_per_set?.join(' / ') ?? '-'}`)
+  }
 
   if (entry.load_kg !== null) {
     details.push(`Load: ${Number(entry.load_kg)} kg`)
@@ -84,7 +99,7 @@ export default function CompletedExercisesPage() {
   const router = useRouter()
   const [entries, setEntries] = useState<CompletedExerciseRow[]>([])
   const [errorMessage, setErrorMessage] = useState('')
-  const [selectedMuscleGroup, setSelectedMuscleGroup] = useState('all')
+  const [selectedExerciseCategory, setSelectedExerciseCategory] = useState('all')
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [deletingEntryId, setDeletingEntryId] = useState<string | null>(null)
   const [deleteLoading, setDeleteLoading] = useState(false)
@@ -99,6 +114,7 @@ export default function CompletedExercisesPage() {
           performed_at,
           sets,
           reps_per_set,
+          duration_per_set_seconds,
           load_kg,
           distance_km,
           pace_min_per_km,
@@ -106,9 +122,9 @@ export default function CompletedExercisesPage() {
           exercise:exercises (
             id,
             name,
-            muscle_group_id,
+            exercise_category_id,
             exercise_type,
-            muscle_group:muscle_groups (
+            exercise_category:exercise_categories (
               name
             )
           )
@@ -131,22 +147,22 @@ export default function CompletedExercisesPage() {
     loadData()
   }, [loadData])
 
-  const muscleGroupOptions = useMemo(
+  const exerciseCategoryOptions = useMemo(
     () =>
       Array.from(
-        new Set(entries.map((entry) => entry.exercise?.muscle_group?.name || 'Unknown muscle group')),
+        new Set(entries.map((entry) => entry.exercise?.exercise_category?.name || 'Unknown exercise category')),
       ).sort((a, b) => a.localeCompare(b)),
     [entries],
   )
 
   const filteredEntries = useMemo(
     () =>
-      selectedMuscleGroup === 'all'
+      selectedExerciseCategory === 'all'
         ? entries
         : entries.filter(
-            (entry) => (entry.exercise?.muscle_group?.name || 'Unknown muscle group') === selectedMuscleGroup,
+            (entry) => (entry.exercise?.exercise_category?.name || 'Unknown exercise category') === selectedExerciseCategory,
           ),
-    [entries, selectedMuscleGroup],
+    [entries, selectedExerciseCategory],
   )
 
   const groupedByDate = useMemo<DayGroup[]>(() => {
@@ -158,17 +174,17 @@ export default function CompletedExercisesPage() {
     })
 
     return Array.from(map.entries()).map(([date, dayEntries]) => {
-      const muscleGroupMap = new Map<string, CompletedExerciseRow[]>()
+      const exerciseCategoryMap = new Map<string, CompletedExerciseRow[]>()
 
       dayEntries.forEach((entry) => {
-        const muscleGroupName = entry.exercise?.muscle_group?.name || 'Unknown muscle group'
-        const current = muscleGroupMap.get(muscleGroupName) || []
-        muscleGroupMap.set(muscleGroupName, [...current, entry])
+        const exerciseCategoryName = entry.exercise?.exercise_category?.name || 'Unknown exercise category'
+        const current = exerciseCategoryMap.get(exerciseCategoryName) || []
+        exerciseCategoryMap.set(exerciseCategoryName, [...current, entry])
       })
 
       return {
         date,
-        muscleGroups: Array.from(muscleGroupMap.entries()).map(([name, groupedEntries]) => ({
+        exerciseCategories: Array.from(exerciseCategoryMap.entries()).map(([name, groupedEntries]) => ({
           name,
           entries: groupedEntries,
         })),
@@ -219,19 +235,19 @@ export default function CompletedExercisesPage() {
         </div>
 
         <div className={styles.filtersBar}>
-          <label htmlFor="muscleGroupFilter" className={styles.filterLabel}>
-            Muscle Group
+          <label htmlFor="exerciseCategoryFilter" className={styles.filterLabel}>
+            Exercise Category
           </label>
           <select
-            id="muscleGroupFilter"
+            id="exerciseCategoryFilter"
             className={styles.filterSelect}
-            value={selectedMuscleGroup}
-            onChange={(e) => setSelectedMuscleGroup(e.target.value)}
+            value={selectedExerciseCategory}
+            onChange={(e) => setSelectedExerciseCategory(e.target.value)}
           >
-            <option value="all">All muscle groups</option>
-            {muscleGroupOptions.map((muscleGroup) => (
-              <option key={muscleGroup} value={muscleGroup}>
-                {muscleGroup}
+            <option value="all">All exercise categories</option>
+            {exerciseCategoryOptions.map((exerciseCategory) => (
+              <option key={exerciseCategory} value={exerciseCategory}>
+                {exerciseCategory}
               </option>
             ))}
           </select>
@@ -247,12 +263,12 @@ export default function CompletedExercisesPage() {
           {groupedByDate.map((group) => (
             <section key={group.date} className={styles.dayCard}>
               <h2 className={styles.dayTitle}>{formatDate(group.date)}</h2>
-              <div className={styles.muscleGroupSections}>
-                {group.muscleGroups.map((muscleGroup) => (
-                  <section key={`${group.date}-${muscleGroup.name}`} className={styles.muscleGroupSection}>
-                    <h3 className={styles.muscleGroupHeading}>{muscleGroup.name}</h3>
+              <div className={styles.exerciseCategorySections}>
+                {group.exerciseCategories.map((exerciseCategory) => (
+                  <section key={`${group.date}-${exerciseCategory.name}`} className={styles.exerciseCategorySection}>
+                    <h3 className={styles.exerciseCategoryHeading}>{exerciseCategory.name}</h3>
                     <ul className={styles.entriesList}>
-                      {muscleGroup.entries.map((entry) => (
+                      {exerciseCategory.entries.map((entry) => (
                         <li key={entry.id} className={styles.entryItem}>
                           <div className={styles.entryRow}>
                             <div className={styles.entryMain}>

@@ -48,7 +48,7 @@ export default function Home() {
         <section className={styles.signedOutPanel}>
           <h2 className={styles.signedOutTitle}>Sign in to see your training data</h2>
           <p className={styles.signedOutText}>
-            Create an account or sign in to add muscle groups, log exercises, and review your workouts.
+            Create an account or sign in to add exercise categories, log exercises, and review your workouts.
           </p>
           <Link href="/login" className={styles.signInLink}>
             Sign In or Create Account

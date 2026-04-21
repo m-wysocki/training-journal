@@ -9,25 +9,27 @@ import { NumericStepper } from '@/components/NumericStepper'
 import PageContainer from '@/components/PageContainer'
 import styles from './CompletedExerciseForm.module.scss'
 
-type MuscleGroup = {
+type ExerciseCategory = {
   id: string
   name: string
 }
 
 export type ExerciseType = 'strength' | 'cardio'
+type StrengthDetailMode = 'reps' | 'time'
 
 type Exercise = {
   id: string
   name: string
-  muscle_group_id: string
+  exercise_category_id: string
   exercise_type: ExerciseType
 }
 
 export type CompletedExerciseFormValues = {
-  muscleGroupId: string
+  exerciseCategoryId: string
   exerciseId: string
   sets: number | null
   repsPerSet: number[] | null
+  durationPerSetSeconds: number[] | null
   loadKg: number | null
   distanceKm: number | null
   paceMinPerKm: number | null
@@ -55,6 +57,9 @@ const MAX_LOAD_KG = 400
 const LOAD_STEP_KG = 0.5
 export const DEFAULT_LOAD_KG = 11.5
 const DEFAULT_REPS = 12
+const DEFAULT_DURATION_SECONDS = 40
+const MIN_DURATION_SECONDS = 1
+const MAX_DURATION_SECONDS = 3600
 const DEFAULT_DISTANCE_KM = 5
 const MIN_DISTANCE_KM = 0.1
 const MAX_DISTANCE_KM = 999
@@ -71,6 +76,15 @@ const formatPace = (paceMinPerKm: number) => {
   return `${minutes}:${String(seconds).padStart(2, '0')} min/km`
 }
 
+const formatDuration = (seconds: number) => {
+  if (seconds < 60) return `${seconds}s`
+
+  const minutes = Math.floor(seconds / 60)
+  const remainingSeconds = seconds % 60
+
+  return remainingSeconds === 0 ? `${minutes}m` : `${minutes}:${String(remainingSeconds).padStart(2, '0')}`
+}
+
 export function CompletedExerciseForm({
   mode,
   title,
@@ -82,15 +96,21 @@ export function CompletedExerciseForm({
   onSuccess,
 }: CompletedExerciseFormProps) {
   const router = useRouter()
-  const [muscleGroups, setMuscleGroups] = useState<MuscleGroup[]>([])
+  const [exerciseCategories, setExerciseCategories] = useState<ExerciseCategory[]>([])
   const [exercises, setExercises] = useState<Exercise[]>([])
-  const [selectedMuscleGroupId, setSelectedMuscleGroupId] = useState(initialValues.muscleGroupId)
+  const [selectedExerciseCategoryId, setSelectedExerciseCategoryId] = useState(initialValues.exerciseCategoryId)
   const [selectedExerciseId, setSelectedExerciseId] = useState(initialValues.exerciseId)
-  const [newMuscleGroupName, setNewMuscleGroupName] = useState('')
+  const [newExerciseCategoryName, setNewExerciseCategoryName] = useState('')
   const [newExerciseName, setNewExerciseName] = useState('')
   const [newExerciseType, setNewExerciseType] = useState<ExerciseType>('strength')
+  const [strengthDetailMode, setStrengthDetailMode] = useState<StrengthDetailMode>(
+    initialValues.durationPerSetSeconds ? 'time' : 'reps',
+  )
   const [sets, setSets] = useState(initialValues.sets ?? 3)
   const [repsPerSet, setRepsPerSet] = useState<number[]>(initialValues.repsPerSet ?? [12, 12, 12])
+  const [durationPerSetSeconds, setDurationPerSetSeconds] = useState<number[]>(
+    initialValues.durationPerSetSeconds ?? [40, 40, 40],
+  )
   const [loadKg, setLoadKg] = useState<number>(initialValues.loadKg ?? DEFAULT_LOAD_KG)
   const [hasLoad, setHasLoad] = useState(initialValues.loadKg !== null)
   const [distanceKm, setDistanceKm] = useState(initialValues.distanceKm ?? DEFAULT_DISTANCE_KM)
@@ -100,27 +120,27 @@ export function CompletedExerciseForm({
   const [message, setMessage] = useState('')
   const [isError, setIsError] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [isAddingMuscleGroup, setIsAddingMuscleGroup] = useState(false)
+  const [isAddingExerciseCategory, setIsAddingExerciseCategory] = useState(false)
   const [isAddingExercise, setIsAddingExercise] = useState(false)
-  const [isMuscleGroupDialogOpen, setIsMuscleGroupDialogOpen] = useState(false)
+  const [isExerciseCategoryDialogOpen, setIsExerciseCategoryDialogOpen] = useState(false)
   const [isExerciseDialogOpen, setIsExerciseDialogOpen] = useState(false)
 
   useEffect(() => {
     let isActive = true
 
     Promise.all([
-      supabase.from('muscle_groups').select('id, name').order('created_at'),
-      supabase.from('exercises').select('id, name, muscle_group_id, exercise_type').order('created_at'),
-    ]).then(([groupsResult, exercisesResult]) => {
+      supabase.from('exercise_categories').select('id, name').order('created_at'),
+      supabase.from('exercises').select('id, name, exercise_category_id, exercise_type').order('created_at'),
+    ]).then(([categoriesResult, exercisesResult]) => {
       if (!isActive) return
 
-      if (groupsResult.error || exercisesResult.error) {
+      if (categoriesResult.error || exercisesResult.error) {
         setIsError(true)
         setMessage('Could not load data. Please try again.')
         return
       }
 
-      setMuscleGroups(groupsResult.data || [])
+      setExerciseCategories(categoriesResult.data || [])
       setExercises(exercisesResult.data || [])
     })
 
@@ -130,8 +150,8 @@ export function CompletedExerciseForm({
   }, [])
 
   const filteredExercises = useMemo(
-    () => exercises.filter((exercise) => exercise.muscle_group_id === selectedMuscleGroupId),
-    [exercises, selectedMuscleGroupId],
+    () => exercises.filter((exercise) => exercise.exercise_category_id === selectedExerciseCategoryId),
+    [exercises, selectedExerciseCategoryId],
   )
 
   const selectedExercise = useMemo(
@@ -154,6 +174,16 @@ export function CompletedExerciseForm({
 
       return [...current, ...Array.from({ length: nextSets - current.length }, () => DEFAULT_REPS)]
     })
+    setDurationPerSetSeconds((current) => {
+      if (nextSets <= current.length) {
+        return current.slice(0, nextSets)
+      }
+
+      return [
+        ...current,
+        ...Array.from({ length: nextSets - current.length }, () => DEFAULT_DURATION_SECONDS),
+      ]
+    })
   }
 
   const handleRepChange = (index: number, value: string) => {
@@ -168,16 +198,27 @@ export function CompletedExerciseForm({
     )
   }
 
-  const handleAddMuscleGroup = async () => {
-    const trimmedName = newMuscleGroupName.trim()
+  const handleDurationChange = (index: number, value: number) => {
+    const nextDuration = Math.min(MAX_DURATION_SECONDS, Math.max(MIN_DURATION_SECONDS, value))
+
+    setDurationPerSetSeconds((current) =>
+      current.map((duration, currentIndex) => {
+        if (currentIndex !== index) return duration
+        return nextDuration
+      }),
+    )
+  }
+
+  const handleAddExerciseCategory = async () => {
+    const trimmedName = newExerciseCategoryName.trim()
 
     if (!trimmedName) {
       setIsError(true)
-      setMessage('Enter a muscle group name.')
+      setMessage('Enter an exercise category name.')
       return
     }
 
-    setIsAddingMuscleGroup(true)
+    setIsAddingExerciseCategory(true)
     setMessage('')
     setIsError(false)
 
@@ -187,13 +228,13 @@ export function CompletedExerciseForm({
 
     if (!session) {
       setIsError(true)
-      setMessage('Sign in before adding a muscle group.')
-      setIsAddingMuscleGroup(false)
+      setMessage('Sign in before adding an exercise category.')
+      setIsAddingExerciseCategory(false)
       return
     }
 
     const { data, error } = await supabase
-      .from('muscle_groups')
+      .from('exercise_categories')
       .insert({
         name: trimmedName,
         user_id: session.user.id,
@@ -201,32 +242,32 @@ export function CompletedExerciseForm({
       .select('id, name')
       .single()
 
-    setIsAddingMuscleGroup(false)
+    setIsAddingExerciseCategory(false)
 
     if (error || !data) {
       setIsError(true)
       setMessage(
         error?.message.includes('row-level security policy')
-          ? 'Could not add the muscle group because database access rules blocked it. Run the muscle_groups RLS policy in Supabase.'
-          : 'Could not add the muscle group.',
+          ? 'Could not add the exercise category because database access rules blocked it. Run the exercise_categories RLS policy in Supabase.'
+          : 'Could not add the exercise category.',
       )
       return
     }
 
-    setMuscleGroups((current) => [...current, data])
-    setSelectedMuscleGroupId(data.id)
+    setExerciseCategories((current) => [...current, data])
+    setSelectedExerciseCategoryId(data.id)
     setSelectedExerciseId('')
-    setNewMuscleGroupName('')
-    setIsMuscleGroupDialogOpen(false)
-    setMessage(`Added muscle group: ${data.name}.`)
+    setNewExerciseCategoryName('')
+    setIsExerciseCategoryDialogOpen(false)
+    setMessage(`Added exercise category: ${data.name}.`)
   }
 
   const handleAddExercise = async () => {
     const trimmedName = newExerciseName.trim()
 
-    if (!selectedMuscleGroupId) {
+    if (!selectedExerciseCategoryId) {
       setIsError(true)
-      setMessage('Select a muscle group first.')
+      setMessage('Select an exercise category first.')
       return
     }
 
@@ -255,11 +296,11 @@ export function CompletedExerciseForm({
       .from('exercises')
       .insert({
         name: trimmedName,
-        muscle_group_id: selectedMuscleGroupId,
+        exercise_category_id: selectedExerciseCategoryId,
         exercise_type: newExerciseType,
         user_id: session.user.id,
       })
-      .select('id, name, muscle_group_id, exercise_type')
+      .select('id, name, exercise_category_id, exercise_type')
       .single()
 
     setIsAddingExercise(false)
@@ -287,13 +328,16 @@ export function CompletedExerciseForm({
     setMessage('')
     setIsError(false)
 
-    if (!selectedMuscleGroupId || !selectedExerciseId) {
+    if (!selectedExerciseCategoryId || !selectedExerciseId) {
       setIsError(true)
-      setMessage('Select a muscle group and exercise.')
+      setMessage('Select an exercise category and exercise.')
       return
     }
 
     const hasInvalidReps = repsPerSet.some((rep) => rep < MIN_REPS || rep > MAX_REPS)
+    const hasInvalidDurations = durationPerSetSeconds.some(
+      (duration) => duration < MIN_DURATION_SECONDS || duration > MAX_DURATION_SECONDS,
+    )
     const hasInvalidLoad = hasLoad && (loadKg < MIN_LOAD_KG || !Number.isInteger(loadKg / LOAD_STEP_KG))
     const hasInvalidDistance = distanceKm < MIN_DISTANCE_KM || distanceKm > MAX_DISTANCE_KM
     const hasInvalidPace =
@@ -302,12 +346,12 @@ export function CompletedExerciseForm({
     if (isStrengthExercise && (
       sets < MIN_SETS ||
       sets > MAX_SETS ||
-      hasInvalidReps ||
-      repsPerSet.length !== sets ||
+      (strengthDetailMode === 'reps' && (hasInvalidReps || repsPerSet.length !== sets)) ||
+      (strengthDetailMode === 'time' && (hasInvalidDurations || durationPerSetSeconds.length !== sets)) ||
       hasInvalidLoad
     )) {
       setIsError(true)
-      setMessage('Check the allowed ranges for sets, reps, and load.')
+      setMessage('Check the allowed ranges for sets, reps, time, and load.')
       return
     }
 
@@ -320,10 +364,12 @@ export function CompletedExerciseForm({
     setLoading(true)
 
     const result = await onSubmit({
-      muscleGroupId: selectedMuscleGroupId,
+      exerciseCategoryId: selectedExerciseCategoryId,
       exerciseId: selectedExerciseId,
       sets: isStrengthExercise ? sets : null,
-      repsPerSet: isStrengthExercise ? repsPerSet : null,
+      repsPerSet: isStrengthExercise && strengthDetailMode === 'reps' ? repsPerSet : null,
+      durationPerSetSeconds:
+        isStrengthExercise && strengthDetailMode === 'time' ? durationPerSetSeconds : null,
       loadKg: isStrengthExercise && hasLoad ? loadKg : null,
       distanceKm: isStrengthExercise ? null : distanceKm,
       paceMinPerKm: isStrengthExercise ? null : paceMinPerKm,
@@ -366,159 +412,163 @@ export function CompletedExerciseForm({
             <div className={styles.sectionHeader}>
               <h2 className={styles.sectionTitle}>Exercise</h2>
               <p className={styles.sectionDescription}>
-                Start by choosing a muscle group and a specific exercise.
+                Start by choosing an exercise category and a specific exercise.
               </p>
             </div>
 
             <div className={styles.sectionBody}>
-              <label htmlFor="muscleGroup" className={styles.label}>
-                Muscle Group
-              </label>
-              <div className={styles.selectRow}>
-                <select
-                  id="muscleGroup"
-                  className={styles.select}
-                  value={selectedMuscleGroupId}
-                  onChange={(e) => {
-                    setSelectedMuscleGroupId(e.target.value)
-                    setSelectedExerciseId('')
-                  }}
-                  required
-                >
-                  <option value="">Select a muscle group</option>
-                  {muscleGroups.map((group) => (
-                    <option key={group.id} value={group.id}>
-                      {group.name}
-                    </option>
-                  ))}
-                </select>
-                <Dialog.Root open={isMuscleGroupDialogOpen} onOpenChange={setIsMuscleGroupDialogOpen}>
-                  <Dialog.Trigger asChild>
-                    <button type="button" className={styles.secondaryButton}>
-                      Add
+              <div className={styles.badgeField}>
+                <p className={styles.label}>Exercise Category</p>
+                <div className={styles.badgeGroup} role="group" aria-label="Exercise category">
+                  {exerciseCategories.length === 0 && (
+                    <p className={styles.badgeEmpty}>No exercise categories yet.</p>
+                  )}
+                  {exerciseCategories.map((category) => (
+                    <button
+                      key={category.id}
+                      type="button"
+                      className={styles.choiceBadge}
+                      aria-pressed={selectedExerciseCategoryId === category.id}
+                      data-selected={selectedExerciseCategoryId === category.id ? 'true' : undefined}
+                      onClick={() => {
+                        setSelectedExerciseCategoryId(category.id)
+                        setSelectedExerciseId('')
+                      }}
+                    >
+                      {category.name}
                     </button>
-                  </Dialog.Trigger>
-                  <Dialog.Portal>
-                    <Dialog.Overlay className={styles.overlay} />
-                    <Dialog.Content className={styles.dialogContent}>
-                      <Dialog.Title className={styles.dialogTitle}>Add Muscle Group</Dialog.Title>
-                      <Dialog.Description className={styles.dialogDescription}>
-                        Enter the name of the new muscle group.
-                      </Dialog.Description>
-                      <div className={styles.dialogBody}>
-                        <input
-                          className={styles.input}
-                          value={newMuscleGroupName}
-                          onChange={(e) => setNewMuscleGroupName(e.target.value)}
-                          placeholder="e.g. Back"
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                              e.preventDefault()
-                              handleAddMuscleGroup()
-                            }
-                          }}
-                        />
-                        <div className={styles.dialogActions}>
-                          <Dialog.Close asChild>
-                            <button type="button" className={styles.ghostButton}>
-                              Cancel
+                  ))}
+                  <Dialog.Root open={isExerciseCategoryDialogOpen} onOpenChange={setIsExerciseCategoryDialogOpen}>
+                    <Dialog.Trigger asChild>
+                      <button type="button" className={styles.addBadge}>
+                        Add
+                      </button>
+                    </Dialog.Trigger>
+                    <Dialog.Portal>
+                      <Dialog.Overlay className={styles.overlay} />
+                      <Dialog.Content className={styles.dialogContent}>
+                        <Dialog.Title className={styles.dialogTitle}>Add Exercise Category</Dialog.Title>
+                        <Dialog.Description className={styles.dialogDescription}>
+                          Enter the name of the new exercise category.
+                        </Dialog.Description>
+                        <div className={styles.dialogBody}>
+                          <input
+                            className={styles.input}
+                            value={newExerciseCategoryName}
+                            onChange={(e) => setNewExerciseCategoryName(e.target.value)}
+                            placeholder="e.g. Back"
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault()
+                                handleAddExerciseCategory()
+                              }
+                            }}
+                          />
+                          <div className={styles.dialogActions}>
+                            <Dialog.Close asChild>
+                              <button type="button" className={styles.ghostButton}>
+                                Cancel
+                              </button>
+                            </Dialog.Close>
+                            <button
+                              type="button"
+                              onClick={handleAddExerciseCategory}
+                              className={styles.primaryButton}
+                              disabled={isAddingExerciseCategory}
+                            >
+                              {isAddingExerciseCategory ? 'Adding...' : 'Add'}
                             </button>
-                          </Dialog.Close>
-                          <button
-                            type="button"
-                            onClick={handleAddMuscleGroup}
-                            className={styles.primaryButton}
-                            disabled={isAddingMuscleGroup}
-                          >
-                            {isAddingMuscleGroup ? 'Adding...' : 'Add'}
-                          </button>
+                          </div>
                         </div>
-                      </div>
-                    </Dialog.Content>
-                  </Dialog.Portal>
-                </Dialog.Root>
+                      </Dialog.Content>
+                    </Dialog.Portal>
+                  </Dialog.Root>
+                </div>
               </div>
 
-              <label htmlFor="exercise" className={`${styles.label} ${styles.labelWithSpacing}`}>
-                Exercise
-              </label>
-              <div className={styles.selectRow}>
-                <select
-                  id="exercise"
-                  className={styles.select}
-                  value={selectedExerciseId}
-                  onChange={(e) => setSelectedExerciseId(e.target.value)}
-                  disabled={!selectedMuscleGroupId}
-                  required
-                >
-                  <option value="">Select an exercise</option>
-                  {filteredExercises.map((exercise) => (
-                    <option key={exercise.id} value={exercise.id}>
-                      {exercise.name}
-                    </option>
-                  ))}
-                </select>
-                <Dialog.Root open={isExerciseDialogOpen} onOpenChange={setIsExerciseDialogOpen}>
-                  <Dialog.Trigger asChild>
-                    <button
-                      type="button"
-                      className={styles.secondaryButton}
-                      disabled={!selectedMuscleGroupId}
-                    >
-                      Add
-                    </button>
-                  </Dialog.Trigger>
-                  <Dialog.Portal>
-                    <Dialog.Overlay className={styles.overlay} />
-                    <Dialog.Content className={styles.dialogContent}>
-                      <Dialog.Title className={styles.dialogTitle}>Add Exercise</Dialog.Title>
-                      <Dialog.Description className={styles.dialogDescription}>
-                        Add a new exercise to the selected muscle group.
-                      </Dialog.Description>
-                      <div className={styles.dialogBody}>
-                        <input
-                          className={styles.input}
-                          value={newExerciseName}
-                          onChange={(e) => setNewExerciseName(e.target.value)}
-                          placeholder="e.g. Barbell Row"
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                              e.preventDefault()
-                              handleAddExercise()
-                            }
-                          }}
-                        />
-                        <label htmlFor="newExerciseType" className={styles.label}>
-                          Type
-                        </label>
-                        <select
-                          id="newExerciseType"
-                          className={styles.select}
-                          value={newExerciseType}
-                          onChange={(e) => setNewExerciseType(e.target.value as ExerciseType)}
-                        >
-                          <option value="strength">Strength</option>
-                          <option value="cardio">Cardio</option>
-                        </select>
-                        <div className={styles.dialogActions}>
-                          <Dialog.Close asChild>
-                            <button type="button" className={styles.ghostButton}>
-                              Cancel
-                            </button>
-                          </Dialog.Close>
-                          <button
-                            type="button"
-                            onClick={handleAddExercise}
-                            className={styles.primaryButton}
-                            disabled={isAddingExercise}
+              <div className={styles.badgeField}>
+                <p className={styles.label}>Exercise</p>
+                <div className={styles.badgeGroup} role="group" aria-label="Exercise">
+                  {!selectedExerciseCategoryId ? (
+                    <p className={styles.badgeEmpty}>Select an exercise category first.</p>
+                  ) : filteredExercises.length === 0 ? (
+                    <p className={styles.badgeEmpty}>No exercises in this category yet.</p>
+                  ) : (
+                    filteredExercises.map((exercise) => (
+                      <button
+                        key={exercise.id}
+                        type="button"
+                        className={styles.choiceBadge}
+                        aria-pressed={selectedExerciseId === exercise.id}
+                        data-selected={selectedExerciseId === exercise.id ? 'true' : undefined}
+                        onClick={() => setSelectedExerciseId(exercise.id)}
+                      >
+                        {exercise.name}
+                      </button>
+                    ))
+                  )}
+                  <Dialog.Root open={isExerciseDialogOpen} onOpenChange={setIsExerciseDialogOpen}>
+                    <Dialog.Trigger asChild>
+                      <button
+                        type="button"
+                        className={styles.addBadge}
+                        disabled={!selectedExerciseCategoryId}
+                      >
+                        Add
+                      </button>
+                    </Dialog.Trigger>
+                    <Dialog.Portal>
+                      <Dialog.Overlay className={styles.overlay} />
+                      <Dialog.Content className={styles.dialogContent}>
+                        <Dialog.Title className={styles.dialogTitle}>Add Exercise</Dialog.Title>
+                        <Dialog.Description className={styles.dialogDescription}>
+                          Add a new exercise to the selected exercise category.
+                        </Dialog.Description>
+                        <div className={styles.dialogBody}>
+                          <input
+                            className={styles.input}
+                            value={newExerciseName}
+                            onChange={(e) => setNewExerciseName(e.target.value)}
+                            placeholder="e.g. Barbell Row"
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault()
+                                handleAddExercise()
+                              }
+                            }}
+                          />
+                          <label htmlFor="newExerciseType" className={styles.label}>
+                            Type
+                          </label>
+                          <select
+                            id="newExerciseType"
+                            className={styles.select}
+                            value={newExerciseType}
+                            onChange={(e) => setNewExerciseType(e.target.value as ExerciseType)}
                           >
-                            {isAddingExercise ? 'Adding...' : 'Add'}
-                          </button>
+                            <option value="strength">Strength</option>
+                            <option value="cardio">Cardio</option>
+                          </select>
+                          <div className={styles.dialogActions}>
+                            <Dialog.Close asChild>
+                              <button type="button" className={styles.ghostButton}>
+                                Cancel
+                              </button>
+                            </Dialog.Close>
+                            <button
+                              type="button"
+                              onClick={handleAddExercise}
+                              className={styles.primaryButton}
+                              disabled={isAddingExercise}
+                            >
+                              {isAddingExercise ? 'Adding...' : 'Add'}
+                            </button>
+                          </div>
                         </div>
-                      </div>
-                    </Dialog.Content>
-                  </Dialog.Portal>
-                </Dialog.Root>
+                      </Dialog.Content>
+                    </Dialog.Portal>
+                  </Dialog.Root>
+                </div>
               </div>
             </div>
           </section>
@@ -528,7 +578,7 @@ export function CompletedExerciseForm({
               <h2 className={styles.sectionTitle}>Workout Details</h2>
               <p className={styles.sectionDescription}>
                 {isStrengthExercise
-                  ? 'Set the number of sets, reps, and load for this exercise.'
+                  ? 'Set the number of sets, reps or time, and load for this exercise.'
                   : 'Set the distance and pace for this cardio exercise.'}
               </p>
             </div>
@@ -551,23 +601,66 @@ export function CompletedExerciseForm({
                   </div>
 
                   <div className={styles.field}>
-                    <p className={styles.repsHeading}>Reps Per Set (1-30)</p>
+                    <p className={styles.repsHeading}>Set Target</p>
+                    <div className={styles.segmentedControl} role="group" aria-label="Set target type">
+                      <button
+                        type="button"
+                        className={styles.segmentButton}
+                        data-selected={strengthDetailMode === 'reps' ? 'true' : undefined}
+                        aria-pressed={strengthDetailMode === 'reps'}
+                        onClick={() => setStrengthDetailMode('reps')}
+                      >
+                        Reps
+                      </button>
+                      <button
+                        type="button"
+                        className={styles.segmentButton}
+                        data-selected={strengthDetailMode === 'time' ? 'true' : undefined}
+                        aria-pressed={strengthDetailMode === 'time'}
+                        onClick={() => setStrengthDetailMode('time')}
+                      >
+                        Time
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className={styles.field}>
+                    <p className={styles.repsHeading}>
+                      {strengthDetailMode === 'reps' ? 'Reps Per Set (1-30)' : 'Time Per Set'}
+                    </p>
                     <div className={styles.repsGrid}>
-                      {repsPerSet.map((rep, index) => (
-                        <div key={`rep-${index}`} className={styles.repField}>
-                          <label htmlFor={`rep-${index}`} className={styles.repLabel}>
-                            Set {index + 1}
-                          </label>
-                          <NumericStepper
-                            id={`rep-${index}`}
-                            inputClassName={styles.input}
-                            value={rep}
-                            min={MIN_REPS}
-                            max={MAX_REPS}
-                            onChange={(value) => handleRepChange(index, String(value))}
-                          />
-                        </div>
-                      ))}
+                      {strengthDetailMode === 'reps'
+                        ? repsPerSet.map((rep, index) => (
+                            <div key={`rep-${index}`} className={styles.repField}>
+                              <label htmlFor={`rep-${index}`} className={styles.repLabel}>
+                                Set {index + 1}
+                              </label>
+                              <NumericStepper
+                                id={`rep-${index}`}
+                                inputClassName={styles.input}
+                                value={rep}
+                                min={MIN_REPS}
+                                max={MAX_REPS}
+                                onChange={(value) => handleRepChange(index, String(value))}
+                              />
+                            </div>
+                          ))
+                        : durationPerSetSeconds.map((duration, index) => (
+                            <div key={`duration-${index}`} className={styles.repField}>
+                              <label htmlFor={`duration-${index}`} className={styles.repLabel}>
+                                Set {index + 1}
+                              </label>
+                              <NumericStepper
+                                id={`duration-${index}`}
+                                inputClassName={styles.input}
+                                value={duration}
+                                min={MIN_DURATION_SECONDS}
+                                max={MAX_DURATION_SECONDS}
+                                onChange={(value) => handleDurationChange(index, value)}
+                                displayValue={formatDuration(duration)}
+                              />
+                            </div>
+                          ))}
                     </div>
                   </div>
 

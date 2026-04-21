@@ -13,10 +13,11 @@ export default function NewCompletedExercisePage() {
   const [today] = useState(() => formatLocalDateOnly(new Date()))
 
   const initialValues: CompletedExerciseFormValues = {
-    muscleGroupId: '',
+    exerciseCategoryId: '',
     exerciseId: '',
     sets: 3,
     repsPerSet: [12, 12, 12],
+    durationPerSetSeconds: null,
     loadKg: DEFAULT_LOAD_KG,
     distanceKm: null,
     paceMinPerKm: null,
@@ -47,6 +48,7 @@ export default function NewCompletedExercisePage() {
           exercise_id: values.exerciseId,
           sets: values.sets,
           reps_per_set: values.repsPerSet,
+          duration_per_set_seconds: values.durationPerSetSeconds,
           load_kg: values.loadKg,
           distance_km: values.distanceKm,
           pace_min_per_km: values.paceMinPerKm,

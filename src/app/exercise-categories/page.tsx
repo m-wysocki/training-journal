@@ -9,53 +9,53 @@ import BackLink from '@/components/BackLink'
 import PageContainer from '@/components/PageContainer'
 import styles from './page.module.scss'
 
-type MuscleGroup = {
+type ExerciseCategory = {
   id: string
   name: string
 }
 
-export default function MuscleGroupsPage() {
+export default function ExerciseCategoriesPage() {
   const [name, setName] = useState('')
-  const [groups, setGroups] = useState<MuscleGroup[]>([])
+  const [categories, setCategories] = useState<ExerciseCategory[]>([])
   const [open, setOpen] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
-  const [editingGroup, setEditingGroup] = useState<MuscleGroup | null>(null)
+  const [editingCategory, setEditingCategory] = useState<ExerciseCategory | null>(null)
   const [editName, setEditName] = useState('')
   const [message, setMessage] = useState('')
   const [isError, setIsError] = useState(false)
 
-  const fetchGroups = async () => {
+  const fetchCategories = async () => {
     const { data, error } = await supabase
-      .from('muscle_groups')
+      .from('exercise_categories')
       .select('*')
       .order('created_at')
 
     if (error) {
       setIsError(true)
-      setMessage('Could not load muscle groups.')
+      setMessage('Could not load exercise categories.')
       return
     }
 
-    setGroups(data || [])
+    setCategories(data || [])
   }
 
   useEffect(() => {
     supabase
-      .from('muscle_groups')
+      .from('exercise_categories')
       .select('*')
       .order('created_at')
       .then(({ data, error }) => {
         if (error) {
           setIsError(true)
-          setMessage('Could not load muscle groups.')
+          setMessage('Could not load exercise categories.')
           return
         }
 
-        setGroups(data || [])
+        setCategories(data || [])
       })
   }, [])
 
-  const addGroup = async () => {
+  const addCategory = async () => {
     const trimmedName = name.trim()
 
     if (!trimmedName) return
@@ -69,11 +69,11 @@ export default function MuscleGroupsPage() {
 
     if (!session) {
       setIsError(true)
-      setMessage('Sign in before adding a muscle group.')
+      setMessage('Sign in before adding an exercise category.')
       return
     }
 
-    const { error } = await supabase.from('muscle_groups').insert({
+    const { error } = await supabase.from('exercise_categories').insert({
       name: trimmedName,
       user_id: session.user.id,
     })
@@ -82,94 +82,94 @@ export default function MuscleGroupsPage() {
       setIsError(true)
       setMessage(
         error.message.includes('row-level security policy')
-          ? 'Could not add the muscle group because database access rules blocked it. Run the muscle_groups RLS policy in Supabase.'
-          : 'Could not add the muscle group.',
+          ? 'Could not add the exercise category because database access rules blocked it. Run the exercise_categories RLS policy in Supabase.'
+          : 'Could not add the exercise category.',
       )
       return
     }
 
     setName('')
     setOpen(false)
-    setMessage(`Added muscle group: ${trimmedName}.`)
-    fetchGroups()
+    setMessage(`Added exercise category: ${trimmedName}.`)
+    fetchCategories()
   }
 
-  const deleteGroup = async (id: string) => {
+  const deleteCategory = async (id: string) => {
     setMessage('')
     setIsError(false)
 
-    const { error } = await supabase.from('muscle_groups').delete().eq('id', id)
+    const { error } = await supabase.from('exercise_categories').delete().eq('id', id)
 
     if (error) {
       setIsError(true)
       setMessage(
         error.message.includes('row-level security policy')
-          ? 'Could not delete the muscle group because database access rules blocked it.'
-          : 'Could not delete the muscle group.',
+          ? 'Could not delete the exercise category because database access rules blocked it.'
+          : 'Could not delete the exercise category.',
       )
       return
     }
 
-    fetchGroups()
+    fetchCategories()
   }
 
-  const openEditGroup = (group: MuscleGroup) => {
-    setEditingGroup(group)
-    setEditName(group.name)
+  const openEditCategory = (category: ExerciseCategory) => {
+    setEditingCategory(category)
+    setEditName(category.name)
     setEditOpen(true)
     setMessage('')
     setIsError(false)
   }
 
-  const updateGroup = async () => {
+  const updateCategory = async () => {
     const trimmedName = editName.trim()
 
-    if (!editingGroup || !trimmedName) return
+    if (!editingCategory || !trimmedName) return
 
     setMessage('')
     setIsError(false)
 
     const { error } = await supabase
-      .from('muscle_groups')
+      .from('exercise_categories')
       .update({ name: trimmedName })
-      .eq('id', editingGroup.id)
+      .eq('id', editingCategory.id)
 
     if (error) {
       setIsError(true)
       setMessage(
         error.message.includes('row-level security policy')
-          ? 'Could not update the muscle group because database access rules blocked it.'
-          : 'Could not update the muscle group.',
+          ? 'Could not update the exercise category because database access rules blocked it.'
+          : 'Could not update the exercise category.',
       )
       return
     }
 
     setEditOpen(false)
-    setEditingGroup(null)
+    setEditingCategory(null)
     setEditName('')
-    setMessage(`Updated muscle group: ${trimmedName}.`)
-    fetchGroups()
+    setMessage(`Updated exercise category: ${trimmedName}.`)
+    fetchCategories()
   }
 
   return (
     <PageContainer className={styles.container}>
         <BackLink href="/" label="← Back to Home" />
         <div className={styles.topBar}>
-          <h1 className={styles.title}>Muscle Groups</h1>
+          <h1 className={styles.title}>Exercise Categories</h1>
           <Dialog.Root open={open} onOpenChange={setOpen}>
             <Dialog.Trigger asChild>
               <button className={styles.primaryButton}>
-                Add Group
+                Add Category
               </button>
             </Dialog.Trigger>
             <Dialog.Portal>
               <Dialog.Overlay className={styles.overlay} />
               <Dialog.Content className={styles.dialogContent}>
                 <Dialog.Title className={styles.dialogTitle}>
-                  Add Muscle Group
+                  Add Exercise Category
                 </Dialog.Title>
                 <Dialog.Description className={styles.dialogDescription}>
-                  Enter the name of the muscle group you want to add.
+                  Enter the name of the exercise category you want to add.
                 </Dialog.Description>
                 <div className={styles.dialogBody}>
                   <input
@@ -179,7 +179,7 @@ export default function MuscleGroupsPage() {
                     placeholder="e.g. Arms"
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
-                        addGroup()
+                        addCategory()
                       }
                     }}
                   />
@@ -190,7 +190,7 @@ export default function MuscleGroupsPage() {
                       </button>
                     </Dialog.Close>
                     <button
-                      onClick={addGroup}
+                      onClick={addCategory}
                       className={styles.primaryButton}
                     >
                       Add
@@ -208,22 +208,22 @@ export default function MuscleGroupsPage() {
           </div>
         )}
 
-        {groups.length === 0 ? (
+        {categories.length === 0 ? (
           <div className={styles.emptyState}>
-            <p className={styles.emptyText}>No muscle groups yet</p>
+            <p className={styles.emptyText}>No exercise categories yet</p>
           </div>
         ) : (
           <ul className={styles.list}>
-            {groups.map((g) => (
+            {categories.map((category) => (
               <li
-                key={g.id}
+                key={category.id}
                 className={styles.listItem}
               >
                 <Link
-                  href={`/muscle-groups/${g.id}`}
-                  className={styles.groupLink}
+                  href={`/exercise-categories/${category.id}`}
+                  className={styles.categoryLink}
                 >
-                  {g.name}
+                  {category.name}
                 </Link>
 
                 <DropdownMenu.Root>
@@ -253,13 +253,13 @@ export default function MuscleGroupsPage() {
                     <DropdownMenu.Content className={styles.menuContent}>
                       <DropdownMenu.Item
                         className={styles.menuItem}
-                        onSelect={() => openEditGroup(g)}
+                        onSelect={() => openEditCategory(category)}
                       >
                         Edit
                       </DropdownMenu.Item>
                       <DropdownMenu.Item
                         className={styles.menuItemDanger}
-                        onSelect={() => deleteGroup(g.id)}
+                        onSelect={() => deleteCategory(category.id)}
                       >
                         Delete
                       </DropdownMenu.Item>
@@ -276,10 +276,10 @@ export default function MuscleGroupsPage() {
             <Dialog.Overlay className={styles.overlay} />
             <Dialog.Content className={styles.dialogContent}>
               <Dialog.Title className={styles.dialogTitle}>
-                Edit Muscle Group
+                Edit Exercise Category
               </Dialog.Title>
               <Dialog.Description className={styles.dialogDescription}>
-                Update the muscle group name.
+                Update the exercise category name.
               </Dialog.Description>
               <div className={styles.dialogBody}>
                 <input
@@ -289,7 +289,7 @@ export default function MuscleGroupsPage() {
                   placeholder="e.g. Arms"
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
-                      updateGroup()
+                      updateCategory()
                     }
                   }}
                 />
@@ -301,7 +301,7 @@ export default function MuscleGroupsPage() {
                   </Dialog.Close>
                   <button
                     type="button"
-                    onClick={updateGroup}
+                    onClick={updateCategory}
                     className={styles.primaryButton}
                   >
                     Save

@@ -36,6 +36,10 @@ yarn-error.log*
 
 # local SQL snippets and Supabase migration scratch files
 /sql/
+!/sql/
+/sql/*
+!/sql/rename-muscle-groups-to-exercise-categories.sql
+!/sql/add-duration-per-set-to-completed-exercises.sql
 
 # vercel
 .vercel

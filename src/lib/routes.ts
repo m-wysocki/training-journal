@@ -1,8 +1,8 @@
 export const routes = [
   {
-    path: '/muscle-groups',
-    name: 'Muscle Groups',
-    description: 'Manage your muscle groups',
+    path: '/exercise-categories',
+    name: 'Exercise Categories',
+    description: 'Manage your exercise categories',
   },
   {
     path: '/completed-exercises/new',

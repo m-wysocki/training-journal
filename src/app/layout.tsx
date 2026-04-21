@@ -36,6 +36,13 @@ export default function RootLayout({
                 <span className={styles.brandText}>Training Journal</span>
               </Link>
               <div className={styles.headerActions}>
+                <Link
+                  href="/completed-exercises/new"
+                  className={styles.logExerciseButton}
+                  aria-label="Log exercise"
+                >
+                  <span aria-hidden="true">+</span>
+                </Link>
                 <AuthButton />
               </div>
             </div>

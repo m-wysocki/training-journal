@@ -119,17 +119,17 @@
   color: #111827;
 }
 
-.muscleGroupSections {
+.exerciseCategorySections {
   display: grid;
   gap: 0.875rem;
 }
 
-.muscleGroupSection {
+.exerciseCategorySection {
   display: grid;
   gap: 0.5rem;
 }
 
-.muscleGroupHeading {
+.exerciseCategoryHeading {
   margin: 0;
   padding: 0.25rem 0;
   font-size: 0.875rem;
@@ -176,7 +176,7 @@
   color: #111827;
 }
 
-.muscleGroupName {
+.exerciseCategoryName {
   margin: 0;
   color: #6b7280;
   font-size: 0.875rem;

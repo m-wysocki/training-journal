@@ -15,17 +15,17 @@ type Exercise = {
   exercise_type: 'strength' | 'cardio'
 }
 
-type MuscleGroup = {
+type ExerciseCategory = {
   id: string
   name: string
   exercises: Exercise[]
 }
 
-export default function MuscleGroupPage() {
+export default function ExerciseCategoryPage() {
   const params = useParams()
-  const muscleGroupId = params.id as string
+  const exerciseCategoryId = params.id as string
 
-  const [group, setGroup] = useState<MuscleGroup | null>(null)
+  const [category, setCategory] = useState<ExerciseCategory | null>(null)
   const [newExercise, setNewExercise] = useState('')
   const [newExerciseType, setNewExerciseType] = useState<'strength' | 'cardio'>('strength')
   const [open, setOpen] = useState(false)
@@ -36,9 +36,9 @@ export default function MuscleGroupPage() {
   const [message, setMessage] = useState('')
   const [isError, setIsError] = useState(false)
 
-  const fetchGroup = useCallback(async () => {
+  const fetchCategory = useCallback(async () => {
     const { data } = await supabase
-      .from('muscle_groups')
+      .from('exercise_categories')
       .select(`
         id,
         name,
@@ -48,28 +48,28 @@ export default function MuscleGroupPage() {
           exercise_type
         )
       `)
-      .eq('id', muscleGroupId)
+      .eq('id', exerciseCategoryId)
       .single()
 
-    return data as MuscleGroup | null
-  }, [muscleGroupId])
+    return data as ExerciseCategory | null
+  }, [exerciseCategoryId])
 
   useEffect(() => {
     let isActive = true
 
-    fetchGroup().then((data) => {
+    fetchCategory().then((data) => {
       if (isActive) {
-        setGroup(data)
+        setCategory(data)
       }
     })
 
     return () => {
       isActive = false
     }
-  }, [fetchGroup])
+  }, [fetchCategory])
 
-  const refreshGroup = async () => {
-    setGroup(await fetchGroup())
+  const refreshCategory = async () => {
+    setCategory(await fetchCategory())
   }
 
   const addExercise = async () => {
@@ -92,7 +92,7 @@ export default function MuscleGroupPage() {
 
     const { error } = await supabase.from('exercises').insert({
       name: trimmedName,
-      muscle_group_id: muscleGroupId,
+      exercise_category_id: exerciseCategoryId,
       exercise_type: newExerciseType,
       user_id: session.user.id,
     })
@@ -111,7 +111,7 @@ export default function MuscleGroupPage() {
     setNewExerciseType('strength')
     setOpen(false)
     setMessage(`Added exercise: ${trimmedName}.`)
-    refreshGroup()
+    refreshCategory()
   }
 
   const deleteExercise = async (id: string) => {
@@ -130,7 +130,7 @@ export default function MuscleGroupPage() {
       return
     }
 
-    refreshGroup()
+    refreshCategory()
   }
 
   const openEditExercise = (exercise: Exercise) => {
@@ -173,10 +173,10 @@ export default function MuscleGroupPage() {
     setEditExerciseName('')
     setEditExerciseType('strength')
     setMessage(`Updated exercise: ${trimmedName}.`)
-    refreshGroup()
+    refreshCategory()
   }
 
-  if (!group) return (
+  if (!category) return (
     <div className={styles.loading}>
       <p className={styles.loadingText}>Loading…</p>
     </div>
@@ -185,8 +185,8 @@ export default function MuscleGroupPage() {
   return (
     <PageContainer className={styles.container}>
         <div className={styles.header}>
-          <BackLink href="/muscle-groups" label="← Back to Muscle Groups" />
-          <h1 className={styles.title}>{group.name}</h1>
+          <BackLink href="/exercise-categories" label="← Back to Exercise Categories" />
+          <h1 className={styles.title}>{category.name}</h1>
         </div>
 
         {message && (
@@ -195,13 +195,13 @@ export default function MuscleGroupPage() {
           </div>
         )}
 
-        {group.exercises.length === 0 ? (
+        {category.exercises.length === 0 ? (
           <div className={styles.emptyState}>
             <p className={styles.emptyText}>No exercises yet</p>
           </div>
         ) : (
           <ul className={styles.list}>
-            {group.exercises.map((exercise) => (
+            {category.exercises.map((exercise) => (
               <li
                 key={exercise.id}
                 className={styles.listItem}
