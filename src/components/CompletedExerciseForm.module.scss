@@ -3,7 +3,7 @@
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding-block: 3rem;
+  padding-block: 2rem;
 }
 
 .container {
@@ -97,6 +97,8 @@
 .input,
 .select {
   width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   border: 1px solid #d1d5db;
   border-radius: 0.375rem;
   padding: 0.625rem 0.75rem;
@@ -462,11 +464,21 @@
 
 @media (max-width: 640px) {
   .wrapper {
-    padding-block: 1.5rem;
+    padding-block: 1rem;
+  }
+
+  .header {
+    margin-bottom: 1rem;
   }
 
   .section {
     padding: 1rem;
+  }
+
+  .input,
+  .select {
+    max-width: 100%;
+    font-size: 1rem;
   }
 
   .selectRow {

@@ -7,7 +7,7 @@ import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import { supabase } from '@/lib/supabase'
 import BackLink from '@/components/BackLink'
 import PageContainer from '@/components/PageContainer'
-import { parseDateOnly } from '@/lib/dateOnly'
+import { formatLocalDateOnly, parseDateOnly } from '@/lib/dateOnly'
 import styles from './page.module.scss'
 
 type CompletedExerciseRow = {
@@ -40,8 +40,15 @@ type DayGroup = {
   }[]
 }
 
+type CopyCategoryTarget = {
+  sourceDate: string
+  categoryName: string
+  entries: CompletedExerciseRow[]
+}
+
 const formatDate = (date: string) =>
   new Intl.DateTimeFormat('en-US', {
+    weekday: 'long',
     day: '2-digit',
     month: 'long',
     year: 'numeric',
@@ -103,6 +110,12 @@ export default function CompletedExercisesPage() {
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [deletingEntryId, setDeletingEntryId] = useState<string | null>(null)
   const [deleteLoading, setDeleteLoading] = useState(false)
+  const [copyOpen, setCopyOpen] = useState(false)
+  const [copyTarget, setCopyTarget] = useState<CopyCategoryTarget | null>(null)
+  const [copyDate, setCopyDate] = useState('')
+  const [copyLoading, setCopyLoading] = useState(false)
+  const [successMessage, setSuccessMessage] = useState('')
+  const isCopyDateSameAsSource = Boolean(copyTarget && copyDate === copyTarget.sourceDate)
 
   const loadData = useCallback(() => {
     void supabase
@@ -135,6 +148,7 @@ export default function CompletedExercisesPage() {
       .then(({ data, error }) => {
         if (error) {
           setErrorMessage('Could not load data.')
+          setSuccessMessage('')
           return
         }
 
@@ -195,6 +209,7 @@ export default function CompletedExercisesPage() {
   const openDelete = (id: string) => {
     setDeletingEntryId(id)
     setDeleteOpen(true)
+    setSuccessMessage('')
   }
 
   const closeDelete = () => {
@@ -213,12 +228,79 @@ export default function CompletedExercisesPage() {
 
     if (error) {
       setErrorMessage('Could not delete the entry.')
+      setSuccessMessage('')
       closeDelete()
       return
     }
 
+    setSuccessMessage('Deleted entry.')
     setEntries((prev) => prev.filter((row) => row.id !== deletingEntryId))
     closeDelete()
+  }
+
+  const openCopyCategory = (sourceDate: string, categoryName: string, categoryEntries: CompletedExerciseRow[]) => {
+    setCopyTarget({
+      sourceDate,
+      categoryName,
+      entries: categoryEntries,
+    })
+    setCopyDate(formatLocalDateOnly(new Date()))
+    setCopyOpen(true)
+    setErrorMessage('')
+    setSuccessMessage('')
+  }
+
+  const closeCopyCategory = () => {
+    setCopyOpen(false)
+    setCopyTarget(null)
+    setCopyDate('')
+  }
+
+  const confirmCopyCategory = async () => {
+    if (!copyTarget || !copyDate || copyDate === copyTarget.sourceDate) return
+
+    setCopyLoading(true)
+    setErrorMessage('')
+    setSuccessMessage('')
+
+    const {
+      data: { session },
+    } = await supabase.auth.getSession()
+
+    if (!session) {
+      setCopyLoading(false)
+      setErrorMessage('Sign in before copying exercises.')
+      return
+    }
+
+    const rowsToInsert = copyTarget.entries.map((entry) => ({
+      exercise_id: entry.exercise_id,
+      sets: entry.sets,
+      reps_per_set: entry.reps_per_set,
+      duration_per_set_seconds: entry.duration_per_set_seconds,
+      load_kg: entry.load_kg,
+      distance_km: entry.distance_km,
+      pace_min_per_km: entry.pace_min_per_km,
+      note: entry.note ?? '',
+      performed_at: copyDate,
+      user_id: session.user.id,
+    }))
+
+    const { error } = await supabase.from('completed_exercises').insert(rowsToInsert)
+
+    setCopyLoading(false)
+
+    if (error) {
+      setErrorMessage('Could not copy exercises to the selected date.')
+      return
+    }
+
+    const copiedCount = rowsToInsert.length
+    setSuccessMessage(
+      `Copied ${copiedCount} ${copiedCount === 1 ? 'exercise' : 'exercises'} from ${copyTarget.categoryName} to ${formatDate(copyDate)}.`,
+    )
+    closeCopyCategory()
+    loadData()
   }
 
   return (
@@ -254,6 +336,7 @@ export default function CompletedExercisesPage() {
         </div>
 
         {errorMessage && <div className={styles.errorBox}>{errorMessage}</div>}
+        {successMessage && <div className={styles.successBox}>{successMessage}</div>}
 
         {!errorMessage && groupedByDate.length === 0 && (
           <div className={styles.emptyState}>No completed exercises yet.</div>
@@ -266,7 +349,46 @@ export default function CompletedExercisesPage() {
               <div className={styles.exerciseCategorySections}>
                 {group.exerciseCategories.map((exerciseCategory) => (
                   <section key={`${group.date}-${exerciseCategory.name}`} className={styles.exerciseCategorySection}>
-                    <h3 className={styles.exerciseCategoryHeading}>{exerciseCategory.name}</h3>
+                    <div className={styles.exerciseCategoryHeader}>
+                      <h3 className={styles.exerciseCategoryHeading}>{exerciseCategory.name}</h3>
+                      <DropdownMenu.Root>
+                        <DropdownMenu.Trigger asChild>
+                          <button
+                            type="button"
+                            className={styles.menuTrigger}
+                            aria-label={`Options for ${exerciseCategory.name}`}
+                          >
+                            <svg
+                              width="16"
+                              height="16"
+                              viewBox="0 0 15 15"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                              className={styles.menuIcon}
+                            >
+                              <path
+                                d="M3.625 7.5C3.625 8.12132 3.12132 8.625 2.5 8.625C1.87868 8.625 1.375 8.12132 1.375 7.5C1.375 6.87868 1.87868 6.375 2.5 6.375C3.12132 6.375 3.625 6.87868 3.625 7.5ZM8.625 7.5C8.625 8.12132 8.12132 8.625 7.5 8.625C6.87868 8.625 6.375 8.12132 6.375 7.5C6.375 6.87868 6.87868 6.375 7.5 6.375C8.12132 6.375 8.625 6.87868 8.625 7.5ZM12.5 8.625C13.1213 8.625 13.625 8.12132 13.625 7.5C13.625 6.87868 13.1213 6.375 12.5 6.375C11.8787 6.375 11.375 6.87868 11.375 7.5C11.375 8.12132 11.8787 8.625 12.5 8.625Z"
+                                fill="currentColor"
+                                fillRule="evenodd"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                          </button>
+                        </DropdownMenu.Trigger>
+                        <DropdownMenu.Portal>
+                          <DropdownMenu.Content className={styles.menuContent} align="end">
+                            <DropdownMenu.Item
+                              className={styles.menuItem}
+                              onSelect={() =>
+                                openCopyCategory(group.date, exerciseCategory.name, exerciseCategory.entries)
+                              }
+                            >
+                              Copy to another date
+                            </DropdownMenu.Item>
+                          </DropdownMenu.Content>
+                        </DropdownMenu.Portal>
+                      </DropdownMenu.Root>
+                    </div>
                     <ul className={styles.entriesList}>
                       {exerciseCategory.entries.map((entry) => (
                         <li key={entry.id} className={styles.entryItem}>
@@ -355,6 +477,52 @@ export default function CompletedExercisesPage() {
                 >
                   {deleteLoading ? 'Deleting…' : 'Delete'}
                 </button>
+              </div>
+            </Dialog.Content>
+          </Dialog.Portal>
+        </Dialog.Root>
+
+        <Dialog.Root open={copyOpen} onOpenChange={(open) => !open && closeCopyCategory()}>
+          <Dialog.Portal>
+            <Dialog.Overlay className={styles.overlay} />
+            <Dialog.Content className={styles.dialogContentSmall}>
+              <Dialog.Title className={styles.dialogTitle}>Copy exercises</Dialog.Title>
+              <Dialog.Description className={styles.dialogDescription}>
+                {copyTarget
+                  ? `Copy ${copyTarget.categoryName} from ${formatDate(copyTarget.sourceDate)} to another date.`
+                  : 'Choose a date to copy these exercises.'}
+              </Dialog.Description>
+              <div className={styles.dialogForm}>
+                <div className={styles.field}>
+                  <label htmlFor="copyDate" className={styles.label}>
+                    New date
+                  </label>
+                  <input
+                    id="copyDate"
+                    type="date"
+                    className={styles.input}
+                    value={copyDate}
+                    onChange={(e) => setCopyDate(e.target.value)}
+                  />
+                  {isCopyDateSameAsSource ? (
+                    <p className={styles.fieldHint}>Choose a different date than the source workout.</p>
+                  ) : null}
+                </div>
+                <div className={styles.dialogActions}>
+                  <Dialog.Close asChild>
+                    <button type="button" className={styles.ghostButton}>
+                      Cancel
+                    </button>
+                  </Dialog.Close>
+                  <button
+                    type="button"
+                    className={styles.primaryButton}
+                    disabled={copyLoading || !copyDate || isCopyDateSameAsSource}
+                    onClick={confirmCopyCategory}
+                  >
+                    {copyLoading ? 'Copying...' : 'Copy'}
+                  </button>
+                </div>
               </div>
             </Dialog.Content>
           </Dialog.Portal>

@@ -11,7 +11,7 @@
 }
 
 .container {
-  padding-block: 3rem;
+  padding-block: 2rem;
 }
 
 .header {
@@ -241,4 +241,14 @@
 
 .ghostButton:hover {
   color: #000;
+}
+
+@media (max-width: 640px) {
+  .container {
+    padding-block: 1rem;
+  }
+
+  .header {
+    margin-bottom: 1.25rem;
+  }
 }
