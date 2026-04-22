@@ -109,7 +109,6 @@ export function PaceStepper({
             className={[styles.valueInput, styles.valueInputWithUnit, inputClassName].filter(Boolean).join(' ')}
             type="text"
             inputMode="numeric"
-            pattern="\\d{1,2}:\\d{2}"
             placeholder="6:30"
             value={inputValue}
             onChange={(e) => setInputValue(normalizeDraft(e.target.value))}

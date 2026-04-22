@@ -118,4 +118,18 @@
   .valueInput {
     font-size: 1rem;
   }
+
+  .paceStepper .valueInputWithUnit {
+    padding-right: 0.875rem;
+  }
+
+  .paceStepper .unitAdornment {
+    position: static;
+    transform: none;
+    display: block;
+    max-width: none;
+    margin-top: 0.25rem;
+    text-align: center;
+    white-space: normal;
+  }
 }
