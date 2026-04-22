@@ -3,8 +3,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import * as Accordion from '@radix-ui/react-accordion'
 import BackLink from '@/components/BackLink'
+import { DatePicker } from '@/components/DatePicker'
 import PageContainer from '@/components/PageContainer'
-import { formatLocalDateOnly } from '@/lib/dateOnly'
+import { formatLocalDateOnly, parseDateOnly } from '@/lib/dateOnly'
 import { supabase } from '@/lib/supabase'
 import styles from './page.module.scss'
 
@@ -37,55 +38,38 @@ const addDays = (date: Date, days: number) => {
   return next
 }
 
-const formatWeekRange = (start: Date, end: Date) =>
-  new Intl.DateTimeFormat('en-US', {
-    day: '2-digit',
-    month: 'short',
-  }).format(start) +
-  ' - ' +
-  new Intl.DateTimeFormat('en-US', {
-    day: '2-digit',
-    month: 'short',
+const formatDateRange = (dateFrom: string, dateTo: string) => {
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    month: 'long',
+    day: 'numeric',
     year: 'numeric',
-  }).format(end)
+  })
 
-const getIsoWeekValue = (date: Date) => {
-  const target = new Date(date.valueOf())
-  const dayNr = (date.getDay() + 6) % 7
-  target.setDate(target.getDate() - dayNr + 3)
-  const firstThursday = new Date(target.getFullYear(), 0, 4)
-  const firstDayNr = (firstThursday.getDay() + 6) % 7
-  firstThursday.setDate(firstThursday.getDate() - firstDayNr + 3)
-  const weekNumber = 1 + Math.round((target.getTime() - firstThursday.getTime()) / 604800000)
-  return `${target.getFullYear()}-W${String(weekNumber).padStart(2, '0')}`
-}
-
-const parseIsoWeek = (value: string) => {
-  const match = /^(\d{4})-W(\d{2})$/.exec(value)
-  if (!match) {
-    return getStartOfWeek(new Date())
-  }
-
-  const year = Number(match[1])
-  const week = Number(match[2])
-  const januaryFourth = new Date(year, 0, 4)
-  const start = getStartOfWeek(januaryFourth)
-  return addDays(start, (week - 1) * 7)
+  return `${formatter.format(parseDateOnly(dateFrom))} - ${formatter.format(parseDateOnly(dateTo))}`
 }
 
 export default function StatsPage() {
-  const [selectedWeekStart, setSelectedWeekStart] = useState(() => getStartOfWeek(new Date()))
+  const [dateFrom, setDateFrom] = useState(() => formatLocalDateOnly(getStartOfWeek(new Date())))
+  const [dateTo, setDateTo] = useState(() => formatLocalDateOnly(new Date()))
   const [entries, setEntries] = useState<WeeklyEntry[]>([])
   const [errorMessage, setErrorMessage] = useState('')
   const [loading, setLoading] = useState(true)
 
-  const weekStart = useMemo(() => selectedWeekStart, [selectedWeekStart])
-  const weekEnd = useMemo(() => addDays(weekStart, 6), [weekStart])
-  const weekValue = useMemo(() => getIsoWeekValue(weekStart), [weekStart])
-
-  const updateSelectedWeekStart = (nextWeekStart: Date) => {
+  const updateDateFrom = (value: string) => {
     setLoading(true)
-    setSelectedWeekStart(nextWeekStart)
+    setDateFrom(value)
+  }
+
+  const updateDateTo = (value: string) => {
+    setLoading(true)
+    setDateTo(value)
+  }
+
+  const shiftDateRangeByWeek = (direction: -1 | 1) => {
+    setLoading(true)
+    const nextWeekStart = addDays(getStartOfWeek(parseDateOnly(dateFrom)), direction * 7)
+    setDateFrom(formatLocalDateOnly(nextWeekStart))
+    setDateTo(formatLocalDateOnly(addDays(nextWeekStart, 6)))
   }
 
   useEffect(() => {
@@ -103,13 +87,13 @@ export default function StatsPage() {
           )
         `,
       )
-      .gte('performed_at', formatLocalDateOnly(weekStart))
-      .lte('performed_at', formatLocalDateOnly(weekEnd))
+      .gte('performed_at', dateFrom)
+      .lte('performed_at', dateTo)
       .then(({ data, error }) => {
         if (!isActive) return
 
         if (error) {
-          setErrorMessage('Could not load statistics for the selected week.')
+          setErrorMessage('Could not load statistics for the selected date range.')
           setEntries([])
           setLoading(false)
           return
@@ -123,7 +107,7 @@ export default function StatsPage() {
     return () => {
       isActive = false
     }
-  }, [weekStart, weekEnd])
+  }, [dateFrom, dateTo])
 
   const workoutDaysCount = useMemo(() => new Set(entries.map((entry) => entry.performed_at)).size, [entries])
 
@@ -152,7 +136,7 @@ export default function StatsPage() {
           <BackLink href="/" label="← Back to Home" />
           <h1 className={styles.title}>Statistics</h1>
           <p className={styles.description}>
-            Review your training week from Monday to Sunday and see how often you trained each exercise category.
+            Review your training by date range and see how often you trained each exercise category.
           </p>
         </div>
 
@@ -168,17 +152,19 @@ export default function StatsPage() {
                 </Accordion.Trigger>
               </Accordion.Header>
               <Accordion.Content className={styles.filtersContent}>
-                <div className={styles.weekPickerGroup}>
-                  <label htmlFor="weekPicker" className={styles.label}>
-                    Week
-                  </label>
-                  <input
-                    id="weekPicker"
-                    type="week"
-                    className={styles.input}
-                    value={weekValue}
-                    onChange={(e) => updateSelectedWeekStart(parseIsoWeek(e.target.value))}
-                  />
+                <div className={styles.dateRangeFields}>
+                  <div className={styles.datePickerGroup}>
+                    <label htmlFor="dateFrom" className={styles.label}>
+                      From
+                    </label>
+                    <DatePicker id="dateFrom" value={dateFrom} onChange={updateDateFrom} />
+                  </div>
+                  <div className={styles.datePickerGroup}>
+                    <label htmlFor="dateTo" className={styles.label}>
+                      To
+                    </label>
+                    <DatePicker id="dateTo" value={dateTo} onChange={updateDateTo} />
+                  </div>
                 </div>
               </Accordion.Content>
             </Accordion.Item>
@@ -188,16 +174,16 @@ export default function StatsPage() {
             <button
               type="button"
               className={styles.weekIconButton}
-              onClick={() => updateSelectedWeekStart(addDays(weekStart, -7))}
+              onClick={() => shiftDateRangeByWeek(-1)}
               aria-label="Previous week"
             >
               ‹
             </button>
-            <p className={styles.weekRange}>{formatWeekRange(weekStart, weekEnd)}</p>
+            <p className={styles.weekRange}>{formatDateRange(dateFrom, dateTo)}</p>
             <button
               type="button"
               className={styles.weekIconButton}
-              onClick={() => updateSelectedWeekStart(addDays(weekStart, 7))}
+              onClick={() => shiftDateRangeByWeek(1)}
               aria-label="Next week"
             >
               ›
@@ -212,21 +198,21 @@ export default function StatsPage() {
             <section className={styles.summaryCard}>
               <p className={styles.cardLabel}>Workout Days</p>
               <p className={styles.primaryStat}>{loading ? '...' : workoutDaysCount}</p>
-              <p className={styles.cardHint}>Number of days you trained during the selected week.</p>
+              <p className={styles.cardHint}>Number of days you trained during the selected date range.</p>
             </section>
 
             <section className={styles.breakdownCard}>
               <div className={styles.breakdownHeader}>
                 <h2 className={styles.breakdownTitle}>Exercise Category Frequency</h2>
                 <p className={styles.breakdownDescription}>
-                  Counted as distinct training days per exercise category within the week.
+                  Counted as distinct training days per exercise category within the selected date range.
                 </p>
               </div>
 
               {loading ? (
                 <p className={styles.emptyText}>Loading statistics...</p>
               ) : exerciseCategoryStats.length === 0 ? (
-                <p className={styles.emptyText}>No workouts logged for this week.</p>
+                <p className={styles.emptyText}>No workouts logged for this date range.</p>
               ) : (
                 <ul className={styles.breakdownList}>
                   {exerciseCategoryStats.map((stat) => (

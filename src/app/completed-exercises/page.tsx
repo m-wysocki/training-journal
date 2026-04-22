@@ -34,6 +34,11 @@ type CompletedExerciseRow = {
   } | null
 }
 
+type ExerciseCategory = {
+  id: string
+  name: string
+}
+
 type DayGroup = {
   date: string
   exerciseCategories: {
@@ -71,40 +76,14 @@ const addDays = (date: Date, days: number) => {
   return next
 }
 
-const formatWeekRange = (start: Date, end: Date) =>
-  new Intl.DateTimeFormat('en-US', {
-    day: '2-digit',
-    month: 'short',
-  }).format(start) +
-  ' - ' +
-  new Intl.DateTimeFormat('en-US', {
-    day: '2-digit',
-    month: 'short',
+const formatDateRange = (dateFrom: string, dateTo: string) => {
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    month: 'long',
+    day: 'numeric',
     year: 'numeric',
-  }).format(end)
+  })
 
-const getIsoWeekValue = (date: Date) => {
-  const target = new Date(date.valueOf())
-  const dayNr = (date.getDay() + 6) % 7
-  target.setDate(target.getDate() - dayNr + 3)
-  const firstThursday = new Date(target.getFullYear(), 0, 4)
-  const firstDayNr = (firstThursday.getDay() + 6) % 7
-  firstThursday.setDate(firstThursday.getDate() - firstDayNr + 3)
-  const weekNumber = 1 + Math.round((target.getTime() - firstThursday.getTime()) / 604800000)
-  return `${target.getFullYear()}-W${String(weekNumber).padStart(2, '0')}`
-}
-
-const parseIsoWeek = (value: string) => {
-  const match = /^(\d{4})-W(\d{2})$/.exec(value)
-  if (!match) {
-    return getStartOfWeek(new Date())
-  }
-
-  const year = Number(match[1])
-  const week = Number(match[2])
-  const januaryFourth = new Date(year, 0, 4)
-  const start = getStartOfWeek(januaryFourth)
-  return addDays(start, (week - 1) * 7)
+  return `${formatter.format(parseDateOnly(dateFrom))} - ${formatter.format(parseDateOnly(dateTo))}`
 }
 
 const formatPace = (paceMinPerKm: number) => {
@@ -157,8 +136,10 @@ const formatEntryDetails = (entry: CompletedExerciseRow) => {
 
 export default function CompletedExercisesPage() {
   const router = useRouter()
-  const [selectedWeekStart, setSelectedWeekStart] = useState(() => getStartOfWeek(new Date()))
+  const [dateFrom, setDateFrom] = useState(() => formatLocalDateOnly(getStartOfWeek(new Date())))
+  const [dateTo, setDateTo] = useState(() => formatLocalDateOnly(new Date()))
   const [entries, setEntries] = useState<CompletedExerciseRow[]>([])
+  const [exerciseCategories, setExerciseCategories] = useState<ExerciseCategory[]>([])
   const [errorMessage, setErrorMessage] = useState('')
   const [selectedExerciseCategory, setSelectedExerciseCategory] = useState('all')
   const [deleteOpen, setDeleteOpen] = useState(false)
@@ -170,9 +151,6 @@ export default function CompletedExercisesPage() {
   const [copyLoading, setCopyLoading] = useState(false)
   const [successMessage, setSuccessMessage] = useState('')
   const isCopyDateSameAsSource = Boolean(copyTarget && copyDate === copyTarget.sourceDate)
-  const weekStart = useMemo(() => selectedWeekStart, [selectedWeekStart])
-  const weekEnd = useMemo(() => addDays(weekStart, 6), [weekStart])
-  const weekValue = useMemo(() => getIsoWeekValue(weekStart), [weekStart])
 
   const loadData = useCallback(() => {
     void supabase
@@ -200,8 +178,8 @@ export default function CompletedExercisesPage() {
           )
         `,
       )
-      .gte('performed_at', formatLocalDateOnly(weekStart))
-      .lte('performed_at', formatLocalDateOnly(weekEnd))
+      .gte('performed_at', dateFrom)
+      .lte('performed_at', dateTo)
       .order('performed_at', { ascending: false })
       .order('created_at', { ascending: false })
       .then(({ data, error }) => {
@@ -214,24 +192,43 @@ export default function CompletedExercisesPage() {
         setErrorMessage('')
         setEntries((data as unknown as CompletedExerciseRow[]) || [])
       })
-  }, [weekStart, weekEnd])
+  }, [dateFrom, dateTo])
 
   useEffect(() => {
     loadData()
   }, [loadData])
 
-  const updateSelectedWeekStart = (nextWeekStart: Date) => {
-    setSelectedExerciseCategory('all')
-    setSelectedWeekStart(nextWeekStart)
+  useEffect(() => {
+    supabase
+      .from('exercise_categories')
+      .select('id, name')
+      .order('created_at')
+      .then(({ data, error }) => {
+        if (error) {
+          setErrorMessage('Could not load exercise categories.')
+          setSuccessMessage('')
+          return
+        }
+
+        setExerciseCategories(data || [])
+      })
+  }, [])
+
+  const shiftDateRangeByWeek = (direction: -1 | 1) => {
+    const nextWeekStart = addDays(getStartOfWeek(parseDateOnly(dateFrom)), direction * 7)
+    setDateFrom(formatLocalDateOnly(nextWeekStart))
+    setDateTo(formatLocalDateOnly(addDays(nextWeekStart, 6)))
   }
 
-  const exerciseCategoryOptions = useMemo(
-    () =>
-      Array.from(
-        new Set(entries.map((entry) => entry.exercise?.exercise_category?.name || 'Unknown exercise category')),
-      ).sort((a, b) => a.localeCompare(b)),
-    [entries],
-  )
+  const exerciseCategoryOptions = useMemo(() => {
+    const categoryNames = new Set(exerciseCategories.map((category) => category.name))
+
+    if (selectedExerciseCategory !== 'all') {
+      categoryNames.add(selectedExerciseCategory)
+    }
+
+    return Array.from(categoryNames).sort((a, b) => a.localeCompare(b))
+  }, [exerciseCategories, selectedExerciseCategory])
 
   const filteredEntries = useMemo(
     () =>
@@ -392,36 +389,46 @@ export default function CompletedExercisesPage() {
                 </Accordion.Trigger>
               </Accordion.Header>
               <Accordion.Content className={styles.filtersContent}>
-                <div className={styles.weekPickerGroup}>
-                  <label htmlFor="weekPicker" className={styles.filterLabel}>
-                    Week
-                  </label>
-                  <input
-                    id="weekPicker"
-                    type="week"
-                    className={styles.filterInput}
-                    value={weekValue}
-                    onChange={(e) => updateSelectedWeekStart(parseIsoWeek(e.target.value))}
-                  />
+                <div className={styles.dateRangeFields}>
+                  <div className={styles.datePickerGroup}>
+                    <label htmlFor="dateFrom" className={styles.filterLabel}>
+                      From
+                    </label>
+                    <DatePicker id="dateFrom" value={dateFrom} onChange={setDateFrom} />
+                  </div>
+                  <div className={styles.datePickerGroup}>
+                    <label htmlFor="dateTo" className={styles.filterLabel}>
+                      To
+                    </label>
+                    <DatePicker id="dateTo" value={dateTo} onChange={setDateTo} />
+                  </div>
                 </div>
 
                 <div className={styles.filterField}>
-                  <label htmlFor="exerciseCategoryFilter" className={styles.filterLabel}>
-                    Exercise Category
-                  </label>
-                  <select
-                    id="exerciseCategoryFilter"
-                    className={styles.filterSelect}
-                    value={selectedExerciseCategory}
-                    onChange={(e) => setSelectedExerciseCategory(e.target.value)}
-                  >
-                    <option value="all">All exercise categories</option>
+                  <p className={styles.filterLabel}>Exercise Category</p>
+                  <div className={styles.badgeGroup} role="group" aria-label="Exercise category filter">
+                    <button
+                      type="button"
+                      className={styles.choiceBadge}
+                      aria-pressed={selectedExerciseCategory === 'all'}
+                      data-selected={selectedExerciseCategory === 'all' ? 'true' : undefined}
+                      onClick={() => setSelectedExerciseCategory('all')}
+                    >
+                      All
+                    </button>
                     {exerciseCategoryOptions.map((exerciseCategory) => (
-                      <option key={exerciseCategory} value={exerciseCategory}>
+                      <button
+                        key={exerciseCategory}
+                        type="button"
+                        className={styles.choiceBadge}
+                        aria-pressed={selectedExerciseCategory === exerciseCategory}
+                        data-selected={selectedExerciseCategory === exerciseCategory ? 'true' : undefined}
+                        onClick={() => setSelectedExerciseCategory(exerciseCategory)}
+                      >
                         {exerciseCategory}
-                      </option>
+                      </button>
                     ))}
-                  </select>
+                  </div>
                 </div>
               </Accordion.Content>
             </Accordion.Item>
@@ -431,16 +438,16 @@ export default function CompletedExercisesPage() {
             <button
               type="button"
               className={styles.weekIconButton}
-              onClick={() => updateSelectedWeekStart(addDays(weekStart, -7))}
+              onClick={() => shiftDateRangeByWeek(-1)}
               aria-label="Previous week"
             >
               ‹
             </button>
-            <p className={styles.weekRange}>{formatWeekRange(weekStart, weekEnd)}</p>
+            <p className={styles.weekRange}>{formatDateRange(dateFrom, dateTo)}</p>
             <button
               type="button"
               className={styles.weekIconButton}
-              onClick={() => updateSelectedWeekStart(addDays(weekStart, 7))}
+              onClick={() => shiftDateRangeByWeek(1)}
               aria-label="Next week"
             >
               ›
@@ -452,7 +459,7 @@ export default function CompletedExercisesPage() {
         {successMessage && <div className={styles.successBox}>{successMessage}</div>}
 
         {!errorMessage && groupedByDate.length === 0 && (
-          <div className={styles.emptyState}>No completed exercises for this week.</div>
+          <div className={styles.emptyState}>No completed exercises for this date range.</div>
         )}
 
         <div className={styles.daysList}>

@@ -8,9 +8,7 @@
 }
 
 .headerInner {
-  max-width: var(--layout-width);
-  margin: 0 auto;
-  padding: 1rem 1.5rem;
+  padding-block: 1rem;
   display: flex;
   align-items: center;
   justify-content: space-between;

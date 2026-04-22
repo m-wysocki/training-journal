@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import "./globals.css";
 import AuthButton from "@/components/AuthButton";
+import PageContainer from "@/components/PageContainer";
 import styles from "./layout.module.scss";
 
 const geistSans = Geist({
@@ -31,7 +32,7 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <div className={styles.pageRoot}>
           <header className={styles.header}>
-            <div className={styles.headerInner}>
+            <PageContainer className={styles.headerInner}>
               <Link href="/" className={styles.brand}>
                 <Image
                   src="/training-journal-logo.png"
@@ -52,7 +53,7 @@ export default function RootLayout({
                 </Link>
                 <AuthButton />
               </div>
-            </div>
+            </PageContainer>
           </header>
           {children}
         </div>
