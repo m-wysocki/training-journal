@@ -38,8 +38,7 @@ yarn-error.log*
 /sql/
 !/sql/
 /sql/*
-!/sql/rename-muscle-groups-to-exercise-categories.sql
-!/sql/add-duration-per-set-to-completed-exercises.sql
+!/sql/initial-schema.sql
 
 # vercel
 .vercel

@@ -1,3 +1,8 @@
+-- Initial database setup for Training Journal.
+-- Run this once in the Supabase SQL Editor for a fresh project.
+
+create extension if not exists pgcrypto;
+
 create table if not exists public.user_access (
   user_id uuid primary key references auth.users(id) on delete cascade,
   email text not null,
@@ -6,17 +11,86 @@ create table if not exists public.user_access (
   created_at timestamptz not null default now()
 );
 
-alter table public.user_access
-  enable row level security;
+create table if not exists public.exercise_categories (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  user_id uuid not null default auth.uid() references auth.users(id) on delete cascade,
+  created_at timestamptz not null default now()
+);
 
-alter table public.exercise_categories
-  enable row level security;
+create table if not exists public.exercises (
+  id uuid primary key default gen_random_uuid(),
+  exercise_category_id uuid not null references public.exercise_categories(id) on delete cascade,
+  name text not null,
+  exercise_type text not null default 'strength',
+  user_id uuid not null default auth.uid() references auth.users(id) on delete cascade,
+  created_at timestamptz not null default now(),
+  constraint exercises_exercise_type_check check (exercise_type in ('strength', 'cardio'))
+);
 
-alter table public.exercises
-  enable row level security;
+create table if not exists public.completed_exercises (
+  id uuid primary key default gen_random_uuid(),
+  exercise_id uuid not null references public.exercises(id) on delete cascade,
+  sets integer check (sets is null or sets between 1 and 5),
+  reps_per_set integer[],
+  duration_per_set_seconds integer[],
+  load_kg numeric(5,1),
+  distance_km numeric(6,2),
+  pace_min_per_km numeric(4,2),
+  note text not null default '',
+  performed_at date not null,
+  user_id uuid not null default auth.uid() references auth.users(id) on delete cascade,
+  created_at timestamptz not null default now(),
+  constraint completed_exercises_reps_per_set_check check (
+    reps_per_set is null
+    or (
+      array_position(reps_per_set, null) is null
+      and 1 <= all(reps_per_set)
+      and 100 >= all(reps_per_set)
+    )
+  ),
+  constraint completed_exercises_duration_per_set_seconds_check check (
+    duration_per_set_seconds is null
+    or (
+      array_position(duration_per_set_seconds, null) is null
+      and 0 < all(duration_per_set_seconds)
+      and 3600 >= all(duration_per_set_seconds)
+    )
+  ),
+  constraint completed_exercises_load_kg_check check (
+    load_kg is null
+    or (load_kg >= 2.5 and load_kg * 2 = trunc(load_kg * 2))
+  ),
+  constraint completed_exercises_distance_km_check check (
+    distance_km is null or distance_km > 0
+  ),
+  constraint completed_exercises_pace_min_per_km_check check (
+    pace_min_per_km is null or pace_min_per_km > 0
+  )
+);
 
-alter table public.completed_exercises
-  enable row level security;
+create index if not exists exercise_categories_user_id_idx
+  on public.exercise_categories (user_id);
+
+create index if not exists exercises_exercise_category_id_idx
+  on public.exercises (exercise_category_id);
+
+create index if not exists exercises_user_id_idx
+  on public.exercises (user_id);
+
+create index if not exists completed_exercises_exercise_id_idx
+  on public.completed_exercises (exercise_id);
+
+create index if not exists completed_exercises_performed_at_idx
+  on public.completed_exercises (performed_at desc);
+
+create index if not exists completed_exercises_user_id_idx
+  on public.completed_exercises (user_id);
+
+alter table public.user_access enable row level security;
+alter table public.exercise_categories enable row level security;
+alter table public.exercises enable row level security;
+alter table public.completed_exercises enable row level security;
 
 create or replace function public.handle_new_user_access()
 returns trigger
@@ -195,14 +269,7 @@ create policy completed_exercises_authenticated_delete
   to authenticated
   using (user_id = auth.uid() and public.current_user_is_approved());
 
--- Approve a candidate:
+-- Approve a user after they sign in for the first time:
 -- update public.user_access
 -- set approved = true, approved_at = now()
 -- where email = 'candidate@example.com';
-
--- Verification: this should return zero rows after the fix.
-select schemaname, tablename
-from pg_tables
-where schemaname = 'public'
-  and rowsecurity = false
-order by tablename;
