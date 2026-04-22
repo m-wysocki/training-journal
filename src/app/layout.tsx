@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Image from "next/image";
 import Link from "next/link";
 import "./globals.css";
 import AuthButton from "@/components/AuthButton";
@@ -32,8 +33,14 @@ export default function RootLayout({
           <header className={styles.header}>
             <div className={styles.headerInner}>
               <Link href="/" className={styles.brand}>
-                <span className={styles.brandMark}>TJ</span>
-                <span className={styles.brandText}>Training Journal</span>
+                <Image
+                  src="/training-journal-logo.png"
+                  alt="Training Journal"
+                  width={220}
+                  height={50}
+                  className={styles.brandLogo}
+                  priority
+                />
               </Link>
               <div className={styles.headerActions}>
                 <Link

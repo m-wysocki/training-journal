@@ -9,6 +9,15 @@ create table if not exists public.user_access (
 alter table public.user_access
   enable row level security;
 
+alter table public.exercise_categories
+  enable row level security;
+
+alter table public.exercises
+  enable row level security;
+
+alter table public.completed_exercises
+  enable row level security;
+
 create or replace function public.handle_new_user_access()
 returns trigger
 language plpgsql
@@ -190,3 +199,10 @@ create policy completed_exercises_authenticated_delete
 -- update public.user_access
 -- set approved = true, approved_at = now()
 -- where email = 'candidate@example.com';
+
+-- Verification: this should return zero rows after the fix.
+select schemaname, tablename
+from pg_tables
+where schemaname = 'public'
+  and rowsecurity = false
+order by tablename;

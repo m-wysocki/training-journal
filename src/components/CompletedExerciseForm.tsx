@@ -5,7 +5,9 @@ import { useRouter } from 'next/navigation'
 import * as Dialog from '@radix-ui/react-dialog'
 import { supabase } from '@/lib/supabase'
 import BackLink from '@/components/BackLink'
+import { DatePicker } from '@/components/DatePicker'
 import { NumericStepper } from '@/components/NumericStepper'
+import { PaceStepper } from '@/components/PaceStepper'
 import PageContainer from '@/components/PageContainer'
 import styles from './CompletedExerciseForm.module.scss'
 
@@ -67,14 +69,6 @@ const DISTANCE_STEP_KM = 0.1
 const DEFAULT_PACE_MIN_PER_KM = 6
 const MIN_PACE_MIN_PER_KM = 1
 const MAX_PACE_MIN_PER_KM = 60
-const PACE_STEP_MIN_PER_KM = 0.05
-
-const formatPace = (paceMinPerKm: number) => {
-  const totalSeconds = Math.round(paceMinPerKm * 60)
-  const minutes = Math.floor(totalSeconds / 60)
-  const seconds = totalSeconds % 60
-  return `${minutes}:${String(seconds).padStart(2, '0')} min/km`
-}
 
 const formatDuration = (seconds: number) => {
   if (seconds < 60) return `${seconds}s`
@@ -331,6 +325,12 @@ export function CompletedExerciseForm({
     if (!selectedExerciseCategoryId || !selectedExerciseId) {
       setIsError(true)
       setMessage('Select an exercise category and exercise.')
+      return
+    }
+
+    if (!performedAt) {
+      setIsError(true)
+      setMessage('Select a workout date.')
       return
     }
 
@@ -658,6 +658,7 @@ export function CompletedExerciseForm({
                                 max={MAX_DURATION_SECONDS}
                                 onChange={(value) => handleDurationChange(index, value)}
                                 displayValue={formatDuration(duration)}
+                                unit="s"
                               />
                             </div>
                           ))}
@@ -688,6 +689,7 @@ export function CompletedExerciseForm({
                         step={LOAD_STEP_KG}
                         onChange={setLoadKg}
                         displayValue={`${loadKg.toFixed(1)} kg`}
+                        unit="kg"
                       />
                     ) : (
                       <div className={styles.emptyValue}>This exercise will be saved without a load value.</div>
@@ -709,6 +711,7 @@ export function CompletedExerciseForm({
                       step={DISTANCE_STEP_KM}
                       onChange={setDistanceKm}
                       displayValue={`${distanceKm.toFixed(1)} km`}
+                      unit="km"
                     />
                   </div>
 
@@ -716,15 +719,13 @@ export function CompletedExerciseForm({
                     <label htmlFor="paceMinPerKm" className={styles.label}>
                       Pace (min/km)
                     </label>
-                    <NumericStepper
+                    <PaceStepper
                       id="paceMinPerKm"
                       inputClassName={styles.input}
                       value={paceMinPerKm}
                       min={MIN_PACE_MIN_PER_KM}
                       max={MAX_PACE_MIN_PER_KM}
-                      step={PACE_STEP_MIN_PER_KM}
                       onChange={setPaceMinPerKm}
-                      displayValue={formatPace(paceMinPerKm)}
                     />
                   </div>
                 </div>
@@ -744,13 +745,10 @@ export function CompletedExerciseForm({
               <label htmlFor="performedAt" className={styles.label}>
                 Date
               </label>
-              <input
+              <DatePicker
                 id="performedAt"
-                className={styles.input}
-                type="date"
                 value={performedAt}
-                onChange={(e) => setPerformedAt(e.target.value)}
-                required
+                onChange={setPerformedAt}
               />
 
               <label htmlFor="note" className={styles.label}>

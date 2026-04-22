@@ -1,5 +1,7 @@
 'use client'
 
+import { useState } from 'react'
+
 import styles from './NumericStepper.module.scss'
 
 type NumericStepperProps = {
@@ -12,6 +14,7 @@ type NumericStepperProps = {
   inputClassName?: string
   disabled?: boolean
   displayValue?: string
+  unit?: string
 }
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value))
@@ -32,21 +35,33 @@ export function NumericStepper({
   inputClassName,
   disabled = false,
   displayValue,
+  unit,
 }: NumericStepperProps) {
   const precision = getPrecision(step)
+  const [inputValue, setInputValue] = useState(String(value))
 
   const normalizeValue = (nextValue: number) => {
     const clamped = clamp(nextValue, min, max)
     return Number(clamped.toFixed(precision))
   }
 
-  const handleInputChange = (rawValue: string) => {
+  const commitInputValue = (rawValue: string) => {
     const parsed = Number(rawValue)
-    onChange(Number.isNaN(parsed) ? min : normalizeValue(parsed))
+    const nextValue = Number.isNaN(parsed) ? min : normalizeValue(parsed)
+
+    setInputValue(String(nextValue))
+    onChange(nextValue)
+  }
+
+  const handleInputChange = (rawValue: string) => {
+    setInputValue(rawValue)
   }
 
   const updateByStep = (direction: -1 | 1) => {
-    onChange(normalizeValue(value + direction * step))
+    const nextValue = normalizeValue(value + direction * step)
+
+    setInputValue(String(nextValue))
+    onChange(nextValue)
   }
 
   return (
@@ -61,7 +76,35 @@ export function NumericStepper({
         >
           -
         </button>
-        <div className={styles.valueBadge}>{displayValue ?? value}</div>
+        <div className={styles.inputShell}>
+          <input
+            id={id}
+            className={[styles.valueInput, unit ? styles.valueInputWithUnit : null, inputClassName]
+              .filter(Boolean)
+              .join(' ')}
+            type="number"
+            inputMode={step % 1 === 0 ? 'numeric' : 'decimal'}
+            min={min}
+            max={max}
+            step={step}
+            value={inputValue}
+            onChange={(e) => handleInputChange(e.target.value)}
+            onBlur={(e) => commitInputValue(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.currentTarget.blur()
+              }
+            }}
+            disabled={disabled}
+            required
+            aria-label={displayValue ? `${displayValue}, editable value` : undefined}
+          />
+          {unit && (
+            <span className={styles.unitAdornment} aria-hidden="true">
+              {unit}
+            </span>
+          )}
+        </div>
         <button
           type="button"
           className={styles.stepButton}
@@ -72,19 +115,6 @@ export function NumericStepper({
           +
         </button>
       </div>
-
-      <input
-        id={id}
-        className={[styles.hiddenInput, inputClassName].filter(Boolean).join(' ')}
-        type="number"
-        min={min}
-        max={max}
-        step={step}
-        value={value}
-        onChange={(e) => handleInputChange(e.target.value)}
-        disabled={disabled}
-        required
-      />
     </div>
   )
 }

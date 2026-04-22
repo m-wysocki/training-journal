@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+import * as Accordion from '@radix-ui/react-accordion'
 import BackLink from '@/components/BackLink'
 import PageContainer from '@/components/PageContainer'
 import { formatLocalDateOnly } from '@/lib/dateOnly'
@@ -155,39 +156,54 @@ export default function StatsPage() {
           </p>
         </div>
 
-        <section className={styles.controlsCard}>
-          <div className={styles.controlsTop}>
+        <div className={styles.filtersBar}>
+          <Accordion.Root type="single" collapsible className={styles.filtersAccordion}>
+            <Accordion.Item value="filters" className={styles.filtersAccordionItem}>
+              <Accordion.Header className={styles.filtersAccordionHeader}>
+                <Accordion.Trigger className={styles.filtersTrigger}>
+                  Filters
+                  <span className={styles.filtersTriggerIcon} aria-hidden="true">
+                    ▾
+                  </span>
+                </Accordion.Trigger>
+              </Accordion.Header>
+              <Accordion.Content className={styles.filtersContent}>
+                <div className={styles.weekPickerGroup}>
+                  <label htmlFor="weekPicker" className={styles.label}>
+                    Week
+                  </label>
+                  <input
+                    id="weekPicker"
+                    type="week"
+                    className={styles.input}
+                    value={weekValue}
+                    onChange={(e) => updateSelectedWeekStart(parseIsoWeek(e.target.value))}
+                  />
+                </div>
+              </Accordion.Content>
+            </Accordion.Item>
+          </Accordion.Root>
+
+          <div className={styles.compactWeekBar}>
             <button
               type="button"
-              className={styles.weekButton}
+              className={styles.weekIconButton}
               onClick={() => updateSelectedWeekStart(addDays(weekStart, -7))}
+              aria-label="Previous week"
             >
-              Previous Week
+              ‹
             </button>
+            <p className={styles.weekRange}>{formatWeekRange(weekStart, weekEnd)}</p>
             <button
               type="button"
-              className={styles.weekButton}
+              className={styles.weekIconButton}
               onClick={() => updateSelectedWeekStart(addDays(weekStart, 7))}
+              aria-label="Next week"
             >
-              Next Week
+              ›
             </button>
           </div>
-
-          <div className={styles.weekPickerGroup}>
-            <label htmlFor="weekPicker" className={styles.label}>
-              Week
-            </label>
-            <input
-              id="weekPicker"
-              type="week"
-              className={styles.input}
-              value={weekValue}
-              onChange={(e) => updateSelectedWeekStart(parseIsoWeek(e.target.value))}
-            />
-          </div>
-
-          <p className={styles.weekRange}>{formatWeekRange(weekStart, weekEnd)}</p>
-        </section>
+        </div>
 
         {errorMessage && <div className={styles.errorBox}>{errorMessage}</div>}
 

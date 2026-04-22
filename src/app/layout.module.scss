@@ -25,25 +25,11 @@
   flex: 1 1 auto;
 }
 
-.brandMark {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.625rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #111827;
-  background: #fff;
-}
-
-.brandText {
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: #111827;
-  white-space: nowrap;
+.brandLogo {
+  width: auto;
+  height: 2.76rem;
+  flex: 0 0 auto;
+  object-fit: contain;
 }
 
 .headerActions {
