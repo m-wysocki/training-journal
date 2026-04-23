@@ -12,7 +12,7 @@ import styles from './page.module.scss'
 type Exercise = {
   id: string
   name: string
-  exercise_type: 'strength' | 'cardio'
+  exercise_type: 'strength' | 'cardio' | 'duration'
 }
 
 type ExerciseCategory = {
@@ -27,12 +27,12 @@ export default function ExerciseCategoryPage() {
 
   const [category, setCategory] = useState<ExerciseCategory | null>(null)
   const [newExercise, setNewExercise] = useState('')
-  const [newExerciseType, setNewExerciseType] = useState<'strength' | 'cardio'>('strength')
+  const [newExerciseType, setNewExerciseType] = useState<'strength' | 'cardio' | 'duration'>('strength')
   const [open, setOpen] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
   const [editingExercise, setEditingExercise] = useState<Exercise | null>(null)
   const [editExerciseName, setEditExerciseName] = useState('')
-  const [editExerciseType, setEditExerciseType] = useState<'strength' | 'cardio'>('strength')
+  const [editExerciseType, setEditExerciseType] = useState<'strength' | 'cardio' | 'duration'>('strength')
   const [message, setMessage] = useState('')
   const [isError, setIsError] = useState(false)
 
@@ -285,10 +285,11 @@ export default function ExerciseCategoryPage() {
                 <select
                   className={styles.input}
                   value={newExerciseType}
-                  onChange={(e) => setNewExerciseType(e.target.value as 'strength' | 'cardio')}
+                  onChange={(e) => setNewExerciseType(e.target.value as 'strength' | 'cardio' | 'duration')}
                 >
                   <option value="strength">Strength</option>
                   <option value="cardio">Cardio</option>
+                  <option value="duration">Duration only</option>
                 </select>
                 <div className={styles.dialogActions}>
                   <Dialog.Close asChild>
@@ -333,10 +334,11 @@ export default function ExerciseCategoryPage() {
                 <select
                   className={styles.input}
                   value={editExerciseType}
-                  onChange={(e) => setEditExerciseType(e.target.value as 'strength' | 'cardio')}
+                  onChange={(e) => setEditExerciseType(e.target.value as 'strength' | 'cardio' | 'duration')}
                 >
                   <option value="strength">Strength</option>
                   <option value="cardio">Cardio</option>
+                  <option value="duration">Duration only</option>
                 </select>
                 <div className={styles.dialogActions}>
                   <Dialog.Close asChild>

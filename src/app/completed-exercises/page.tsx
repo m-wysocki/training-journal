@@ -27,7 +27,7 @@ type CompletedExerciseRow = {
     id: string
     name: string
     exercise_category_id: string
-    exercise_type: 'strength' | 'cardio'
+    exercise_type: 'strength' | 'cardio' | 'duration'
     exercise_category: {
       name: string
     } | null
@@ -96,10 +96,30 @@ const formatPace = (paceMinPerKm: number) => {
 const formatDuration = (seconds: number) => {
   if (seconds < 60) return `${seconds}s`
 
+  const hours = Math.floor(seconds / 3600)
   const minutes = Math.floor(seconds / 60)
+  const remainingMinutes = Math.floor((seconds % 3600) / 60)
   const remainingSeconds = seconds % 60
 
+  if (hours > 0) {
+    if (remainingMinutes === 0) {
+      return remainingSeconds === 0 ? `${hours}h` : `${hours}h ${remainingSeconds}s`
+    }
+
+    return remainingSeconds === 0
+      ? `${hours}h ${remainingMinutes}min`
+      : `${hours}h ${remainingMinutes}min ${remainingSeconds}s`
+  }
+
   return remainingSeconds === 0 ? `${minutes}m` : `${minutes}:${String(remainingSeconds).padStart(2, '0')}`
+}
+
+const formatDurationHoursMinutes = (seconds: number) => {
+  const totalMinutes = Math.floor(seconds / 60)
+  const hours = Math.floor(totalMinutes / 60)
+  const minutes = totalMinutes % 60
+
+  return `${hours}h ${minutes}min`
 }
 
 const formatEntryDetails = (entry: CompletedExerciseRow) => {
@@ -115,6 +135,10 @@ const formatEntryDetails = (entry: CompletedExerciseRow) => {
     }
 
     return details.join(' | ')
+  }
+
+  if (entry.exercise?.exercise_type === 'duration') {
+    return `Time: ${entry.duration_per_set_seconds?.[0] ? formatDurationHoursMinutes(entry.duration_per_set_seconds[0]) : '-'}`
   }
 
   const details = [

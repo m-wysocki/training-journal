@@ -25,7 +25,7 @@ create table if not exists public.exercises (
   exercise_type text not null default 'strength',
   user_id uuid not null default auth.uid() references auth.users(id) on delete cascade,
   created_at timestamptz not null default now(),
-  constraint exercises_exercise_type_check check (exercise_type in ('strength', 'cardio'))
+  constraint exercises_exercise_type_check check (exercise_type in ('strength', 'cardio', 'duration'))
 );
 
 create table if not exists public.completed_exercises (
@@ -54,7 +54,7 @@ create table if not exists public.completed_exercises (
     or (
       array_position(duration_per_set_seconds, null) is null
       and 0 < all(duration_per_set_seconds)
-      and 3600 >= all(duration_per_set_seconds)
+      and 86400 >= all(duration_per_set_seconds)
     )
   ),
   constraint completed_exercises_load_kg_check check (

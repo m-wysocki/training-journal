@@ -6,6 +6,7 @@ import * as Dialog from '@radix-ui/react-dialog'
 import { supabase } from '@/lib/supabase'
 import BackLink from '@/components/BackLink'
 import { DatePicker } from '@/components/DatePicker'
+import { DurationStepper } from '@/components/DurationStepper'
 import { NumericStepper } from '@/components/NumericStepper'
 import { PaceStepper } from '@/components/PaceStepper'
 import PageContainer from '@/components/PageContainer'
@@ -16,7 +17,7 @@ type ExerciseCategory = {
   name: string
 }
 
-export type ExerciseType = 'strength' | 'cardio'
+export type ExerciseType = 'strength' | 'cardio' | 'duration'
 type StrengthDetailMode = 'reps' | 'time'
 
 type Exercise = {
@@ -62,6 +63,10 @@ const DEFAULT_REPS = 12
 const DEFAULT_DURATION_SECONDS = 40
 const MIN_DURATION_SECONDS = 1
 const MAX_DURATION_SECONDS = 3600
+const DEFAULT_ACTIVITY_DURATION_SECONDS = 600
+const MIN_ACTIVITY_DURATION_SECONDS = 300
+const MAX_ACTIVITY_DURATION_SECONDS = 86400
+const ACTIVITY_DURATION_STEP_SECONDS = 300
 const DEFAULT_DISTANCE_KM = 5
 const MIN_DISTANCE_KM = 0.1
 const MAX_DISTANCE_KM = 999
@@ -73,8 +78,20 @@ const MAX_PACE_MIN_PER_KM = 60
 const formatDuration = (seconds: number) => {
   if (seconds < 60) return `${seconds}s`
 
+  const hours = Math.floor(seconds / 3600)
   const minutes = Math.floor(seconds / 60)
+  const remainingMinutes = Math.floor((seconds % 3600) / 60)
   const remainingSeconds = seconds % 60
+
+  if (hours > 0) {
+    if (remainingMinutes === 0) {
+      return remainingSeconds === 0 ? `${hours}h` : `${hours}h ${remainingSeconds}s`
+    }
+
+    return remainingSeconds === 0
+      ? `${hours}h ${remainingMinutes}min`
+      : `${hours}h ${remainingMinutes}min ${remainingSeconds}s`
+  }
 
   return remainingSeconds === 0 ? `${minutes}m` : `${minutes}:${String(remainingSeconds).padStart(2, '0')}`
 }
@@ -109,6 +126,11 @@ export function CompletedExerciseForm({
   const [hasLoad, setHasLoad] = useState(initialValues.loadKg !== null)
   const [distanceKm, setDistanceKm] = useState(initialValues.distanceKm ?? DEFAULT_DISTANCE_KM)
   const [paceMinPerKm, setPaceMinPerKm] = useState(initialValues.paceMinPerKm ?? DEFAULT_PACE_MIN_PER_KM)
+  const [activityDurationSeconds, setActivityDurationSeconds] = useState(
+    initialValues.durationPerSetSeconds?.length === 1
+      ? initialValues.durationPerSetSeconds[0]
+      : DEFAULT_ACTIVITY_DURATION_SECONDS,
+  )
   const [note, setNote] = useState(initialValues.note)
   const [performedAt, setPerformedAt] = useState(initialValues.performedAt)
   const [message, setMessage] = useState('')
@@ -155,6 +177,8 @@ export function CompletedExerciseForm({
 
   const selectedExerciseType = selectedExercise?.exercise_type ?? 'strength'
   const isStrengthExercise = selectedExerciseType === 'strength'
+  const isCardioExercise = selectedExerciseType === 'cardio'
+  const isDurationExercise = selectedExerciseType === 'duration'
 
   const handleSetsChange = (value: string) => {
     const parsed = Number(value)
@@ -340,8 +364,11 @@ export function CompletedExerciseForm({
     )
     const hasInvalidLoad = hasLoad && (loadKg < MIN_LOAD_KG || !Number.isInteger(loadKg / LOAD_STEP_KG))
     const hasInvalidDistance = distanceKm < MIN_DISTANCE_KM || distanceKm > MAX_DISTANCE_KM
-    const hasInvalidPace =
-      paceMinPerKm < MIN_PACE_MIN_PER_KM || paceMinPerKm > MAX_PACE_MIN_PER_KM
+    const hasInvalidPace = paceMinPerKm < MIN_PACE_MIN_PER_KM || paceMinPerKm > MAX_PACE_MIN_PER_KM
+    const hasInvalidActivityDuration =
+      activityDurationSeconds < MIN_ACTIVITY_DURATION_SECONDS ||
+      activityDurationSeconds > MAX_ACTIVITY_DURATION_SECONDS ||
+      activityDurationSeconds % ACTIVITY_DURATION_STEP_SECONDS !== 0
 
     if (isStrengthExercise && (
       sets < MIN_SETS ||
@@ -355,9 +382,15 @@ export function CompletedExerciseForm({
       return
     }
 
-    if (!isStrengthExercise && (hasInvalidDistance || hasInvalidPace)) {
+    if (isCardioExercise && (hasInvalidDistance || hasInvalidPace)) {
       setIsError(true)
       setMessage('Check the allowed ranges for distance and pace.')
+      return
+    }
+
+    if (isDurationExercise && hasInvalidActivityDuration) {
+      setIsError(true)
+      setMessage('Enter a valid duration in hh:mm using 5-minute steps.')
       return
     }
 
@@ -369,10 +402,14 @@ export function CompletedExerciseForm({
       sets: isStrengthExercise ? sets : null,
       repsPerSet: isStrengthExercise && strengthDetailMode === 'reps' ? repsPerSet : null,
       durationPerSetSeconds:
-        isStrengthExercise && strengthDetailMode === 'time' ? durationPerSetSeconds : null,
+        isStrengthExercise && strengthDetailMode === 'time'
+          ? durationPerSetSeconds
+          : isDurationExercise
+            ? [activityDurationSeconds]
+            : null,
       loadKg: isStrengthExercise && hasLoad ? loadKg : null,
-      distanceKm: isStrengthExercise ? null : distanceKm,
-      paceMinPerKm: isStrengthExercise ? null : paceMinPerKm,
+      distanceKm: isCardioExercise ? distanceKm : null,
+      paceMinPerKm: isCardioExercise ? paceMinPerKm : null,
       note: note.trim(),
       performedAt,
     })
@@ -548,6 +585,7 @@ export function CompletedExerciseForm({
                           >
                             <option value="strength">Strength</option>
                             <option value="cardio">Cardio</option>
+                            <option value="duration">Duration only</option>
                           </select>
                           <div className={styles.dialogActions}>
                             <Dialog.Close asChild>
@@ -579,7 +617,9 @@ export function CompletedExerciseForm({
               <p className={styles.sectionDescription}>
                 {isStrengthExercise
                   ? 'Set the number of sets, reps or time, and load for this exercise.'
-                  : 'Set the distance and pace for this cardio exercise.'}
+                  : isCardioExercise
+                    ? 'Set the distance and pace for this cardio exercise.'
+                    : 'Enter the total duration for this activity in hh:mm, using 5-minute steps.'}
               </p>
             </div>
 
@@ -696,7 +736,7 @@ export function CompletedExerciseForm({
                     )}
                   </div>
                 </>
-              ) : (
+              ) : isCardioExercise ? (
                 <div className={styles.metricsGrid}>
                   <div className={styles.field}>
                     <label htmlFor="distanceKm" className={styles.label}>
@@ -728,6 +768,21 @@ export function CompletedExerciseForm({
                       onChange={setPaceMinPerKm}
                     />
                   </div>
+                </div>
+              ) : (
+                <div className={styles.field}>
+                  <label htmlFor="activityDuration" className={styles.label}>
+                    Duration
+                  </label>
+                  <DurationStepper
+                    id="activityDuration"
+                    inputClassName={styles.input}
+                    value={activityDurationSeconds}
+                    min={MIN_ACTIVITY_DURATION_SECONDS}
+                    max={MAX_ACTIVITY_DURATION_SECONDS}
+                    step={ACTIVITY_DURATION_STEP_SECONDS}
+                    onChange={setActivityDurationSeconds}
+                  />
                 </div>
               )}
             </div>
