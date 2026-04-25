@@ -1,5 +1,6 @@
 'use client'
 
+import { BarChart3 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import * as Accordion from '@radix-ui/react-accordion'
 import BackLink from '@/components/BackLink'
@@ -134,7 +135,12 @@ export default function StatsPage() {
       <PageContainer className={styles.container}>
         <div className={styles.header}>
           <BackLink href="/" label="← Back to Home" />
-          <h1 className={styles.title}>Statistics</h1>
+          <div className={styles.titleRow}>
+            <div className={styles.titleIcon} aria-hidden="true">
+              <BarChart3 size={22} strokeWidth={1.9} />
+            </div>
+            <h1 className={styles.title}>Statistics</h1>
+          </div>
           <p className={styles.description}>
             Review your training by date range and see how often you trained each exercise category.
           </p>

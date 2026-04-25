@@ -1,5 +1,6 @@
 'use client'
 
+import type { LucideIcon } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import * as Dialog from '@radix-ui/react-dialog'
@@ -44,6 +45,7 @@ type CompletedExerciseFormProps = {
   mode: 'create' | 'edit'
   title: string
   description: string
+  headerIcon?: LucideIcon
   submitLabel: string
   submittingLabel: string
   initialValues: CompletedExerciseFormValues
@@ -100,6 +102,7 @@ export function CompletedExerciseForm({
   mode,
   title,
   description,
+  headerIcon: HeaderIcon,
   submitLabel,
   submittingLabel,
   initialValues,
@@ -440,7 +443,14 @@ export function CompletedExerciseForm({
             href={mode === 'edit' ? '/completed-exercises' : '/'}
             label={mode === 'edit' ? '← Back to Completed Exercises' : '← Back to Home'}
           />
-          <h1 className={styles.title}>{title}</h1>
+          <div className={styles.titleRow}>
+            {HeaderIcon ? (
+              <div className={styles.titleIcon} aria-hidden="true">
+                <HeaderIcon size={22} strokeWidth={1.9} />
+              </div>
+            ) : null}
+            <h1 className={styles.title}>{title}</h1>
+          </div>
           <p className={styles.description}>{description}</p>
         </div>
 

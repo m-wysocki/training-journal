@@ -1,5 +1,7 @@
 'use client'
 
+import Link from 'next/link'
+import { LogOut, Settings, User } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
@@ -61,32 +63,6 @@ export default function AuthButton() {
     router.refresh()
   }
 
-  const userIcon = (
-    <svg
-      aria-hidden="true"
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M12 12C14.2091 12 16 10.2091 16 8C16 5.79086 14.2091 4 12 4C9.79086 4 8 5.79086 8 8C8 10.2091 9.79086 12 12 12Z"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M4.5 20C5.38599 16.8713 8.28758 14.75 12 14.75C15.7124 14.75 18.614 16.8713 19.5 20"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  )
-
   if (loading) {
     return null
   }
@@ -102,18 +78,32 @@ export default function AuthButton() {
           aria-haspopup="menu"
           onClick={() => setMenuOpen((isOpen) => !isOpen)}
         >
-          {userIcon}
+          <User size={18} strokeWidth={1.8} aria-hidden="true" />
         </button>
 
         {menuOpen ? (
           <div className={styles.menuPanel} role="menu">
             <div className={styles.menuEmail}>{user.email}</div>
+            <Link
+              href="/settings"
+              className={styles.menuItem}
+              role="menuitem"
+              onClick={() => setMenuOpen(false)}
+            >
+              <span className={styles.menuIcon}>
+                <Settings size={16} strokeWidth={1.9} />
+              </span>
+              Settings
+            </Link>
             <button
               type="button"
               onClick={handleLogout}
-              className={styles.menuItem}
+              className={`${styles.menuItem} ${styles.menuItemPrimary}`}
               role="menuitem"
             >
+              <span className={styles.menuIcon}>
+                <LogOut size={16} strokeWidth={1.9} />
+              </span>
               Sign Out
             </button>
           </div>
@@ -129,7 +119,7 @@ export default function AuthButton() {
       aria-label="Sign in"
       type="button"
     >
-      {userIcon}
+      <User size={18} strokeWidth={1.8} aria-hidden="true" />
     </button>
   )
 }

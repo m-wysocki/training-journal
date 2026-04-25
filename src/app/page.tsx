@@ -1,5 +1,6 @@
 'use client'
 
+import { BarChart3, ChevronRight, ClipboardList, SquarePen } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import type { User } from '@supabase/supabase-js'
@@ -8,6 +9,12 @@ import PageContainer from '@/components/PageContainer'
 import { supabase } from '@/lib/supabase'
 import { getCurrentUserAccessStatus, type UserAccessStatus } from '@/lib/userAccess'
 import styles from './page.module.scss'
+
+const routeIcons = {
+  '/completed-exercises/new': SquarePen,
+  '/completed-exercises': ClipboardList,
+  '/stats': BarChart3,
+} as const
 
 export default function Home() {
   const [user, setUser] = useState<User | null>(null)
@@ -67,37 +74,34 @@ export default function Home() {
         </section>
       ) : user ? (
         <div className={styles.list}>
-          {routes.map((route) => (
-            <Link
-              key={route.path}
-              href={route.path}
-              className={styles.card}
-            >
-              <div className={styles.cardInner}>
-                <div>
-                  <h2 className={styles.cardTitle}>
-                    {route.name}
-                  </h2>
-                  <p className={styles.cardDescription}>{route.description}</p>
+          {routes.map((route) => {
+            const RouteIcon = routeIcons[route.path as keyof typeof routeIcons]
+
+            return (
+              <Link
+                key={route.path}
+                href={route.path}
+                className={styles.card}
+              >
+                <div className={styles.cardInner}>
+                  <div className={styles.cardContent}>
+                    {RouteIcon ? (
+                      <div className={styles.cardIcon} aria-hidden="true">
+                        <RouteIcon size={20} strokeWidth={1.9} />
+                      </div>
+                    ) : null}
+                    <div>
+                      <h2 className={styles.cardTitle}>
+                        {route.name}
+                      </h2>
+                      <p className={styles.cardDescription}>{route.description}</p>
+                    </div>
+                  </div>
+                  <ChevronRight size={20} strokeWidth={2} className={styles.arrowIcon} aria-hidden="true" />
                 </div>
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 15 15"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  className={styles.arrowIcon}
-                >
-                  <path
-                    d="M8.14645 3.14645C8.34171 2.95118 8.65829 2.95118 8.85355 3.14645L12.8536 7.14645C13.0488 7.34171 13.0488 7.65829 12.8536 7.85355L8.85355 11.8536C8.65829 12.0488 8.34171 12.0488 8.14645 11.8536C7.95118 11.6583 7.95118 11.3417 8.14645 11.1464L11.2929 8H2.5C2.22386 8 2 7.77614 2 7.5C2 7.22386 2.22386 7 2.5 7H11.2929L8.14645 3.85355C7.95118 3.65829 7.95118 3.34171 8.14645 3.14645Z"
-                    fill="currentColor"
-                    fillRule="evenodd"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </div>
-            </Link>
-          ))}
+              </Link>
+            )
+          })}
         </div>
       ) : null}
     </PageContainer>

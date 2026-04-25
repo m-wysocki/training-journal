@@ -14,14 +14,22 @@
   margin-bottom: 1.5rem;
 }
 
-.headerTop {
+.titleRow {
   display: flex;
-  align-items: flex-start;
-  gap: 1rem;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-.headerCopy {
-  min-width: 0;
+.titleIcon {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 10%, white);
 }
 
 .backLink {

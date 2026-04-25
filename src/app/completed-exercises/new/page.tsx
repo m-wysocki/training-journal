@@ -1,5 +1,6 @@
 'use client'
 
+import { SquarePen } from 'lucide-react'
 import { useState } from 'react'
 import {
   CompletedExerciseForm,
@@ -30,6 +31,7 @@ export default function NewCompletedExercisePage() {
       mode="create"
       title="Log Exercise"
       description="Choose an exercise and save only the most important workout details."
+      headerIcon={SquarePen}
       submitLabel="Save Exercise"
       submittingLabel="Saving..."
       initialValues={initialValues}

@@ -1,10 +1,5 @@
 export const routes = [
   {
-    path: '/exercise-categories',
-    name: 'Exercise Categories',
-    description: 'Manage your exercise categories',
-  },
-  {
     path: '/completed-exercises/new',
     name: 'Log Exercise',
     description: 'Log a completed exercise',
