@@ -28,6 +28,17 @@ type Exercise = {
   exercise_type: ExerciseType
 }
 
+type RecentCompletedExercise = {
+  id: string
+  performed_at: string
+  sets: number | null
+  reps_per_set: number[] | null
+  duration_per_set_seconds: number[] | null
+  load_kg: number | null
+  distance_km: number | null
+  pace_min_per_km: number | null
+}
+
 export type CompletedExerciseFormValues = {
   exerciseCategoryId: string
   exerciseId: string
@@ -98,6 +109,58 @@ const formatDuration = (seconds: number) => {
   return remainingSeconds === 0 ? `${minutes}m` : `${minutes}:${String(remainingSeconds).padStart(2, '0')}`
 }
 
+const formatDate = (date: string) =>
+  new Intl.DateTimeFormat('en-US', {
+    day: '2-digit',
+    month: 'long',
+    year: 'numeric',
+  }).format(new Date(`${date}T00:00:00`))
+
+const formatPace = (paceMinPerKm: number) => {
+  const totalSeconds = Math.round(paceMinPerKm * 60)
+  const minutes = Math.floor(totalSeconds / 60)
+  const seconds = totalSeconds % 60
+
+  return `${minutes}:${String(seconds).padStart(2, '0')} min/km`
+}
+
+const formatRecentExerciseSummary = (
+  exerciseType: ExerciseType,
+  exercise: RecentCompletedExercise,
+) => {
+  if (exerciseType === 'cardio') {
+    const details = []
+
+    if (exercise.distance_km !== null) {
+      details.push(`Distance: ${Number(exercise.distance_km).toFixed(1)} km`)
+    }
+
+    if (exercise.pace_min_per_km !== null) {
+      details.push(`Pace: ${formatPace(Number(exercise.pace_min_per_km))}`)
+    }
+
+    return details.join(' | ')
+  }
+
+  if (exerciseType === 'duration') {
+    return `Time: ${exercise.duration_per_set_seconds?.[0] ? formatDuration(exercise.duration_per_set_seconds[0]) : '-'}`
+  }
+
+  const details = [`Sets: ${exercise.sets ?? '-'}`]
+
+  if (exercise.duration_per_set_seconds?.length) {
+    details.push(`Time: ${exercise.duration_per_set_seconds.map(formatDuration).join(' / ')}`)
+  } else {
+    details.push(`Reps: ${exercise.reps_per_set?.join(' / ') ?? '-'}`)
+  }
+
+  if (exercise.load_kg !== null) {
+    details.push(`Load: ${Number(exercise.load_kg)} kg`)
+  }
+
+  return details.join(' | ')
+}
+
 export function CompletedExerciseForm({
   mode,
   title,
@@ -143,6 +206,13 @@ export function CompletedExerciseForm({
   const [isAddingExercise, setIsAddingExercise] = useState(false)
   const [isExerciseCategoryDialogOpen, setIsExerciseCategoryDialogOpen] = useState(false)
   const [isExerciseDialogOpen, setIsExerciseDialogOpen] = useState(false)
+  const [recentExercisesState, setRecentExercisesState] = useState<{
+    exerciseId: string
+    entries: RecentCompletedExercise[]
+  }>({
+    exerciseId: '',
+    entries: [],
+  })
 
   useEffect(() => {
     let isActive = true
@@ -182,6 +252,58 @@ export function CompletedExerciseForm({
   const isStrengthExercise = selectedExerciseType === 'strength'
   const isCardioExercise = selectedExerciseType === 'cardio'
   const isDurationExercise = selectedExerciseType === 'duration'
+  const recentExercises =
+    recentExercisesState.exerciseId === selectedExerciseId ? recentExercisesState.entries : []
+  const isRecentExercisesLoading = Boolean(selectedExerciseId) && recentExercisesState.exerciseId !== selectedExerciseId
+
+  useEffect(() => {
+    let isActive = true
+
+    if (!selectedExerciseId) {
+      return () => {
+        isActive = false
+      }
+    }
+
+    supabase
+      .from('completed_exercises')
+      .select(
+        `
+          id,
+          performed_at,
+          sets,
+          reps_per_set,
+          duration_per_set_seconds,
+          load_kg,
+          distance_km,
+          pace_min_per_km
+        `,
+      )
+      .eq('exercise_id', selectedExerciseId)
+      .order('performed_at', { ascending: false })
+      .order('created_at', { ascending: false })
+      .limit(3)
+      .then(({ data, error }) => {
+        if (!isActive) return
+
+        if (error) {
+          setRecentExercisesState({
+            exerciseId: selectedExerciseId,
+            entries: [],
+          })
+          return
+        }
+
+        setRecentExercisesState({
+          exerciseId: selectedExerciseId,
+          entries: (data as RecentCompletedExercise[]) || [],
+        })
+      })
+
+    return () => {
+      isActive = false
+    }
+  }, [selectedExerciseId])
 
   const handleSetsChange = (value: string) => {
     const parsed = Number(value)
@@ -621,20 +743,41 @@ export function CompletedExerciseForm({
             </div>
           </section>
 
-          <section className={styles.section}>
-            <div className={styles.sectionHeader}>
-              <h2 className={styles.sectionTitle}>Workout Details</h2>
-              <p className={styles.sectionDescription}>
-                {isStrengthExercise
-                  ? 'Set the number of sets, reps or time, and load for this exercise.'
-                  : isCardioExercise
-                    ? 'Set the distance and pace for this cardio exercise.'
-                    : 'Enter the total duration for this activity in hh:mm, using 5-minute steps.'}
-              </p>
-            </div>
+          {selectedExercise ? (
+            <section className={styles.section}>
+              <div className={styles.sectionHeader}>
+                <h2 className={styles.sectionTitle}>Workout Details</h2>
+                <p className={styles.sectionDescription}>
+                  {isStrengthExercise
+                    ? 'Set the number of sets, reps or time, and load for this exercise.'
+                    : isCardioExercise
+                      ? 'Set the distance and pace for this cardio exercise.'
+                      : 'Enter the total duration for this activity in hh:mm, using 5-minute steps.'}
+                </p>
 
-            <div className={styles.sectionBody}>
-              {isStrengthExercise ? (
+                <div className={styles.recentHistory}>
+                  <p className={styles.recentHistoryTitle}>Last 3 entries</p>
+                  {isRecentExercisesLoading ? (
+                    <p className={styles.recentHistoryEmpty}>Loading recent history...</p>
+                  ) : recentExercises.length === 0 ? (
+                    <p className={styles.recentHistoryEmpty}>No previous entries for this exercise yet.</p>
+                  ) : (
+                    <div className={styles.recentHistoryList}>
+                      {recentExercises.map((exercise) => (
+                        <div key={exercise.id} className={styles.recentHistoryItem}>
+                          <p className={styles.recentHistoryDate}>{formatDate(exercise.performed_at)}</p>
+                          <p className={styles.recentHistoryDetails}>
+                            {formatRecentExerciseSummary(selectedExerciseType, exercise)}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className={styles.sectionBody}>
+                {isStrengthExercise ? (
                 <>
                   <div className={styles.field}>
                     <label htmlFor="sets" className={styles.label}>
@@ -746,7 +889,7 @@ export function CompletedExerciseForm({
                     )}
                   </div>
                 </>
-              ) : isCardioExercise ? (
+                ) : isCardioExercise ? (
                 <div className={styles.metricsGrid}>
                   <div className={styles.field}>
                     <label htmlFor="distanceKm" className={styles.label}>
@@ -779,7 +922,7 @@ export function CompletedExerciseForm({
                     />
                   </div>
                 </div>
-              ) : (
+                ) : (
                 <div className={styles.field}>
                   <label htmlFor="activityDuration" className={styles.label}>
                     Duration
@@ -794,41 +937,44 @@ export function CompletedExerciseForm({
                     onChange={setActivityDurationSeconds}
                   />
                 </div>
-              )}
-            </div>
-          </section>
+                )}
+              </div>
+            </section>
+          ) : null}
 
-          <section className={styles.section}>
-            <div className={styles.sectionHeader}>
-              <h2 className={styles.sectionTitle}>Notes</h2>
-              <p className={styles.sectionDescription}>
-                Add the workout date and an optional note.
-              </p>
-            </div>
+          {selectedExercise ? (
+            <section className={styles.section}>
+              <div className={styles.sectionHeader}>
+                <h2 className={styles.sectionTitle}>Notes</h2>
+                <p className={styles.sectionDescription}>
+                  Add the workout date and an optional note.
+                </p>
+              </div>
 
-            <div className={styles.sectionBody}>
-              <label htmlFor="performedAt" className={styles.label}>
-                Date
-              </label>
-              <DatePicker
-                id="performedAt"
-                value={performedAt}
-                onChange={setPerformedAt}
-              />
+              <div className={styles.sectionBody}>
+                <label htmlFor="performedAt" className={styles.label}>
+                  Date
+                </label>
+                <DatePicker
+                  id="performedAt"
+                  value={performedAt}
+                  onChange={setPerformedAt}
+                />
 
-              <label htmlFor="note" className={styles.label}>
-                Note
-              </label>
-              <textarea
-                id="note"
-                className={`${styles.input} ${styles.textarea}`}
-                value={note}
-                onChange={(e) => setNote(e.target.value)}
-                rows={3}
-                placeholder="Optional: how the workout felt, notes, observations..."
-              />
-            </div>
-          </section>
+                <label htmlFor="note" className={styles.label}>
+                  Note
+                </label>
+                <textarea
+                  id="note"
+                  className={`${styles.input} ${styles.textarea}`}
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                  rows={3}
+                  placeholder="Optional: how the workout felt, notes, observations..."
+                />
+              </div>
+            </section>
+          ) : null}
 
           <div className={styles.formFooter}>
             {message && (

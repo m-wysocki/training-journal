@@ -92,6 +92,52 @@
   color: #6b7280;
 }
 
+.recentHistory {
+  display: grid;
+  gap: 0.625rem;
+  margin-top: 0.875rem;
+  padding-top: 0.875rem;
+  border-top: 1px solid #edf0f3;
+}
+
+.recentHistoryTitle {
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #374151;
+}
+
+.recentHistoryList {
+  display: grid;
+  gap: 0.625rem;
+}
+
+.recentHistoryItem {
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.75rem 0.875rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  background: #fff;
+}
+
+.recentHistoryDate {
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.recentHistoryDetails,
+.recentHistoryEmpty {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: #6b7280;
+}
+
 .sectionBody {
   display: grid;
   gap: 0.9rem;
