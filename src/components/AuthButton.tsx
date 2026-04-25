@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { LogOut, Settings, User } from 'lucide-react'
+import { LogOut, Settings, User as UserIcon } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
@@ -78,7 +78,7 @@ export default function AuthButton() {
           aria-haspopup="menu"
           onClick={() => setMenuOpen((isOpen) => !isOpen)}
         >
-          <User size={18} strokeWidth={1.8} aria-hidden="true" />
+          <UserIcon size={18} strokeWidth={1.8} aria-hidden="true" />
         </button>
 
         {menuOpen ? (
@@ -119,7 +119,7 @@ export default function AuthButton() {
       aria-label="Sign in"
       type="button"
     >
-      <User size={18} strokeWidth={1.8} aria-hidden="true" />
+      <UserIcon size={18} strokeWidth={1.8} aria-hidden="true" />
     </button>
   )
 }
