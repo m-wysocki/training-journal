@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
+import trainingJournalLogo from "../../public/training-journal-logo.png";
 import "./globals.css";
 import AuthButton from "@/components/AuthButton";
 import PageContainer from "@/components/PageContainer";
@@ -20,6 +21,22 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Training Journal",
   description: "Training Journal App",
+  manifest: "/favicon/site.webmanifest",
+  icons: {
+    shortcut: "/favicon/favicon.ico",
+    icon: [
+      { url: "/favicon/favicon.ico", media: "(prefers-color-scheme: light)" },
+      { url: "/favicon/favicon.svg", type: "image/svg+xml", media: "(prefers-color-scheme: light)" },
+      { url: "/favicon/favicon-96x96.png", sizes: "96x96", type: "image/png", media: "(prefers-color-scheme: light)" },
+      { url: "/favicon-black/favicon.ico", media: "(prefers-color-scheme: dark)" },
+      { url: "/favicon-black/favicon.svg", type: "image/svg+xml", media: "(prefers-color-scheme: dark)" },
+      { url: "/favicon-black/favicon-96x96.png", sizes: "96x96", type: "image/png", media: "(prefers-color-scheme: dark)" },
+    ],
+    apple: [
+      { url: "/favicon/apple-touch-icon.png", media: "(prefers-color-scheme: light)" },
+      { url: "/favicon-black/apple-touch-icon.png", media: "(prefers-color-scheme: dark)" },
+    ],
+  },
 };
 
 export default function RootLayout({
@@ -35,10 +52,10 @@ export default function RootLayout({
             <PageContainer className={styles.headerInner}>
               <Link href="/" className={styles.brand}>
                 <Image
-                  src="/training-journal-logo.png"
+                  src={trainingJournalLogo}
                   alt="Training Journal"
-                  width={220}
-                  height={50}
+                  width={187}
+                  height={43}
                   className={styles.brandLogo}
                   priority
                 />
