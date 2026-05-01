@@ -1,7 +1,7 @@
 'use client'
 
 import type { LucideIcon } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import * as Dialog from '@radix-ui/react-dialog'
 import { supabase } from '@/lib/supabase'
@@ -11,6 +11,7 @@ import { DurationStepper } from '@/components/DurationStepper'
 import { NumericStepper } from '@/components/NumericStepper'
 import { PaceStepper } from '@/components/PaceStepper'
 import PageContainer from '@/components/PageContainer'
+import { formatDuration, formatLongDate, formatPace } from '@/lib/trainingFormatters'
 import styles from './CompletedExerciseForm.module.scss'
 
 type ExerciseCategory = {
@@ -87,42 +88,6 @@ const DISTANCE_STEP_KM = 0.1
 const DEFAULT_PACE_MIN_PER_KM = 6
 const MIN_PACE_MIN_PER_KM = 1
 const MAX_PACE_MIN_PER_KM = 60
-
-const formatDuration = (seconds: number) => {
-  if (seconds < 60) return `${seconds}s`
-
-  const hours = Math.floor(seconds / 3600)
-  const minutes = Math.floor(seconds / 60)
-  const remainingMinutes = Math.floor((seconds % 3600) / 60)
-  const remainingSeconds = seconds % 60
-
-  if (hours > 0) {
-    if (remainingMinutes === 0) {
-      return remainingSeconds === 0 ? `${hours}h` : `${hours}h ${remainingSeconds}s`
-    }
-
-    return remainingSeconds === 0
-      ? `${hours}h ${remainingMinutes}min`
-      : `${hours}h ${remainingMinutes}min ${remainingSeconds}s`
-  }
-
-  return remainingSeconds === 0 ? `${minutes}m` : `${minutes}:${String(remainingSeconds).padStart(2, '0')}`
-}
-
-const formatDate = (date: string) =>
-  new Intl.DateTimeFormat('en-US', {
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric',
-  }).format(new Date(`${date}T00:00:00`))
-
-const formatPace = (paceMinPerKm: number) => {
-  const totalSeconds = Math.round(paceMinPerKm * 60)
-  const minutes = Math.floor(totalSeconds / 60)
-  const seconds = totalSeconds % 60
-
-  return `${minutes}:${String(seconds).padStart(2, '0')} min/km`
-}
 
 const formatRecentExerciseSummary = (
   exerciseType: ExerciseType,
@@ -213,6 +178,7 @@ export function CompletedExerciseForm({
     exerciseId: '',
     entries: [],
   })
+  const recentExercisesCacheRef = useRef(new Map<string, RecentCompletedExercise[]>())
 
   useEffect(() => {
     let isActive = true
@@ -265,6 +231,19 @@ export function CompletedExerciseForm({
       }
     }
 
+    const cachedEntries = recentExercisesCacheRef.current.get(selectedExerciseId)
+
+    if (cachedEntries) {
+      setRecentExercisesState({
+        exerciseId: selectedExerciseId,
+        entries: cachedEntries,
+      })
+
+      return () => {
+        isActive = false
+      }
+    }
+
     supabase
       .from('completed_exercises')
       .select(
@@ -291,12 +270,15 @@ export function CompletedExerciseForm({
             exerciseId: selectedExerciseId,
             entries: [],
           })
+          recentExercisesCacheRef.current.set(selectedExerciseId, [])
           return
         }
 
+        const entries = (data as RecentCompletedExercise[]) || []
+        recentExercisesCacheRef.current.set(selectedExerciseId, entries)
         setRecentExercisesState({
           exerciseId: selectedExerciseId,
-          entries: (data as RecentCompletedExercise[]) || [],
+          entries,
         })
       })
 
@@ -765,7 +747,7 @@ export function CompletedExerciseForm({
                     <div className={styles.recentHistoryList}>
                       {recentExercises.map((exercise) => (
                         <div key={exercise.id} className={styles.recentHistoryItem}>
-                          <p className={styles.recentHistoryDate}>{formatDate(exercise.performed_at)}</p>
+                          <p className={styles.recentHistoryDate}>{formatLongDate(exercise.performed_at)}</p>
                           <p className={styles.recentHistoryDetails}>
                             {formatRecentExerciseSummary(selectedExerciseType, exercise)}
                           </p>

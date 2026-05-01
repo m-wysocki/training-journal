@@ -60,6 +60,11 @@ export function PaceStepper({
   disabled = false,
 }: PaceStepperProps) {
   const [inputValue, setInputValue] = useState(formatPaceInput(value))
+  const formattedValue = formatPaceInput(value)
+
+  if (inputValue !== formattedValue && parsePaceInput(inputValue) === value) {
+    setInputValue(formattedValue)
+  }
 
   const commitInputValue = (rawValue: string) => {
     const parsed = parsePaceInput(rawValue)

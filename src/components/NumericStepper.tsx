@@ -38,7 +38,17 @@ export function NumericStepper({
   unit,
 }: NumericStepperProps) {
   const precision = getPrecision(step)
-  const [inputValue, setInputValue] = useState(String(value))
+  const [draftState, setDraftState] = useState(() => ({
+    inputValue: String(value),
+    lastSyncedValue: value,
+  }))
+
+  if (draftState.lastSyncedValue !== value) {
+    setDraftState({
+      inputValue: String(value),
+      lastSyncedValue: value,
+    })
+  }
 
   const normalizeValue = (nextValue: number) => {
     const clamped = clamp(nextValue, min, max)
@@ -49,18 +59,27 @@ export function NumericStepper({
     const parsed = Number(rawValue)
     const nextValue = Number.isNaN(parsed) ? min : normalizeValue(parsed)
 
-    setInputValue(String(nextValue))
+    setDraftState({
+      inputValue: String(nextValue),
+      lastSyncedValue: nextValue,
+    })
     onChange(nextValue)
   }
 
   const handleInputChange = (rawValue: string) => {
-    setInputValue(rawValue)
+    setDraftState((current) => ({
+      ...current,
+      inputValue: rawValue,
+    }))
   }
 
   const updateByStep = (direction: -1 | 1) => {
     const nextValue = normalizeValue(value + direction * step)
 
-    setInputValue(String(nextValue))
+    setDraftState({
+      inputValue: String(nextValue),
+      lastSyncedValue: nextValue,
+    })
     onChange(nextValue)
   }
 
@@ -87,7 +106,7 @@ export function NumericStepper({
             min={min}
             max={max}
             step={step}
-            value={inputValue}
+            value={draftState.inputValue}
             onChange={(e) => handleInputChange(e.target.value)}
             onBlur={(e) => commitInputValue(e.target.value)}
             onKeyDown={(e) => {

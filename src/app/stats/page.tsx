@@ -6,8 +6,8 @@ import * as Accordion from '@radix-ui/react-accordion'
 import BackLink from '@/components/BackLink'
 import { DatePicker } from '@/components/DatePicker'
 import PageContainer from '@/components/PageContainer'
-import { formatLocalDateOnly, parseDateOnly } from '@/lib/dateOnly'
 import { supabase } from '@/lib/supabase'
+import { formatDateRange, getCurrentWeekRange, shiftWeekRange } from '@/lib/trainingDateRange'
 import styles from './page.module.scss'
 
 type WeeklyEntry = {
@@ -24,53 +24,25 @@ type ExerciseCategoryStat = {
   trainingDays: number
 }
 
-const getStartOfWeek = (date: Date) => {
-  const normalized = new Date(date)
-  normalized.setHours(0, 0, 0, 0)
-  const day = normalized.getDay()
-  const diff = day === 0 ? -6 : 1 - day
-  normalized.setDate(normalized.getDate() + diff)
-  return normalized
-}
-
-const addDays = (date: Date, days: number) => {
-  const next = new Date(date)
-  next.setDate(next.getDate() + days)
-  return next
-}
-
-const formatDateRange = (dateFrom: string, dateTo: string) => {
-  const formatter = new Intl.DateTimeFormat('en-US', {
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
-  })
-
-  return `${formatter.format(parseDateOnly(dateFrom))} - ${formatter.format(parseDateOnly(dateTo))}`
-}
-
 export default function StatsPage() {
-  const [dateFrom, setDateFrom] = useState(() => formatLocalDateOnly(getStartOfWeek(new Date())))
-  const [dateTo, setDateTo] = useState(() => formatLocalDateOnly(new Date()))
+  const [{ dateFrom, dateTo }, setDateRange] = useState(getCurrentWeekRange)
   const [entries, setEntries] = useState<WeeklyEntry[]>([])
   const [errorMessage, setErrorMessage] = useState('')
   const [loading, setLoading] = useState(true)
 
   const updateDateFrom = (value: string) => {
     setLoading(true)
-    setDateFrom(value)
+    setDateRange((current) => ({ ...current, dateFrom: value }))
   }
 
   const updateDateTo = (value: string) => {
     setLoading(true)
-    setDateTo(value)
+    setDateRange((current) => ({ ...current, dateTo: value }))
   }
 
   const shiftDateRangeByWeek = (direction: -1 | 1) => {
     setLoading(true)
-    const nextWeekStart = addDays(getStartOfWeek(parseDateOnly(dateFrom)), direction * 7)
-    setDateFrom(formatLocalDateOnly(nextWeekStart))
-    setDateTo(formatLocalDateOnly(addDays(nextWeekStart, 6)))
+    setDateRange(shiftWeekRange(dateFrom, direction))
   }
 
   useEffect(() => {

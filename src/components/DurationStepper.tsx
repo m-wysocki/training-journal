@@ -63,6 +63,11 @@ export function DurationStepper({
   disabled = false,
 }: DurationStepperProps) {
   const [inputValue, setInputValue] = useState(formatDurationInput(value))
+  const formattedValue = formatDurationInput(value)
+
+  if (inputValue !== formattedValue && parseDurationInput(inputValue) === value) {
+    setInputValue(formattedValue)
+  }
 
   const commitInputValue = (rawValue: string) => {
     const parsed = parseDurationInput(rawValue)
