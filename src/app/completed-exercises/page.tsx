@@ -1,6 +1,6 @@
 'use client'
 
-import { ClipboardList, Ellipsis } from 'lucide-react'
+import { ArrowDown, ArrowUp, ClipboardList, Ellipsis } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import * as Accordion from '@radix-ui/react-accordion'
@@ -10,13 +10,16 @@ import { supabase } from '@/lib/supabase'
 import BackLink from '@/components/BackLink'
 import { DatePicker } from '@/components/DatePicker'
 import PageContainer from '@/components/PageContainer'
-import { formatLocalDateOnly, parseDateOnly } from '@/lib/dateOnly'
+import { formatLocalDateOnly } from '@/lib/dateOnly'
+import { formatDateRange, getCurrentWeekRange, shiftWeekRange } from '@/lib/trainingDateRange'
+import { formatDuration, formatDurationHoursMinutes, formatPace, formatWeekdayDate } from '@/lib/trainingFormatters'
 import styles from './page.module.scss'
 
 type CompletedExerciseRow = {
   id: string
   exercise_id: string
   performed_at: string
+  created_at: string
   sets: number | null
   reps_per_set: number[] | null
   duration_per_set_seconds: number[] | null
@@ -54,73 +57,138 @@ type CopyCategoryTarget = {
   entries: CompletedExerciseRow[]
 }
 
-const formatDate = (date: string) =>
-  new Intl.DateTimeFormat('en-US', {
-    weekday: 'long',
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric',
-  }).format(parseDateOnly(date))
-
-const getStartOfWeek = (date: Date) => {
-  const normalized = new Date(date)
-  normalized.setHours(0, 0, 0, 0)
-  const day = normalized.getDay()
-  const diff = day === 0 ? -6 : 1 - day
-  normalized.setDate(normalized.getDate() + diff)
-  return normalized
+type EntryComparisonMetric = {
+  key: 'reps' | 'load' | 'time' | 'distance' | 'pace'
+  label: string
+  direction: 'up' | 'down'
+  tone: 'positive' | 'negative'
+  value: string
 }
 
-const addDays = (date: Date, days: number) => {
-  const next = new Date(date)
-  next.setDate(next.getDate() + days)
-  return next
+type EntryComparisons = Record<string, EntryComparisonMetric[]>
+
+const sumValues = (values: number[] | null) => values?.reduce((total, value) => total + value, 0) ?? null
+
+const formatSignedNumber = (value: number) => {
+  const absoluteValue = Math.abs(value)
+  const formattedValue = Number.isInteger(absoluteValue) ? String(absoluteValue) : absoluteValue.toFixed(1)
+
+  return `${value > 0 ? '+' : '-'}${formattedValue}`
 }
 
-const formatDateRange = (dateFrom: string, dateTo: string) => {
-  const formatter = new Intl.DateTimeFormat('en-US', {
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
-  })
+const formatSignedDuration = (seconds: number) => `${seconds > 0 ? '+' : '-'}${formatDuration(Math.abs(seconds))}`
 
-  return `${formatter.format(parseDateOnly(dateFrom))} - ${formatter.format(parseDateOnly(dateTo))}`
-}
-
-const formatPace = (paceMinPerKm: number) => {
-  const totalSeconds = Math.round(paceMinPerKm * 60)
+const formatSignedPace = (paceMinPerKm: number) => {
+  const sign = paceMinPerKm > 0 ? '+' : '-'
+  const totalSeconds = Math.round(Math.abs(paceMinPerKm) * 60)
   const minutes = Math.floor(totalSeconds / 60)
   const seconds = totalSeconds % 60
-  return `${minutes}:${String(seconds).padStart(2, '0')} min/km`
+
+  return `${sign}${minutes}:${String(seconds).padStart(2, '0')} min/km`
 }
 
-const formatDuration = (seconds: number) => {
-  if (seconds < 60) return `${seconds}s`
+const createComparisonMetric = (
+  key: EntryComparisonMetric['key'],
+  label: string,
+  delta: number,
+  value: string,
+  isIncreasePositive = true,
+): EntryComparisonMetric | null => {
+  if (delta === 0) return null
 
-  const hours = Math.floor(seconds / 3600)
-  const minutes = Math.floor(seconds / 60)
-  const remainingMinutes = Math.floor((seconds % 3600) / 60)
-  const remainingSeconds = seconds % 60
+  const isPositive = isIncreasePositive ? delta > 0 : delta < 0
 
-  if (hours > 0) {
-    if (remainingMinutes === 0) {
-      return remainingSeconds === 0 ? `${hours}h` : `${hours}h ${remainingSeconds}s`
-    }
+  return {
+    key,
+    label,
+    direction: delta > 0 ? 'up' : 'down',
+    tone: isPositive ? 'positive' : 'negative',
+    value,
+  }
+}
 
-    return remainingSeconds === 0
-      ? `${hours}h ${remainingMinutes}min`
-      : `${hours}h ${remainingMinutes}min ${remainingSeconds}s`
+const getEntryComparisonMetrics = (
+  currentEntry: CompletedExerciseRow,
+  previousEntry: CompletedExerciseRow | undefined,
+) => {
+  if (!previousEntry) return []
+
+  const metrics: EntryComparisonMetric[] = []
+  const currentReps = sumValues(currentEntry.reps_per_set)
+  const previousReps = sumValues(previousEntry.reps_per_set)
+  const currentDuration = sumValues(currentEntry.duration_per_set_seconds)
+  const previousDuration = sumValues(previousEntry.duration_per_set_seconds)
+
+  if (currentReps !== null && previousReps !== null) {
+    const delta = currentReps - previousReps
+    const metric = createComparisonMetric('reps', 'Reps', delta, formatSignedNumber(delta))
+
+    if (metric) metrics.push(metric)
   }
 
-  return remainingSeconds === 0 ? `${minutes}m` : `${minutes}:${String(remainingSeconds).padStart(2, '0')}`
+  if (currentEntry.load_kg !== null && previousEntry.load_kg !== null) {
+    const delta = Number(currentEntry.load_kg) - Number(previousEntry.load_kg)
+    const metric = createComparisonMetric('load', 'Load', delta, `${formatSignedNumber(delta)} kg`)
+
+    if (metric) metrics.push(metric)
+  }
+
+  if (currentDuration !== null && previousDuration !== null) {
+    const delta = currentDuration - previousDuration
+    const metric = createComparisonMetric('time', 'Time', delta, formatSignedDuration(delta))
+
+    if (metric) metrics.push(metric)
+  }
+
+  if (currentEntry.distance_km !== null && previousEntry.distance_km !== null) {
+    const delta = Number(currentEntry.distance_km) - Number(previousEntry.distance_km)
+    const metric = createComparisonMetric('distance', 'Distance', delta, `${formatSignedNumber(delta)} km`)
+
+    if (metric) metrics.push(metric)
+  }
+
+  if (currentEntry.pace_min_per_km !== null && previousEntry.pace_min_per_km !== null) {
+    const delta = Number(currentEntry.pace_min_per_km) - Number(previousEntry.pace_min_per_km)
+    const metric = createComparisonMetric('pace', 'Pace', delta, formatSignedPace(delta), false)
+
+    if (metric) metrics.push(metric)
+  }
+
+  return metrics
 }
 
-const formatDurationHoursMinutes = (seconds: number) => {
-  const totalMinutes = Math.floor(seconds / 60)
-  const hours = Math.floor(totalMinutes / 60)
-  const minutes = totalMinutes % 60
+const compareEntriesByRecency = (firstEntry: CompletedExerciseRow, secondEntry: CompletedExerciseRow) => {
+  const performedAtComparison = secondEntry.performed_at.localeCompare(firstEntry.performed_at)
 
-  return `${hours}h ${minutes}min`
+  if (performedAtComparison !== 0) return performedAtComparison
+
+  return secondEntry.created_at.localeCompare(firstEntry.created_at)
+}
+
+const getEntryComparisons = (historyEntries: CompletedExerciseRow[], visibleEntryIds: Set<string>) => {
+  const entriesByExercise = new Map<string, CompletedExerciseRow[]>()
+  const comparisons: EntryComparisons = {}
+
+  historyEntries.forEach((entry) => {
+    const currentEntries = entriesByExercise.get(entry.exercise_id) ?? []
+    entriesByExercise.set(entry.exercise_id, [...currentEntries, entry])
+  })
+
+  entriesByExercise.forEach((exerciseEntries) => {
+    const sortedEntries = [...exerciseEntries].sort(compareEntriesByRecency)
+
+    sortedEntries.forEach((entry, index) => {
+      if (!visibleEntryIds.has(entry.id)) return
+
+      const metrics = getEntryComparisonMetrics(entry, sortedEntries[index + 1])
+
+      if (metrics.length > 0) {
+        comparisons[entry.id] = metrics
+      }
+    })
+  })
+
+  return comparisons
 }
 
 const formatEntryDetails = (entry: CompletedExerciseRow) => {
@@ -161,8 +229,7 @@ const formatEntryDetails = (entry: CompletedExerciseRow) => {
 
 export default function CompletedExercisesPage() {
   const router = useRouter()
-  const [dateFrom, setDateFrom] = useState(() => formatLocalDateOnly(getStartOfWeek(new Date())))
-  const [dateTo, setDateTo] = useState(() => formatLocalDateOnly(new Date()))
+  const [{ dateFrom, dateTo }, setDateRange] = useState(getCurrentWeekRange)
   const [entries, setEntries] = useState<CompletedExerciseRow[]>([])
   const [exerciseCategories, setExerciseCategories] = useState<ExerciseCategory[]>([])
   const [errorMessage, setErrorMessage] = useState('')
@@ -175,6 +242,7 @@ export default function CompletedExercisesPage() {
   const [copyDate, setCopyDate] = useState('')
   const [copyLoading, setCopyLoading] = useState(false)
   const [successMessage, setSuccessMessage] = useState('')
+  const [entryComparisons, setEntryComparisons] = useState<EntryComparisons>({})
   const isCopyDateSameAsSource = Boolean(copyTarget && copyDate === copyTarget.sourceDate)
 
   const loadData = useCallback(() => {
@@ -185,6 +253,7 @@ export default function CompletedExercisesPage() {
           id,
           exercise_id,
           performed_at,
+          created_at,
           sets,
           reps_per_set,
           duration_per_set_seconds,
@@ -224,6 +293,63 @@ export default function CompletedExercisesPage() {
   }, [loadData])
 
   useEffect(() => {
+    const exerciseIds = Array.from(new Set(entries.map((entry) => entry.exercise_id)))
+
+    if (exerciseIds.length === 0) {
+      return
+    }
+
+    let isActive = true
+
+    void supabase
+      .from('completed_exercises')
+      .select(
+        `
+          id,
+          exercise_id,
+          performed_at,
+          created_at,
+          sets,
+          reps_per_set,
+          duration_per_set_seconds,
+          load_kg,
+          distance_km,
+          pace_min_per_km,
+          note,
+          exercise:exercises (
+            id,
+            name,
+            exercise_category_id,
+            exercise_type,
+            exercise_category:exercise_categories (
+              name
+            )
+          )
+        `,
+      )
+      .in('exercise_id', exerciseIds)
+      .lte('performed_at', dateTo)
+      .order('performed_at', { ascending: false })
+      .order('created_at', { ascending: false })
+      .then(({ data, error }) => {
+        if (!isActive) return
+
+        if (error) {
+          setEntryComparisons({})
+          return
+        }
+
+        setEntryComparisons(
+          getEntryComparisons((data as unknown as CompletedExerciseRow[]) || [], new Set(entries.map((entry) => entry.id))),
+        )
+      })
+
+    return () => {
+      isActive = false
+    }
+  }, [dateTo, entries])
+
+  useEffect(() => {
     supabase
       .from('exercise_categories')
       .select('id, name')
@@ -240,9 +366,7 @@ export default function CompletedExercisesPage() {
   }, [])
 
   const shiftDateRangeByWeek = (direction: -1 | 1) => {
-    const nextWeekStart = addDays(getStartOfWeek(parseDateOnly(dateFrom)), direction * 7)
-    setDateFrom(formatLocalDateOnly(nextWeekStart))
-    setDateTo(formatLocalDateOnly(addDays(nextWeekStart, 6)))
+    setDateRange(shiftWeekRange(dateFrom, direction))
   }
 
   const exerciseCategoryOptions = useMemo(() => {
@@ -383,7 +507,7 @@ export default function CompletedExercisesPage() {
 
     const copiedCount = rowsToInsert.length
     setSuccessMessage(
-      `Copied ${copiedCount} ${copiedCount === 1 ? 'exercise' : 'exercises'} from ${copyTarget.categoryName} to ${formatDate(copyDate)}.`,
+      `Copied ${copiedCount} ${copiedCount === 1 ? 'exercise' : 'exercises'} from ${copyTarget.categoryName} to ${formatWeekdayDate(copyDate)}.`,
     )
     closeCopyCategory()
     loadData()
@@ -420,13 +544,21 @@ export default function CompletedExercisesPage() {
                     <label htmlFor="dateFrom" className={styles.filterLabel}>
                       From
                     </label>
-                    <DatePicker id="dateFrom" value={dateFrom} onChange={setDateFrom} />
+                    <DatePicker
+                      id="dateFrom"
+                      value={dateFrom}
+                      onChange={(value) => setDateRange((current) => ({ ...current, dateFrom: value }))}
+                    />
                   </div>
                   <div className={styles.datePickerGroup}>
                     <label htmlFor="dateTo" className={styles.filterLabel}>
                       To
                     </label>
-                    <DatePicker id="dateTo" value={dateTo} onChange={setDateTo} />
+                    <DatePicker
+                      id="dateTo"
+                      value={dateTo}
+                      onChange={(value) => setDateRange((current) => ({ ...current, dateTo: value }))}
+                    />
                   </div>
                 </div>
 
@@ -491,7 +623,7 @@ export default function CompletedExercisesPage() {
         <div className={styles.daysList}>
           {groupedByDate.map((group) => (
             <section key={group.date} className={styles.dayCard}>
-              <h2 className={styles.dayTitle}>{formatDate(group.date)}</h2>
+              <h2 className={styles.dayTitle}>{formatWeekdayDate(group.date)}</h2>
               <div className={styles.exerciseCategorySections}>
                 {group.exerciseCategories.map((exerciseCategory) => (
                   <section key={`${group.date}-${exerciseCategory.name}`} className={styles.exerciseCategorySection}>
@@ -534,6 +666,27 @@ export default function CompletedExercisesPage() {
                               <p className={styles.entryDetails}>
                                 {formatEntryDetails(entry)}
                               </p>
+                              {entryComparisons[entry.id]?.length ? (
+                                <div className={styles.entryComparisons} aria-label="Changes since previous session">
+                                  {entryComparisons[entry.id].map((metric) => {
+                                    const ComparisonIcon = metric.direction === 'up' ? ArrowUp : ArrowDown
+
+                                    return (
+                                      <span
+                                        key={metric.key}
+                                        className={styles.comparisonBadge}
+                                        data-direction={metric.direction}
+                                        data-tone={metric.tone}
+                                      >
+                                        <ComparisonIcon size={14} strokeWidth={2.4} aria-hidden="true" />
+                                        <span>
+                                          {metric.label}: {metric.value}
+                                        </span>
+                                      </span>
+                                    )
+                                  })}
+                                </div>
+                              ) : null}
                               {entry.note?.trim() ? (
                                 <p className={styles.entryNote}>{entry.note.trim()}</p>
                               ) : null}
@@ -607,7 +760,7 @@ export default function CompletedExercisesPage() {
               <Dialog.Title className={styles.dialogTitle}>Copy exercises</Dialog.Title>
               <Dialog.Description className={styles.dialogDescription}>
                 {copyTarget
-                  ? `Copy ${copyTarget.categoryName} from ${formatDate(copyTarget.sourceDate)} to another date.`
+                  ? `Copy ${copyTarget.categoryName} from ${formatWeekdayDate(copyTarget.sourceDate)} to another date.`
                   : 'Choose a date to copy these exercises.'}
               </Dialog.Description>
               <div className={styles.dialogForm}>
