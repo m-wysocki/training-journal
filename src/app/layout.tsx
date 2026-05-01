@@ -1,11 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import Image from "next/image";
-import Link from "next/link";
-import trainingJournalLogo from "../../public/training-journal-logo.png";
 import "./globals.css";
-import AuthButton from "@/components/AuthButton";
-import PageContainer from "@/components/PageContainer";
+import AppHeader from "@/components/AppHeader";
 import styles from "./layout.module.scss";
 
 const geistSans = Geist({
@@ -48,30 +44,7 @@ export default function RootLayout({
     <html lang="pl">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <div className={styles.pageRoot}>
-          <header className={styles.header}>
-            <PageContainer className={styles.headerInner}>
-              <Link href="/" className={styles.brand}>
-                <Image
-                  src={trainingJournalLogo}
-                  alt="Training Journal"
-                  width={187}
-                  height={43}
-                  className={styles.brandLogo}
-                  priority
-                />
-              </Link>
-              <div className={styles.headerActions}>
-                <Link
-                  href="/completed-exercises/new"
-                  className={styles.logExerciseButton}
-                  aria-label="Log exercise"
-                >
-                  <span aria-hidden="true">+</span>
-                </Link>
-                <AuthButton />
-              </div>
-            </PageContainer>
-          </header>
+          <AppHeader />
           {children}
         </div>
       </body>

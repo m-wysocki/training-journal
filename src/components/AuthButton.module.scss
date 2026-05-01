@@ -3,25 +3,6 @@
   flex: 0 0 auto;
 }
 
-.avatarButton {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.25rem;
-  height: 2.25rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
-  color: #111827;
-  background: #fff;
-  cursor: pointer;
-}
-
-.avatarButton:hover,
-.avatarButton[aria-expanded='true'] {
-  border-color: #9ca3af;
-  background: #f9fafb;
-}
-
 .menuPanel {
   position: absolute;
   top: calc(100% + 0.5rem);

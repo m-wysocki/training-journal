@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import type { User } from '@supabase/supabase-js'
+import ButtonSquare from '@/components/ButtonSquare'
 import styles from './AuthButton.module.scss'
 
 export default function AuthButton() {
@@ -70,16 +71,15 @@ export default function AuthButton() {
   if (user) {
     return (
       <div className={styles.userMenu} ref={menuRef}>
-        <button
+        <ButtonSquare
           type="button"
-          className={styles.avatarButton}
           aria-label="Open account menu"
           aria-expanded={menuOpen}
           aria-haspopup="menu"
           onClick={() => setMenuOpen((isOpen) => !isOpen)}
         >
           <UserIcon size={18} strokeWidth={1.8} aria-hidden="true" />
-        </button>
+        </ButtonSquare>
 
         {menuOpen ? (
           <div className={styles.menuPanel} role="menu">
@@ -113,13 +113,12 @@ export default function AuthButton() {
   }
 
   return (
-    <button
+    <ButtonSquare
       onClick={() => router.push('/login')}
-      className={styles.avatarButton}
       aria-label="Sign in"
       type="button"
     >
       <UserIcon size={18} strokeWidth={1.8} aria-hidden="true" />
-    </button>
+    </ButtonSquare>
   )
 }
