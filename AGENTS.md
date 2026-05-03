@@ -34,14 +34,6 @@ The app is used to track workouts, muscle groups, exercises, sets, reps, and tra
 - Avoid large global styles unless truly shared.
 - Do not duplicate the same visual patterns in multiple places. Extract reusable styling or components when appropriate.
 
-Example BEM style:
-
-.workout-card {}
-.workout-card__header {}
-.workout-card__title {}
-.workout-card__actions {}
-.workout-card--active {}
-
 ## Component rules
 
 - Separate visual components from functional/container components when it improves readability.

@@ -3,35 +3,20 @@
 import Link from 'next/link'
 import { LogOut, Settings, User as UserIcon } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
-import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import type { User } from '@supabase/supabase-js'
 import ButtonSquare from '@/components/ButtonSquare'
+import { signOut } from '@/components/authActions'
 import styles from './AuthButton.module.scss'
 
-export default function AuthButton() {
-  const [user, setUser] = useState<User | null>(null)
-  const [loading, setLoading] = useState(true)
+type AuthButtonProps = {
+  user: User | null
+}
+
+export default function AuthButton({ user }: AuthButtonProps) {
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement | null>(null)
   const router = useRouter()
-
-  useEffect(() => {
-    // Sprawdź aktualną sesję
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null)
-      setLoading(false)
-    })
-
-    // Nasłuchuj zmian w autoryzacji
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null)
-    })
-
-    return () => subscription.unsubscribe()
-  }, [])
 
   useEffect(() => {
     if (!menuOpen) return
@@ -59,13 +44,9 @@ export default function AuthButton() {
 
   const handleLogout = async () => {
     setMenuOpen(false)
-    await supabase.auth.signOut()
+    await signOut()
     router.push('/')
     router.refresh()
-  }
-
-  if (loading) {
-    return null
   }
 
   if (user) {

@@ -6,6 +6,11 @@ import { supabase } from '@/lib/supabase'
 import * as Dialog from '@radix-ui/react-dialog'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import Link from 'next/link'
+import {
+  addExerciseCategory,
+  deleteExerciseCategory,
+  updateExerciseCategory,
+} from '@/app/exerciseSetupActions'
 import styles from './ExerciseCategoriesManager.module.scss'
 
 type ExerciseCategory = {
@@ -13,32 +18,29 @@ type ExerciseCategory = {
   name: string
 }
 
-export default function ExerciseCategoriesManager() {
+type ExerciseCategoriesManagerProps = {
+  initialCategories?: ExerciseCategory[]
+  initialErrorMessage?: string
+  initialDataLoaded?: boolean
+}
+
+export default function ExerciseCategoriesManager({
+  initialCategories = [],
+  initialErrorMessage = '',
+  initialDataLoaded = false,
+}: ExerciseCategoriesManagerProps) {
   const [name, setName] = useState('')
-  const [categories, setCategories] = useState<ExerciseCategory[]>([])
+  const [categories, setCategories] = useState<ExerciseCategory[]>(initialCategories)
   const [open, setOpen] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
   const [editingCategory, setEditingCategory] = useState<ExerciseCategory | null>(null)
   const [editName, setEditName] = useState('')
-  const [message, setMessage] = useState('')
-  const [isError, setIsError] = useState(false)
-
-  const fetchCategories = async () => {
-    const { data, error } = await supabase
-      .from('exercise_categories')
-      .select('*')
-      .order('created_at')
-
-    if (error) {
-      setIsError(true)
-      setMessage('Could not load exercise categories.')
-      return
-    }
-
-    setCategories(data || [])
-  }
+  const [message, setMessage] = useState(initialErrorMessage)
+  const [isError, setIsError] = useState(Boolean(initialErrorMessage))
 
   useEffect(() => {
+    if (initialDataLoaded || initialErrorMessage) return
+
     supabase
       .from('exercise_categories')
       .select('*')
@@ -52,7 +54,7 @@ export default function ExerciseCategoriesManager() {
 
         setCategories(data || [])
       })
-  }, [])
+  }, [initialDataLoaded, initialErrorMessage])
 
   const addCategory = async () => {
     const trimmedName = name.trim()
@@ -62,54 +64,33 @@ export default function ExerciseCategoriesManager() {
     setMessage('')
     setIsError(false)
 
-    const {
-      data: { session },
-    } = await supabase.auth.getSession()
+    const result = await addExerciseCategory(trimmedName)
 
-    if (!session) {
+    if (result.error) {
       setIsError(true)
-      setMessage('Sign in before adding an exercise category.')
-      return
-    }
-
-    const { error } = await supabase.from('exercise_categories').insert({
-      name: trimmedName,
-      user_id: session.user.id,
-    })
-
-    if (error) {
-      setIsError(true)
-      setMessage(
-        error.message.includes('row-level security policy')
-          ? 'Could not add the exercise category because database access rules blocked it. Run the exercise_categories RLS policy in Supabase.'
-          : 'Could not add the exercise category.',
-      )
+      setMessage(result.error)
       return
     }
 
     setName('')
     setOpen(false)
     setMessage(`Added exercise category: ${trimmedName}.`)
-    fetchCategories()
+    setCategories((current) => result.data ? [...current, result.data] : current)
   }
 
   const deleteCategory = async (id: string) => {
     setMessage('')
     setIsError(false)
 
-    const { error } = await supabase.from('exercise_categories').delete().eq('id', id)
+    const result = await deleteExerciseCategory(id)
 
-    if (error) {
+    if (result.error) {
       setIsError(true)
-      setMessage(
-        error.message.includes('row-level security policy')
-          ? 'Could not delete the exercise category because database access rules blocked it.'
-          : 'Could not delete the exercise category.',
-      )
+      setMessage(result.error)
       return
     }
 
-    fetchCategories()
+    setCategories((current) => current.filter((category) => category.id !== id))
   }
 
   const openEditCategory = (category: ExerciseCategory) => {
@@ -128,18 +109,11 @@ export default function ExerciseCategoriesManager() {
     setMessage('')
     setIsError(false)
 
-    const { error } = await supabase
-      .from('exercise_categories')
-      .update({ name: trimmedName })
-      .eq('id', editingCategory.id)
+    const result = await updateExerciseCategory(editingCategory.id, trimmedName)
 
-    if (error) {
+    if (result.error) {
       setIsError(true)
-      setMessage(
-        error.message.includes('row-level security policy')
-          ? 'Could not update the exercise category because database access rules blocked it.'
-          : 'Could not update the exercise category.',
-      )
+      setMessage(result.error)
       return
     }
 
@@ -147,7 +121,9 @@ export default function ExerciseCategoriesManager() {
     setEditingCategory(null)
     setEditName('')
     setMessage(`Updated exercise category: ${trimmedName}.`)
-    fetchCategories()
+    setCategories((current) =>
+      current.map((category) => category.id === editingCategory.id ? { ...category, name: trimmedName } : category),
+    )
   }
 
   return (

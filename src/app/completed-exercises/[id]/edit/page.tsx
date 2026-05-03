@@ -1,9 +1,7 @@
-'use client'
-
-import { useEffect, useState } from 'react'
-import { useParams } from 'next/navigation'
-import { CompletedExerciseForm, type CompletedExerciseFormValues } from '@/components/CompletedExerciseForm'
-import { supabase } from '@/lib/supabase'
+import { notFound } from 'next/navigation'
+import { createClient } from '@/lib/supabase/server'
+import type { CompletedExerciseFormValues } from '@/components/CompletedExerciseForm'
+import EditCompletedExerciseClient from './EditCompletedExerciseClient'
 
 type CompletedExerciseRecord = {
   id: string
@@ -21,15 +19,29 @@ type CompletedExerciseRecord = {
   } | null
 }
 
-export default function EditCompletedExercisePage() {
-  const params = useParams()
-  const entryId = params.id as string
-  const [initialValues, setInitialValues] = useState<CompletedExerciseFormValues | null>(null)
-  const [loadError, setLoadError] = useState('')
+type EditCompletedExercisePageProps = {
+  params: Promise<{
+    id: string
+  }>
+}
 
-  useEffect(() => {
-    let isActive = true
+const mapEntryToInitialValues = (entry: CompletedExerciseRecord): CompletedExerciseFormValues => ({
+  exerciseCategoryId: entry.exercise?.exercise_category_id ?? '',
+  exerciseId: entry.exercise_id,
+  sets: entry.sets,
+  repsPerSet: entry.reps_per_set,
+  durationPerSetSeconds: entry.duration_per_set_seconds,
+  loadKg: entry.load_kg === null ? null : Number(entry.load_kg),
+  distanceKm: entry.distance_km === null ? null : Number(entry.distance_km),
+  paceMinPerKm: entry.pace_min_per_km === null ? null : Number(entry.pace_min_per_km),
+  note: entry.note ?? '',
+  performedAt: entry.performed_at,
+})
 
+export default async function EditCompletedExercisePage({ params }: EditCompletedExercisePageProps) {
+  const { id } = await params
+  const supabase = await createClient()
+  const [entryResult, categoriesResult, exercisesResult] = await Promise.all([
     supabase
       .from('completed_exercises')
       .select(
@@ -49,75 +61,22 @@ export default function EditCompletedExercisePage() {
           )
         `,
       )
-      .eq('id', entryId)
-      .single()
-      .then(({ data, error }) => {
-        if (!isActive) return
+      .eq('id', id)
+      .single(),
+    supabase.from('exercise_categories').select('id, name').order('created_at'),
+    supabase.from('exercises').select('id, name, exercise_category_id, exercise_type').order('created_at'),
+  ])
 
-        if (error || !data) {
-          setLoadError('Could not load the entry for editing.')
-          return
-        }
-
-        const entry = data as unknown as CompletedExerciseRecord
-
-        setInitialValues({
-          exerciseCategoryId: entry.exercise?.exercise_category_id ?? '',
-          exerciseId: entry.exercise_id,
-          sets: entry.sets,
-          repsPerSet: entry.reps_per_set,
-          durationPerSetSeconds: entry.duration_per_set_seconds,
-          loadKg: entry.load_kg === null ? null : Number(entry.load_kg),
-          distanceKm: entry.distance_km === null ? null : Number(entry.distance_km),
-          paceMinPerKm: entry.pace_min_per_km === null ? null : Number(entry.pace_min_per_km),
-          note: entry.note ?? '',
-          performedAt: entry.performed_at,
-        })
-      })
-
-    return () => {
-      isActive = false
-    }
-  }, [entryId])
-
-  if (loadError) {
-    return <div>{loadError}</div>
-  }
-
-  if (!initialValues) {
-    return <div>Loading entry data...</div>
+  if (entryResult.error || !entryResult.data) {
+    notFound()
   }
 
   return (
-    <CompletedExerciseForm
-      mode="edit"
-      title="Edit Completed Exercise"
-      description="Update the exercise, workout details, or notes using the same view as the create form."
-      submitLabel="Save Changes"
-      submittingLabel="Saving..."
-      initialValues={initialValues}
-      onSubmit={async (values) => {
-        const { error } = await supabase
-          .from('completed_exercises')
-          .update({
-            exercise_id: values.exerciseId,
-            sets: values.sets,
-            reps_per_set: values.repsPerSet,
-            duration_per_set_seconds: values.durationPerSetSeconds,
-            load_kg: values.loadKg,
-            distance_km: values.distanceKm,
-            pace_min_per_km: values.paceMinPerKm,
-            note: values.note,
-            performed_at: values.performedAt,
-          })
-          .eq('id', entryId)
-
-        if (error) {
-          return { error: 'Could not save changes.' }
-        }
-
-        return {}
-      }}
+    <EditCompletedExerciseClient
+      entryId={id}
+      initialValues={mapEntryToInitialValues(entryResult.data as unknown as CompletedExerciseRecord)}
+      exerciseCategories={categoriesResult.data || []}
+      exercises={exercisesResult.data || []}
     />
   )
 }

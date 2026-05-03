@@ -1,13 +1,8 @@
-'use client'
-
 import { BarChart3, ChevronRight, ClipboardList, SquarePen } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import type { User } from '@supabase/supabase-js'
 import { routes } from '@/lib/routes'
 import PageContainer from '@/components/PageContainer'
-import { supabase } from '@/lib/supabase'
-import { getCurrentUserAccessStatus, type UserAccessStatus } from '@/lib/userAccess'
+import { createClient } from '@/lib/supabase/server'
 import styles from './page.module.scss'
 
 const routeIcons = {
@@ -16,42 +11,21 @@ const routeIcons = {
   '/stats': BarChart3,
 } as const
 
-export default function Home() {
-  const [user, setUser] = useState<User | null>(null)
-  const [accessStatus, setAccessStatus] = useState<UserAccessStatus | null>(null)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    const updateSession = async (sessionUser: User | null) => {
-      setUser(sessionUser)
-
-      if (sessionUser) {
-        setAccessStatus(await getCurrentUserAccessStatus())
-      } else {
-        setAccessStatus(null)
-      }
-
-      setLoading(false)
-    }
-
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      updateSession(session?.user ?? null)
-    })
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      updateSession(session?.user ?? null)
-    })
-
-    return () => subscription.unsubscribe()
-  }, [])
+export default async function Home() {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  const { data: userAccess } = user
+    ? await supabase.from('user_access').select('approved').maybeSingle()
+    : { data: null }
+  const accessStatus = userAccess?.approved ? 'approved' : 'pending'
 
   return (
     <PageContainer className={styles.container}>
       <h1 className={styles.title}>Training Journal</h1>
 
-      {!loading && !user ? (
+      {!user ? (
         <section className={styles.signedOutPanel}>
           <h2 className={styles.signedOutTitle}>Sign in to see your training data</h2>
           <p className={styles.signedOutText}>
@@ -63,9 +37,7 @@ export default function Home() {
         </section>
       ) : null}
 
-      {loading ? (
-        <p className={styles.loadingText}>Loading...</p>
-      ) : user && accessStatus === 'pending' ? (
+      {user && accessStatus === 'pending' ? (
         <section className={styles.pendingPanel}>
           <h2 className={styles.pendingTitle}>Account pending approval</h2>
           <p className={styles.pendingText}>

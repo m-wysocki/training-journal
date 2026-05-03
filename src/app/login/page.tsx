@@ -2,9 +2,9 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
 import BackLink from '@/components/BackLink'
 import PageContainer from '@/components/PageContainer'
+import { signInWithPassword, signUpWithPassword } from './actions'
 import styles from './page.module.scss'
 
 type PasswordMode = 'sign-in' | 'sign-up'
@@ -60,45 +60,23 @@ export default function LoginPage() {
           return
         }
 
-        const { data, error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: `${window.location.origin}/auth/callback`,
-          },
-        })
+        const result = await signUpWithPassword(email, password)
 
-        if (error) throw error
+        if (result.error) throw new Error(result.error)
 
-        if (data.user?.email) {
-          await fetch('/api/auth/new-user', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              email: data.user.email,
-              userId: data.user.id,
-            }),
-          })
-        }
-
-        if (data.session) {
+        if (result.signedIn) {
           router.push('/')
           router.refresh()
           return
         }
 
-        showMessage('Account created. Check your inbox to confirm your email address. Access starts after admin approval.', 'success')
+        showMessage(result.message ?? 'Account created. Check your inbox to confirm your email address.', 'success')
         return
       }
 
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
+      const result = await signInWithPassword(email, password)
 
-      if (error) throw error
+      if (result.error) throw new Error(result.error)
 
       router.push('/')
       router.refresh()

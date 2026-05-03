@@ -11,6 +11,10 @@ import { DurationStepper } from '@/components/DurationStepper'
 import { NumericStepper } from '@/components/NumericStepper'
 import { PaceStepper } from '@/components/PaceStepper'
 import PageContainer from '@/components/PageContainer'
+import {
+  addExercise,
+  addExerciseCategory,
+} from '@/app/exerciseSetupActions'
 import { formatDuration, formatLongDate, formatPace } from '@/lib/trainingFormatters'
 import styles from './CompletedExerciseForm.module.scss'
 
@@ -61,6 +65,9 @@ type CompletedExerciseFormProps = {
   submitLabel: string
   submittingLabel: string
   initialValues: CompletedExerciseFormValues
+  initialExerciseCategories?: ExerciseCategory[]
+  initialExercises?: Exercise[]
+  initialSetupDataLoaded?: boolean
   onSubmit: (values: CompletedExerciseFormValues) => Promise<{ error?: string | null }>
   onSuccess?: () => void
 }
@@ -133,12 +140,15 @@ export function CompletedExerciseForm({
   submitLabel,
   submittingLabel,
   initialValues,
+  initialExerciseCategories = [],
+  initialExercises = [],
+  initialSetupDataLoaded = false,
   onSubmit,
   onSuccess,
 }: CompletedExerciseFormProps) {
   const router = useRouter()
-  const [exerciseCategories, setExerciseCategories] = useState<ExerciseCategory[]>([])
-  const [exercises, setExercises] = useState<Exercise[]>([])
+  const [exerciseCategories, setExerciseCategories] = useState<ExerciseCategory[]>(initialExerciseCategories)
+  const [exercises, setExercises] = useState<Exercise[]>(initialExercises)
   const [selectedExerciseCategoryId, setSelectedExerciseCategoryId] = useState(initialValues.exerciseCategoryId)
   const [selectedExerciseId, setSelectedExerciseId] = useState(initialValues.exerciseId)
   const [newExerciseCategoryName, setNewExerciseCategoryName] = useState('')
@@ -180,6 +190,8 @@ export function CompletedExerciseForm({
   const recentExercisesCacheRef = useRef(new Map<string, RecentCompletedExercise[]>())
 
   useEffect(() => {
+    if (initialSetupDataLoaded) return
+
     let isActive = true
 
     Promise.all([
@@ -201,7 +213,7 @@ export function CompletedExerciseForm({
     return () => {
       isActive = false
     }
-  }, [])
+  }, [initialSetupDataLoaded])
 
   const filteredExercises = useMemo(
     () => exercises.filter((exercise) => exercise.exercise_category_id === selectedExerciseCategoryId),
@@ -346,38 +358,17 @@ export function CompletedExerciseForm({
     setMessage('')
     setIsError(false)
 
-    const {
-      data: { session },
-    } = await supabase.auth.getSession()
-
-    if (!session) {
-      setIsError(true)
-      setMessage('Sign in before adding an exercise category.')
-      setIsAddingExerciseCategory(false)
-      return
-    }
-
-    const { data, error } = await supabase
-      .from('exercise_categories')
-      .insert({
-        name: trimmedName,
-        user_id: session.user.id,
-      })
-      .select('id, name')
-      .single()
+    const result = await addExerciseCategory(trimmedName)
 
     setIsAddingExerciseCategory(false)
 
-    if (error || !data) {
+    if (result.error || !result.data) {
       setIsError(true)
-      setMessage(
-        error?.message.includes('row-level security policy')
-          ? 'Could not add the exercise category because database access rules blocked it. Run the exercise_categories RLS policy in Supabase.'
-          : 'Could not add the exercise category.',
-      )
+      setMessage(result.error ?? 'Could not add the exercise category.')
       return
     }
 
+    const data = result.data
     setExerciseCategories((current) => [...current, data])
     setSelectedExerciseCategoryId(data.id)
     setSelectedExerciseId('')
@@ -405,40 +396,17 @@ export function CompletedExerciseForm({
     setMessage('')
     setIsError(false)
 
-    const {
-      data: { session },
-    } = await supabase.auth.getSession()
-
-    if (!session) {
-      setIsError(true)
-      setMessage('Sign in before adding an exercise.')
-      setIsAddingExercise(false)
-      return
-    }
-
-    const { data, error } = await supabase
-      .from('exercises')
-      .insert({
-        name: trimmedName,
-        exercise_category_id: selectedExerciseCategoryId,
-        exercise_type: newExerciseType,
-        user_id: session.user.id,
-      })
-      .select('id, name, exercise_category_id, exercise_type')
-      .single()
+    const result = await addExercise(selectedExerciseCategoryId, trimmedName, newExerciseType)
 
     setIsAddingExercise(false)
 
-    if (error || !data) {
+    if (result.error || !result.data) {
       setIsError(true)
-      setMessage(
-        error?.message.includes('row-level security policy')
-          ? 'Could not add the exercise because database access rules blocked it. Run the exercises RLS policy in Supabase.'
-          : 'Could not add the exercise.',
-      )
+      setMessage(result.error ?? 'Could not add the exercise.')
       return
     }
 
+    const data = result.data
     setExercises((current) => [...current, data])
     setSelectedExerciseId(data.id)
     setNewExerciseName('')

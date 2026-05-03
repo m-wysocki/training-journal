@@ -5,9 +5,15 @@ import trainingJournalLogo from '../../public/training-journal-logo.png'
 import AuthButton from '@/components/AuthButton'
 import ButtonSquare from '@/components/ButtonSquare'
 import PageContainer from '@/components/PageContainer'
+import { createClient } from '@/lib/supabase/server'
 import styles from './AppHeader.module.scss'
 
-export default function AppHeader() {
+export default async function AppHeader() {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
   return (
     <header className={styles.appHeader}>
       <PageContainer className={styles.appHeaderInner}>
@@ -26,7 +32,7 @@ export default function AppHeader() {
           <ButtonSquare href="/completed-exercises/new" aria-label="Log exercise">
             <Plus size={20} strokeWidth={2} aria-hidden="true" />
           </ButtonSquare>
-          <AuthButton />
+          <AuthButton user={user} />
         </div>
       </PageContainer>
     </header>

@@ -1,14 +1,11 @@
-'use client'
-
 import { BarChart3, ChevronDown } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
 import * as Accordion from '@radix-ui/react-accordion'
 import BackLink from '@/components/BackLink'
-import { DatePicker } from '@/components/DatePicker'
 import PageContainer from '@/components/PageContainer'
-import { supabase } from '@/lib/supabase'
-import { formatDateRange, getCurrentWeekRange, shiftWeekRange } from '@/lib/trainingDateRange'
+import { createClient } from '@/lib/supabase/server'
+import { getCurrentWeekRange } from '@/lib/trainingDateRange'
 import { formatWeekdayDate } from '@/lib/trainingFormatters'
+import StatsFilters from './StatsFilters'
 import styles from './page.module.scss'
 
 type WeeklyEntry = {
@@ -26,84 +23,57 @@ type ExerciseCategoryStat = {
   trainingDates: string[]
 }
 
-export default function StatsPage() {
-  const [{ dateFrom, dateTo }, setDateRange] = useState(getCurrentWeekRange)
-  const [entries, setEntries] = useState<WeeklyEntry[]>([])
-  const [errorMessage, setErrorMessage] = useState('')
-  const [loading, setLoading] = useState(true)
+type StatsPageProps = {
+  searchParams?: Promise<{
+    dateFrom?: string
+    dateTo?: string
+  }>
+}
 
-  const updateDateFrom = (value: string) => {
-    setLoading(true)
-    setDateRange((current) => ({ ...current, dateFrom: value }))
-  }
+const getExerciseCategoryStats = (entries: WeeklyEntry[]): ExerciseCategoryStat[] => {
+  const groups = new Map<string, Set<string>>()
 
-  const updateDateTo = (value: string) => {
-    setLoading(true)
-    setDateRange((current) => ({ ...current, dateTo: value }))
-  }
+  entries.forEach((entry) => {
+    const exerciseCategoryName = entry.exercise?.exercise_category?.name || 'Unknown exercise category'
+    const current = groups.get(exerciseCategoryName) || new Set<string>()
+    current.add(entry.performed_at)
+    groups.set(exerciseCategoryName, current)
+  })
 
-  const shiftDateRangeByWeek = (direction: -1 | 1) => {
-    setLoading(true)
-    setDateRange(shiftWeekRange(dateFrom, direction))
-  }
+  return Array.from(groups.entries())
+    .map(([name, trainingDates]) => ({
+      name,
+      trainingDays: trainingDates.size,
+      trainingDates: Array.from(trainingDates).sort((a, b) => b.localeCompare(a)),
+    }))
+    .sort((a, b) => b.trainingDays - a.trainingDays || a.name.localeCompare(b.name))
+}
 
-  useEffect(() => {
-    let isActive = true
-
-    supabase
-      .from('completed_exercises')
-      .select(
-        `
-          performed_at,
-          exercise:exercises (
-            exercise_category:exercise_categories (
-              name
-            )
+export default async function StatsPage({ searchParams }: StatsPageProps) {
+  const params = await searchParams
+  const currentWeekRange = getCurrentWeekRange()
+  const dateFrom = params?.dateFrom || currentWeekRange.dateFrom
+  const dateTo = params?.dateTo || currentWeekRange.dateTo
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('completed_exercises')
+    .select(
+      `
+        performed_at,
+        exercise:exercises (
+          exercise_category:exercise_categories (
+            name
           )
-        `,
-      )
-      .gte('performed_at', dateFrom)
-      .lte('performed_at', dateTo)
-      .then(({ data, error }) => {
-        if (!isActive) return
+        )
+      `,
+    )
+    .gte('performed_at', dateFrom)
+    .lte('performed_at', dateTo)
 
-        if (error) {
-          setErrorMessage('Could not load statistics for the selected date range.')
-          setEntries([])
-          setLoading(false)
-          return
-        }
-
-        setErrorMessage('')
-        setEntries((data as unknown as WeeklyEntry[]) || [])
-        setLoading(false)
-      })
-
-    return () => {
-      isActive = false
-    }
-  }, [dateFrom, dateTo])
-
-  const workoutDaysCount = useMemo(() => new Set(entries.map((entry) => entry.performed_at)).size, [entries])
-
-  const exerciseCategoryStats = useMemo<ExerciseCategoryStat[]>(() => {
-    const groups = new Map<string, Set<string>>()
-
-    entries.forEach((entry) => {
-      const exerciseCategoryName = entry.exercise?.exercise_category?.name || 'Unknown exercise category'
-      const current = groups.get(exerciseCategoryName) || new Set<string>()
-      current.add(entry.performed_at)
-      groups.set(exerciseCategoryName, current)
-    })
-
-    return Array.from(groups.entries())
-      .map(([name, trainingDates]) => ({
-        name,
-        trainingDays: trainingDates.size,
-        trainingDates: Array.from(trainingDates).sort((a, b) => b.localeCompare(a)),
-      }))
-      .sort((a, b) => b.trainingDays - a.trainingDays || a.name.localeCompare(b.name))
-  }, [entries])
+  const entries = error ? [] : ((data as unknown as WeeklyEntry[]) || [])
+  const errorMessage = error ? 'Could not load statistics for the selected date range.' : ''
+  const workoutDaysCount = new Set(entries.map((entry) => entry.performed_at)).size
+  const exerciseCategoryStats = getExerciseCategoryStats(entries)
 
   return (
     <div className={styles.wrapper}>
@@ -121,56 +91,7 @@ export default function StatsPage() {
           </p>
         </div>
 
-        <div className={styles.filtersBar}>
-          <Accordion.Root type="single" collapsible className={styles.filtersAccordion}>
-            <Accordion.Item value="filters" className={styles.filtersAccordionItem}>
-              <Accordion.Header className={styles.filtersAccordionHeader}>
-                <Accordion.Trigger className={styles.filtersTrigger}>
-                  Filters
-                  <span className={styles.filtersTriggerIcon} aria-hidden="true">
-                    ▾
-                  </span>
-                </Accordion.Trigger>
-              </Accordion.Header>
-              <Accordion.Content className={styles.filtersContent}>
-                <div className={styles.dateRangeFields}>
-                  <div className={styles.datePickerGroup}>
-                    <label htmlFor="dateFrom" className={styles.label}>
-                      From
-                    </label>
-                    <DatePicker id="dateFrom" value={dateFrom} onChange={updateDateFrom} />
-                  </div>
-                  <div className={styles.datePickerGroup}>
-                    <label htmlFor="dateTo" className={styles.label}>
-                      To
-                    </label>
-                    <DatePicker id="dateTo" value={dateTo} onChange={updateDateTo} />
-                  </div>
-                </div>
-              </Accordion.Content>
-            </Accordion.Item>
-          </Accordion.Root>
-
-          <div className={styles.compactWeekBar}>
-            <button
-              type="button"
-              className={styles.weekIconButton}
-              onClick={() => shiftDateRangeByWeek(-1)}
-              aria-label="Previous week"
-            >
-              ‹
-            </button>
-            <p className={styles.weekRange}>{formatDateRange(dateFrom, dateTo)}</p>
-            <button
-              type="button"
-              className={styles.weekIconButton}
-              onClick={() => shiftDateRangeByWeek(1)}
-              aria-label="Next week"
-            >
-              ›
-            </button>
-          </div>
-        </div>
+        <StatsFilters dateFrom={dateFrom} dateTo={dateTo} />
 
         {errorMessage && <div className={styles.errorBox}>{errorMessage}</div>}
 
@@ -178,7 +99,7 @@ export default function StatsPage() {
           <div className={styles.statsGrid}>
             <section className={styles.summaryCard}>
               <p className={styles.cardLabel}>Workout Days</p>
-              <p className={styles.primaryStat}>{loading ? '...' : workoutDaysCount}</p>
+              <p className={styles.primaryStat}>{workoutDaysCount}</p>
               <p className={styles.cardHint}>Number of days you trained during the selected date range.</p>
             </section>
 
@@ -190,9 +111,7 @@ export default function StatsPage() {
                 </p>
               </div>
 
-              {loading ? (
-                <p className={styles.emptyText}>Loading statistics...</p>
-              ) : exerciseCategoryStats.length === 0 ? (
+              {exerciseCategoryStats.length === 0 ? (
                 <p className={styles.emptyText}>No workouts logged for this date range.</p>
               ) : (
                 <Accordion.Root type="single" collapsible className={styles.breakdownList} asChild>
