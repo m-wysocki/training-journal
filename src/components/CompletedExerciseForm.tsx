@@ -85,7 +85,6 @@ const DEFAULT_DISTANCE_KM = 5
 const MIN_DISTANCE_KM = 0.1
 const MAX_DISTANCE_KM = 999
 const DISTANCE_STEP_KM = 0.1
-const DEFAULT_PACE_MIN_PER_KM = 6
 const MIN_PACE_MIN_PER_KM = 1
 const MAX_PACE_MIN_PER_KM = 60
 
@@ -156,7 +155,7 @@ export function CompletedExerciseForm({
   const [loadKg, setLoadKg] = useState<number>(initialValues.loadKg ?? DEFAULT_LOAD_KG)
   const [hasLoad, setHasLoad] = useState(initialValues.loadKg !== null)
   const [distanceKm, setDistanceKm] = useState(initialValues.distanceKm ?? DEFAULT_DISTANCE_KM)
-  const [paceMinPerKm, setPaceMinPerKm] = useState(initialValues.paceMinPerKm ?? DEFAULT_PACE_MIN_PER_KM)
+  const [paceMinPerKm, setPaceMinPerKm] = useState<number | null>(initialValues.paceMinPerKm)
   const [activityDurationSeconds, setActivityDurationSeconds] = useState(
     initialValues.durationPerSetSeconds?.length === 1
       ? initialValues.durationPerSetSeconds[0]
@@ -471,7 +470,8 @@ export function CompletedExerciseForm({
     )
     const hasInvalidLoad = hasLoad && (loadKg < MIN_LOAD_KG || !Number.isInteger(loadKg / LOAD_STEP_KG))
     const hasInvalidDistance = distanceKm < MIN_DISTANCE_KM || distanceKm > MAX_DISTANCE_KM
-    const hasInvalidPace = paceMinPerKm < MIN_PACE_MIN_PER_KM || paceMinPerKm > MAX_PACE_MIN_PER_KM
+    const hasInvalidPace =
+      paceMinPerKm !== null && (paceMinPerKm < MIN_PACE_MIN_PER_KM || paceMinPerKm > MAX_PACE_MIN_PER_KM)
     const hasInvalidActivityDuration =
       activityDurationSeconds < MIN_ACTIVITY_DURATION_SECONDS ||
       activityDurationSeconds > MAX_ACTIVITY_DURATION_SECONDS ||
@@ -491,7 +491,7 @@ export function CompletedExerciseForm({
 
     if (isCardioExercise && (hasInvalidDistance || hasInvalidPace)) {
       setIsError(true)
-      setMessage('Check the allowed ranges for distance and pace.')
+      setMessage('Check the allowed ranges for distance and pace if provided.')
       return
     }
 
@@ -733,7 +733,7 @@ export function CompletedExerciseForm({
                   {isStrengthExercise
                     ? 'Set the number of sets, reps or time, and load for this exercise.'
                     : isCardioExercise
-                      ? 'Set the distance and pace for this cardio exercise.'
+                      ? 'Set the distance and optional pace for this cardio exercise.'
                       : 'Enter the total duration for this activity in hh:mm, using 5-minute steps.'}
                 </p>
 

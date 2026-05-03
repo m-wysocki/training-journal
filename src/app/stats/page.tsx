@@ -1,6 +1,6 @@
 'use client'
 
-import { BarChart3 } from 'lucide-react'
+import { BarChart3, ChevronDown } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import * as Accordion from '@radix-ui/react-accordion'
 import BackLink from '@/components/BackLink'
@@ -8,6 +8,7 @@ import { DatePicker } from '@/components/DatePicker'
 import PageContainer from '@/components/PageContainer'
 import { supabase } from '@/lib/supabase'
 import { formatDateRange, getCurrentWeekRange, shiftWeekRange } from '@/lib/trainingDateRange'
+import { formatWeekdayDate } from '@/lib/trainingFormatters'
 import styles from './page.module.scss'
 
 type WeeklyEntry = {
@@ -22,6 +23,7 @@ type WeeklyEntry = {
 type ExerciseCategoryStat = {
   name: string
   trainingDays: number
+  trainingDates: string[]
 }
 
 export default function StatsPage() {
@@ -95,9 +97,10 @@ export default function StatsPage() {
     })
 
     return Array.from(groups.entries())
-      .map(([name, trainingDays]) => ({
+      .map(([name, trainingDates]) => ({
         name,
-        trainingDays: trainingDays.size,
+        trainingDays: trainingDates.size,
+        trainingDates: Array.from(trainingDates).sort((a, b) => b.localeCompare(a)),
       }))
       .sort((a, b) => b.trainingDays - a.trainingDays || a.name.localeCompare(b.name))
   }, [entries])
@@ -192,16 +195,41 @@ export default function StatsPage() {
               ) : exerciseCategoryStats.length === 0 ? (
                 <p className={styles.emptyText}>No workouts logged for this date range.</p>
               ) : (
-                <ul className={styles.breakdownList}>
-                  {exerciseCategoryStats.map((stat) => (
-                    <li key={stat.name} className={styles.breakdownItem}>
-                      <span className={styles.exerciseCategoryName}>{stat.name}</span>
-                      <span className={styles.exerciseCategoryValue}>
-                        {stat.trainingDays} {stat.trainingDays === 1 ? 'day' : 'days'}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
+                <Accordion.Root type="single" collapsible className={styles.breakdownList} asChild>
+                  <ul>
+                    {exerciseCategoryStats.map((stat) => (
+                      <Accordion.Item key={stat.name} value={stat.name} className={styles.breakdownItem} asChild>
+                        <li>
+                          <Accordion.Header className={styles.breakdownItemHeader}>
+                            <Accordion.Trigger className={styles.breakdownTrigger}>
+                              <span className={styles.exerciseCategoryName}>{stat.name}</span>
+                              <span className={styles.exerciseCategoryMeta}>
+                                <span className={styles.exerciseCategoryValue}>
+                                  {stat.trainingDays} {stat.trainingDays === 1 ? 'day' : 'days'}
+                                </span>
+                                <ChevronDown
+                                  size={16}
+                                  strokeWidth={2}
+                                  className={styles.breakdownTriggerIcon}
+                                  aria-hidden="true"
+                                />
+                              </span>
+                            </Accordion.Trigger>
+                          </Accordion.Header>
+                          <Accordion.Content className={styles.breakdownContent}>
+                            <ul className={styles.trainingDatesList}>
+                              {stat.trainingDates.map((trainingDate) => (
+                                <li key={trainingDate} className={styles.trainingDateItem}>
+                                  {formatWeekdayDate(trainingDate)}
+                                </li>
+                              ))}
+                            </ul>
+                          </Accordion.Content>
+                        </li>
+                      </Accordion.Item>
+                    ))}
+                  </ul>
+                </Accordion.Root>
               )}
             </section>
           </div>

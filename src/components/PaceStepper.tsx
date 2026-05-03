@@ -1,15 +1,16 @@
 'use client'
 
+import { X } from 'lucide-react'
 import { useState } from 'react'
 
 import styles from './NumericStepper.module.scss'
 
 type PaceStepperProps = {
   id: string
-  value: number
+  value: number | null
   min: number
   max: number
-  onChange: (value: number) => void
+  onChange: (value: number | null) => void
   inputClassName?: string
   disabled?: boolean
 }
@@ -59,18 +60,19 @@ export function PaceStepper({
   inputClassName,
   disabled = false,
 }: PaceStepperProps) {
-  const [inputValue, setInputValue] = useState(formatPaceInput(value))
-  const formattedValue = formatPaceInput(value)
-
-  if (inputValue !== formattedValue && parsePaceInput(inputValue) === value) {
-    setInputValue(formattedValue)
-  }
+  const [inputValue, setInputValue] = useState(value === null ? '' : formatPaceInput(value))
 
   const commitInputValue = (rawValue: string) => {
+    if (rawValue.trim() === '') {
+      setInputValue('')
+      onChange(null)
+      return
+    }
+
     const parsed = parsePaceInput(rawValue)
 
     if (parsed === null) {
-      setInputValue(formatPaceInput(value))
+      setInputValue(value === null ? '' : formatPaceInput(value))
       return
     }
 
@@ -81,10 +83,17 @@ export function PaceStepper({
   }
 
   const updateBySeconds = (seconds: number) => {
+    if (value === null) return
+
     const nextValue = clamp(value + seconds / 60, min, max)
 
     setInputValue(formatPaceInput(nextValue))
     onChange(nextValue)
+  }
+
+  const clearInput = () => {
+    setInputValue('')
+    onChange(null)
   }
 
   return (
@@ -94,7 +103,7 @@ export function PaceStepper({
           type="button"
           className={styles.paceStepButton}
           onClick={() => updateBySeconds(-10)}
-          disabled={disabled || value <= min}
+          disabled={disabled || value === null || value <= min}
           aria-label="Decrease pace by 10 seconds"
         >
           -10s
@@ -103,7 +112,7 @@ export function PaceStepper({
           type="button"
           className={styles.paceStepButton}
           onClick={() => updateBySeconds(-1)}
-          disabled={disabled || value <= min}
+          disabled={disabled || value === null || value <= min}
           aria-label="Decrease pace by 1 second"
         >
           -1s
@@ -111,7 +120,14 @@ export function PaceStepper({
         <div className={styles.inputShell}>
           <input
             id={id}
-            className={[styles.valueInput, styles.valueInputWithUnit, inputClassName].filter(Boolean).join(' ')}
+            className={[
+              styles.valueInput,
+              styles.valueInputWithUnit,
+              inputValue ? styles.valueInputWithClear : '',
+              inputClassName,
+            ]
+              .filter(Boolean)
+              .join(' ')}
             type="text"
             inputMode="numeric"
             placeholder="6:30"
@@ -124,9 +140,21 @@ export function PaceStepper({
               }
             }}
             disabled={disabled}
-            required
-            aria-label={`${formatPaceInput(value)} min/km, editable pace`}
+            aria-label={
+              value === null ? 'Empty min/km pace, editable pace' : `${formatPaceInput(value)} min/km, editable pace`
+            }
           />
+          {inputValue ? (
+            <button
+              type="button"
+              className={styles.clearAdornment}
+              onClick={clearInput}
+              disabled={disabled}
+              aria-label="Clear pace"
+            >
+              <X size={14} aria-hidden="true" />
+            </button>
+          ) : null}
           <span className={styles.unitAdornment} aria-hidden="true">
             min/km
           </span>
@@ -135,7 +163,7 @@ export function PaceStepper({
           type="button"
           className={styles.paceStepButton}
           onClick={() => updateBySeconds(1)}
-          disabled={disabled || value >= max}
+          disabled={disabled || value === null || value >= max}
           aria-label="Increase pace by 1 second"
         >
           +1s
@@ -144,7 +172,7 @@ export function PaceStepper({
           type="button"
           className={styles.paceStepButton}
           onClick={() => updateBySeconds(10)}
-          disabled={disabled || value >= max}
+          disabled={disabled || value === null || value >= max}
           aria-label="Increase pace by 10 seconds"
         >
           +10s

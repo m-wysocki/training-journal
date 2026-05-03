@@ -236,14 +236,35 @@
 }
 
 .breakdownItem {
+  border: 1px solid #dbe4ea;
+  border-radius: 0.625rem;
+  background: #fff;
+  overflow: hidden;
+}
+
+.breakdownItemHeader {
+  margin: 0;
+  font-weight: 400;
+}
+
+.breakdownTrigger {
+  width: 100%;
+  min-height: 3rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
+  border: 0;
   padding: 0.75rem 0.875rem;
-  border: 1px solid #dbe4ea;
-  border-radius: 0.625rem;
-  background: #fff;
+  color: inherit;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.breakdownTrigger:hover {
+  background: #f9fafb;
 }
 
 .exerciseCategoryName {
@@ -251,9 +272,48 @@
   color: #111827;
 }
 
+.exerciseCategoryMeta {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.375rem;
+}
+
 .exerciseCategoryValue {
   font-size: 0.875rem;
   color: #4b5563;
+}
+
+.breakdownTriggerIcon {
+  flex: 0 0 auto;
+  color: #6b7280;
+  transition: transform 160ms ease;
+}
+
+.breakdownTrigger[data-state='open'] .breakdownTriggerIcon {
+  transform: rotate(180deg);
+}
+
+.breakdownContent {
+  padding: 0 0.875rem 0.875rem;
+}
+
+.breakdownContent[data-state='closed'] {
+  display: none;
+}
+
+.trainingDatesList {
+  list-style: none;
+  display: grid;
+  gap: 0.375rem;
+  margin: 0;
+  padding: 0.75rem 0 0;
+  border-top: 1px solid #e5e7eb;
+}
+
+.trainingDateItem {
+  font-size: 0.875rem;
+  color: #374151;
 }
 
 .emptyText {
@@ -275,7 +335,7 @@
     grid-template-columns: 1fr;
   }
 
-  .breakdownItem {
+  .breakdownTrigger {
     flex-direction: column;
     align-items: flex-start;
   }
