@@ -32,6 +32,23 @@ export const getCurrentWeekRange = (): TrainingDateRange => {
   }
 }
 
+export const getWeekRangeForDate = (date: string): TrainingDateRange => {
+  const dateFrom = getStartOfWeek(parseDateOnly(date))
+  const dateTo = addDays(dateFrom, 6)
+
+  return {
+    dateFrom: formatLocalDateOnly(dateFrom),
+    dateTo: formatLocalDateOnly(dateTo),
+  }
+}
+
+export const getCompletedExercisesHrefForDate = (date: string) => {
+  const dateRange = getWeekRangeForDate(date)
+  const searchParams = new URLSearchParams(dateRange)
+
+  return `/completed-exercises?${searchParams.toString()}`
+}
+
 export const shiftWeekRange = (dateFrom: string, direction: -1 | 1): TrainingDateRange => {
   const nextDateFrom = addDays(getStartOfWeek(parseDateOnly(dateFrom)), direction * 7)
   const nextDateTo = addDays(nextDateFrom, 6)

@@ -16,6 +16,7 @@ import {
   addExerciseCategory,
 } from '@/app/exerciseSetupActions'
 import type { RecentCompletedExercise } from '@/lib/completedExercises'
+import { getCompletedExercisesHrefForDate } from '@/lib/trainingDateRange'
 import { formatDuration, formatLongDate, formatPace } from '@/lib/trainingFormatters'
 import styles from './CompletedExerciseForm.module.scss'
 
@@ -444,12 +445,12 @@ export function CompletedExerciseForm({
 
     if (mode === 'create') {
       onSuccess?.()
-      router.push('/completed-exercises')
+      router.push(getCompletedExercisesHrefForDate(performedAt))
       return
     }
 
     onSuccess?.()
-    router.push('/completed-exercises')
+    router.push(getCompletedExercisesHrefForDate(performedAt))
   }
 
   return (

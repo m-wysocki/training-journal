@@ -1,7 +1,7 @@
 'use client'
 
 import { ArrowDown, ArrowUp, ClipboardList, Ellipsis } from 'lucide-react'
-import { useCallback, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import * as Accordion from '@radix-ui/react-accordion'
 import * as Dialog from '@radix-ui/react-dialog'
@@ -14,9 +14,8 @@ import type { CompletedExerciseRow, EntryComparisons, ExerciseCategory } from '@
 import {
   copyCompletedExerciseCategory,
   deleteCompletedExercise,
-  loadCompletedExercisesForRange,
 } from '@/app/completed-exercises/actions'
-import { formatDateRange, shiftWeekRange } from '@/lib/trainingDateRange'
+import { formatDateRange, getCompletedExercisesHrefForDate, shiftWeekRange } from '@/lib/trainingDateRange'
 import { formatDuration, formatDurationHoursMinutes, formatPace, formatWeekdayDate } from '@/lib/trainingFormatters'
 import styles from './page.module.scss'
 
@@ -102,23 +101,8 @@ export default function CompletedExercisesClient({
   const [copyDate, setCopyDate] = useState('')
   const [copyLoading, setCopyLoading] = useState(false)
   const [successMessage, setSuccessMessage] = useState('')
-  const [entryComparisons, setEntryComparisons] = useState<EntryComparisons>(initialEntryComparisons)
+  const [entryComparisons] = useState<EntryComparisons>(initialEntryComparisons)
   const isCopyDateSameAsSource = Boolean(copyTarget && copyDate === copyTarget.sourceDate)
-
-  const loadData = useCallback(() => {
-    void loadCompletedExercisesForRange(dateFrom, dateTo)
-      .then(({ data, error }) => {
-        if (error) {
-          setErrorMessage('Could not load data.')
-          setSuccessMessage('')
-          return
-        }
-
-        setErrorMessage('')
-        setEntries(data?.entries || [])
-        setEntryComparisons(data?.entryComparisons || {})
-      })
-  }, [dateFrom, dateTo])
 
   const updateDateRange = (nextDateRange: { dateFrom: string; dateTo: string }) => {
     setDateRange(nextDateRange)
@@ -248,7 +232,7 @@ export default function CompletedExercisesClient({
       `Copied ${copiedCount} ${copiedCount === 1 ? 'exercise' : 'exercises'} from ${copyTarget.categoryName} to ${formatWeekdayDate(copyDate)}.`,
     )
     closeCopyCategory()
-    loadData()
+    router.push(getCompletedExercisesHrefForDate(copyDate))
   }
 
   return (
