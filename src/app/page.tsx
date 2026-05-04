@@ -2,7 +2,7 @@ import { BarChart3, ChevronRight, ClipboardList, SquarePen } from 'lucide-react'
 import Link from 'next/link'
 import { routes } from '@/lib/routes'
 import PageContainer from '@/components/PageContainer'
-import { createClient } from '@/lib/supabase/server'
+import { getCurrentUserContext } from '@/lib/supabase/auth'
 import styles from './page.module.scss'
 
 const routeIcons = {
@@ -12,10 +12,7 @@ const routeIcons = {
 } as const
 
 export default async function Home() {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { supabase, user } = await getCurrentUserContext()
   const { data: userAccess } = user
     ? await supabase.from('user_access').select('approved').maybeSingle()
     : { data: null }

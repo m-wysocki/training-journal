@@ -5,14 +5,11 @@ import trainingJournalLogo from '../../public/training-journal-logo.png'
 import AuthButton from '@/components/AuthButton'
 import ButtonSquare from '@/components/ButtonSquare'
 import PageContainer from '@/components/PageContainer'
-import { createClient } from '@/lib/supabase/server'
+import { getCurrentUser } from '@/lib/supabase/auth'
 import styles from './AppHeader.module.scss'
 
 export default async function AppHeader() {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const user = await getCurrentUser()
 
   return (
     <header className={styles.appHeader}>

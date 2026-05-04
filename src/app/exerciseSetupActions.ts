@@ -1,22 +1,13 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { createClient } from '@/lib/supabase/server'
 import type { ExerciseType } from '@/components/CompletedExerciseForm'
+import { getCurrentUserContext } from '@/lib/supabase/auth'
 
 type ActionResult<T = undefined> = Promise<{
   data?: T
   error?: string | null
 }>
-
-const getCurrentUser = async () => {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  return { supabase, user }
-}
 
 const getRlsErrorMessage = (errorMessage: string, resource: string, action: string) =>
   errorMessage.includes('row-level security policy')
@@ -30,7 +21,7 @@ export async function addExerciseCategory(name: string): ActionResult<{ id: stri
     return { error: 'Enter an exercise category name.' }
   }
 
-  const { supabase, user } = await getCurrentUser()
+  const { supabase, user } = await getCurrentUserContext()
 
   if (!user) {
     return { error: 'Sign in before adding an exercise category.' }
@@ -65,7 +56,7 @@ export async function updateExerciseCategory(id: string, name: string): ActionRe
 
   if (!trimmedName) return { error: 'Enter an exercise category name.' }
 
-  const { supabase, user } = await getCurrentUser()
+  const { supabase, user } = await getCurrentUserContext()
 
   if (!user) return { error: 'Sign in before updating an exercise category.' }
 
@@ -86,7 +77,7 @@ export async function updateExerciseCategory(id: string, name: string): ActionRe
 }
 
 export async function deleteExerciseCategory(id: string): ActionResult {
-  const { supabase, user } = await getCurrentUser()
+  const { supabase, user } = await getCurrentUserContext()
 
   if (!user) return { error: 'Sign in before deleting an exercise category.' }
 
@@ -118,7 +109,7 @@ export async function addExercise(
   if (!exerciseCategoryId) return { error: 'Select an exercise category first.' }
   if (!trimmedName) return { error: 'Enter an exercise name.' }
 
-  const { supabase, user } = await getCurrentUser()
+  const { supabase, user } = await getCurrentUserContext()
 
   if (!user) return { error: 'Sign in before adding an exercise.' }
 
@@ -158,7 +149,7 @@ export async function updateExercise(
 
   if (!trimmedName) return { error: 'Enter an exercise name.' }
 
-  const { supabase, user } = await getCurrentUser()
+  const { supabase, user } = await getCurrentUserContext()
 
   if (!user) return { error: 'Sign in before updating an exercise.' }
 
@@ -182,7 +173,7 @@ export async function updateExercise(
 }
 
 export async function deleteExercise(id: string, exerciseCategoryId: string): ActionResult {
-  const { supabase, user } = await getCurrentUser()
+  const { supabase, user } = await getCurrentUserContext()
 
   if (!user) return { error: 'Sign in before deleting an exercise.' }
 

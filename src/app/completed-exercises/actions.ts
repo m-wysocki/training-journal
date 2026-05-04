@@ -1,8 +1,9 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { createClient } from '@/lib/supabase/server'
 import type { CompletedExerciseFormValues } from '@/components/CompletedExerciseForm'
+import { createClient } from '@/lib/supabase/server'
+import { getCurrentUserContext } from '@/lib/supabase/auth'
 import {
   getEntryComparisons,
   type CompletedExerciseRow,
@@ -132,10 +133,7 @@ export async function loadRecentCompletedExercises(
 }
 
 export async function createCompletedExercise(values: CompletedExerciseFormValues): ActionResult {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { supabase, user } = await getCurrentUserContext()
 
   if (!user) {
     return { error: 'Sign in before logging an exercise.' }
@@ -180,10 +178,7 @@ export async function updateCompletedExercise(
   entryId: string,
   values: CompletedExerciseFormValues,
 ): ActionResult {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { supabase, user } = await getCurrentUserContext()
 
   if (!user) {
     return { error: 'Sign in before saving changes.' }
@@ -216,10 +211,7 @@ export async function updateCompletedExercise(
 }
 
 export async function deleteCompletedExercise(entryId: string): ActionResult {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { supabase, user } = await getCurrentUserContext()
 
   if (!user) {
     return { error: 'Sign in before deleting an entry.' }
@@ -241,10 +233,7 @@ export async function copyCompletedExerciseCategory(
   entries: CompletedExerciseRow[],
   performedAt: string,
 ): ActionResult<{ copiedCount: number }> {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { supabase, user } = await getCurrentUserContext()
 
   if (!user) {
     return { error: 'Sign in before copying exercises.' }
