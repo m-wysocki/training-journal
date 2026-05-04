@@ -3,9 +3,133 @@
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import type { CompletedExerciseFormValues } from '@/components/CompletedExerciseForm'
-import type { CompletedExerciseRow } from '@/lib/completedExercises'
+import {
+  getEntryComparisons,
+  type CompletedExerciseRow,
+  type EntryComparisons,
+  type RecentCompletedExercise,
+} from '@/lib/completedExercises'
 
 type ActionResult<T = undefined> = Promise<{ data?: T; error?: string | null }>
+
+const COMPLETED_EXERCISES_SELECT = `
+  id,
+  exercise_id,
+  performed_at,
+  created_at,
+  sets,
+  reps_per_set,
+  duration_per_set_seconds,
+  load_kg,
+  distance_km,
+  pace_min_per_km,
+  note,
+  exercise:exercises (
+    id,
+    name,
+    exercise_category_id,
+    exercise_type,
+    exercise_category:exercise_categories (
+      name
+    )
+  )
+`
+
+const getCompletedExercisePayload = async (
+  dateFrom: string,
+  dateTo: string,
+): Promise<{
+  entries: CompletedExerciseRow[]
+  entryComparisons: EntryComparisons
+}> => {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('completed_exercises')
+    .select(COMPLETED_EXERCISES_SELECT)
+    .gte('performed_at', dateFrom)
+    .lte('performed_at', dateTo)
+    .order('performed_at', { ascending: false })
+    .order('created_at', { ascending: false })
+
+  if (error) {
+    throw error
+  }
+
+  const entries = ((data as unknown as CompletedExerciseRow[]) || [])
+
+  if (entries.length === 0) {
+    return { entries, entryComparisons: {} }
+  }
+
+  const exerciseIds = Array.from(new Set(entries.map((entry) => entry.exercise_id)))
+  const { data: historyData, error: historyError } = await supabase
+    .from('completed_exercises')
+    .select(COMPLETED_EXERCISES_SELECT)
+    .in('exercise_id', exerciseIds)
+    .lte('performed_at', dateTo)
+    .order('performed_at', { ascending: false })
+    .order('created_at', { ascending: false })
+
+  if (historyError) {
+    throw historyError
+  }
+
+  return {
+    entries,
+    entryComparisons: getEntryComparisons(
+      ((historyData as unknown as CompletedExerciseRow[]) || []),
+      new Set(entries.map((entry) => entry.id)),
+    ),
+  }
+}
+
+export async function loadCompletedExercisesForRange(
+  dateFrom: string,
+  dateTo: string,
+): ActionResult<{
+  entries: CompletedExerciseRow[]
+  entryComparisons: EntryComparisons
+}> {
+  try {
+    return { data: await getCompletedExercisePayload(dateFrom, dateTo) }
+  } catch {
+    return { error: 'Could not load data.' }
+  }
+}
+
+export async function loadRecentCompletedExercises(
+  exerciseId: string,
+): ActionResult<RecentCompletedExercise[]> {
+  if (!exerciseId) {
+    return { data: [] }
+  }
+
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('completed_exercises')
+    .select(
+      `
+        id,
+        performed_at,
+        sets,
+        reps_per_set,
+        duration_per_set_seconds,
+        load_kg,
+        distance_km,
+        pace_min_per_km
+      `,
+    )
+    .eq('exercise_id', exerciseId)
+    .order('performed_at', { ascending: false })
+    .order('created_at', { ascending: false })
+    .limit(3)
+
+  if (error) {
+    return { error: 'Could not load recent exercise history.' }
+  }
+
+  return { data: (data as RecentCompletedExercise[]) || [] }
+}
 
 export async function createCompletedExercise(values: CompletedExerciseFormValues): ActionResult {
   const supabase = await createClient()

@@ -4,17 +4,18 @@ import type { LucideIcon } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import * as Dialog from '@radix-ui/react-dialog'
-import { supabase } from '@/lib/supabase'
 import BackLink from '@/components/BackLink'
 import { DatePicker } from '@/components/DatePicker'
 import { DurationStepper } from '@/components/DurationStepper'
 import { NumericStepper } from '@/components/NumericStepper'
 import { PaceStepper } from '@/components/PaceStepper'
 import PageContainer from '@/components/PageContainer'
+import { loadRecentCompletedExercises } from '@/app/completed-exercises/actions'
 import {
   addExercise,
   addExerciseCategory,
 } from '@/app/exerciseSetupActions'
+import type { RecentCompletedExercise } from '@/lib/completedExercises'
 import { formatDuration, formatLongDate, formatPace } from '@/lib/trainingFormatters'
 import styles from './CompletedExerciseForm.module.scss'
 
@@ -31,17 +32,6 @@ type Exercise = {
   name: string
   exercise_category_id: string
   exercise_type: ExerciseType
-}
-
-type RecentCompletedExercise = {
-  id: string
-  performed_at: string
-  sets: number | null
-  reps_per_set: number[] | null
-  duration_per_set_seconds: number[] | null
-  load_kg: number | null
-  distance_km: number | null
-  pace_min_per_km: number | null
 }
 
 export type CompletedExerciseFormValues = {
@@ -65,9 +55,8 @@ type CompletedExerciseFormProps = {
   submitLabel: string
   submittingLabel: string
   initialValues: CompletedExerciseFormValues
-  initialExerciseCategories?: ExerciseCategory[]
-  initialExercises?: Exercise[]
-  initialSetupDataLoaded?: boolean
+  initialExerciseCategories: ExerciseCategory[]
+  initialExercises: Exercise[]
   onSubmit: (values: CompletedExerciseFormValues) => Promise<{ error?: string | null }>
   onSuccess?: () => void
 }
@@ -140,9 +129,8 @@ export function CompletedExerciseForm({
   submitLabel,
   submittingLabel,
   initialValues,
-  initialExerciseCategories = [],
-  initialExercises = [],
-  initialSetupDataLoaded = false,
+  initialExerciseCategories,
+  initialExercises,
   onSubmit,
   onSuccess,
 }: CompletedExerciseFormProps) {
@@ -189,32 +177,6 @@ export function CompletedExerciseForm({
   })
   const recentExercisesCacheRef = useRef(new Map<string, RecentCompletedExercise[]>())
 
-  useEffect(() => {
-    if (initialSetupDataLoaded) return
-
-    let isActive = true
-
-    Promise.all([
-      supabase.from('exercise_categories').select('id, name').order('created_at'),
-      supabase.from('exercises').select('id, name, exercise_category_id, exercise_type').order('created_at'),
-    ]).then(([categoriesResult, exercisesResult]) => {
-      if (!isActive) return
-
-      if (categoriesResult.error || exercisesResult.error) {
-        setIsError(true)
-        setMessage('Could not load data. Please try again.')
-        return
-      }
-
-      setExerciseCategories(categoriesResult.data || [])
-      setExercises(exercisesResult.data || [])
-    })
-
-    return () => {
-      isActive = false
-    }
-  }, [initialSetupDataLoaded])
-
   const filteredExercises = useMemo(
     () => exercises.filter((exercise) => exercise.exercise_category_id === selectedExerciseCategoryId),
     [exercises, selectedExerciseCategoryId],
@@ -255,24 +217,7 @@ export function CompletedExerciseForm({
       }
     }
 
-    supabase
-      .from('completed_exercises')
-      .select(
-        `
-          id,
-          performed_at,
-          sets,
-          reps_per_set,
-          duration_per_set_seconds,
-          load_kg,
-          distance_km,
-          pace_min_per_km
-        `,
-      )
-      .eq('exercise_id', selectedExerciseId)
-      .order('performed_at', { ascending: false })
-      .order('created_at', { ascending: false })
-      .limit(3)
+    loadRecentCompletedExercises(selectedExerciseId)
       .then(({ data, error }) => {
         if (!isActive) return
 
@@ -285,7 +230,7 @@ export function CompletedExerciseForm({
           return
         }
 
-        const entries = (data as RecentCompletedExercise[]) || []
+        const entries = data || []
         recentExercisesCacheRef.current.set(selectedExerciseId, entries)
         setRecentExercisesState({
           exerciseId: selectedExerciseId,

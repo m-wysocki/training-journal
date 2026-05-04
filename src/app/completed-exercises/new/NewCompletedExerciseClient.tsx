@@ -57,7 +57,6 @@ export default function NewCompletedExerciseClient({
       initialValues={initialValues}
       initialExerciseCategories={exerciseCategories}
       initialExercises={exercises}
-      initialSetupDataLoaded
       onSubmit={createCompletedExercise}
     />
   )

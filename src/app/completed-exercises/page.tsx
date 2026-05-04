@@ -81,13 +81,13 @@ export default async function CompletedExercisesPage({ searchParams }: Completed
 
   return (
     <CompletedExercisesClient
+      key={`${dateFrom}-${dateTo}`}
       initialDateFrom={dateFrom}
       initialDateTo={dateTo}
       initialEntries={entries}
       initialExerciseCategories={exerciseCategories}
       initialEntryComparisons={entryComparisons}
       initialErrorMessage={entriesResult.error || categoriesResult.error ? 'Could not load data.' : ''}
-      initialExerciseCategoriesLoaded={!categoriesResult.error}
     />
   )
 }

@@ -28,6 +28,17 @@ export type ExerciseCategory = {
   name: string
 }
 
+export type RecentCompletedExercise = {
+  id: string
+  performed_at: string
+  sets: number | null
+  reps_per_set: number[] | null
+  duration_per_set_seconds: number[] | null
+  load_kg: number | null
+  distance_km: number | null
+  pace_min_per_km: number | null
+}
+
 export type EntryComparisonMetric = {
   key: 'reps' | 'load' | 'time' | 'distance' | 'pace'
   label: string

@@ -1,8 +1,7 @@
 'use client'
 
 import { Ellipsis } from 'lucide-react'
-import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { useState } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import Link from 'next/link'
@@ -19,15 +18,13 @@ type ExerciseCategory = {
 }
 
 type ExerciseCategoriesManagerProps = {
-  initialCategories?: ExerciseCategory[]
+  initialCategories: ExerciseCategory[]
   initialErrorMessage?: string
-  initialDataLoaded?: boolean
 }
 
 export default function ExerciseCategoriesManager({
-  initialCategories = [],
+  initialCategories,
   initialErrorMessage = '',
-  initialDataLoaded = false,
 }: ExerciseCategoriesManagerProps) {
   const [name, setName] = useState('')
   const [categories, setCategories] = useState<ExerciseCategory[]>(initialCategories)
@@ -37,24 +34,6 @@ export default function ExerciseCategoriesManager({
   const [editName, setEditName] = useState('')
   const [message, setMessage] = useState(initialErrorMessage)
   const [isError, setIsError] = useState(Boolean(initialErrorMessage))
-
-  useEffect(() => {
-    if (initialDataLoaded || initialErrorMessage) return
-
-    supabase
-      .from('exercise_categories')
-      .select('*')
-      .order('created_at')
-      .then(({ data, error }) => {
-        if (error) {
-          setIsError(true)
-          setMessage('Could not load exercise categories.')
-          return
-        }
-
-        setCategories(data || [])
-      })
-  }, [initialDataLoaded, initialErrorMessage])
 
   const addCategory = async () => {
     const trimmedName = name.trim()

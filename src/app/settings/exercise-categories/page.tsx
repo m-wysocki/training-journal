@@ -17,7 +17,6 @@ export default async function SettingsExerciseCategoriesPage() {
       <ExerciseCategoriesManager
         initialCategories={data || []}
         initialErrorMessage={error ? 'Could not load exercise categories.' : ''}
-        initialDataLoaded
       />
     </PageContainer>
   )

@@ -38,7 +38,6 @@ export default function EditCompletedExerciseClient({
       initialValues={serverInitialValues}
       initialExerciseCategories={exerciseCategories}
       initialExercises={exercises}
-      initialSetupDataLoaded
       onSubmit={(values) => updateCompletedExercise(entryId, values)}
     />
   )

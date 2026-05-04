@@ -1,20 +1,20 @@
 'use client'
 
 import { ArrowDown, ArrowUp, ClipboardList, Ellipsis } from 'lucide-react'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import * as Accordion from '@radix-ui/react-accordion'
 import * as Dialog from '@radix-ui/react-dialog'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
-import { supabase } from '@/lib/supabase'
 import BackLink from '@/components/BackLink'
 import { DatePicker } from '@/components/DatePicker'
 import PageContainer from '@/components/PageContainer'
 import { formatLocalDateOnly } from '@/lib/dateOnly'
-import { getEntryComparisons, type CompletedExerciseRow, type EntryComparisons, type ExerciseCategory } from '@/lib/completedExercises'
+import type { CompletedExerciseRow, EntryComparisons, ExerciseCategory } from '@/lib/completedExercises'
 import {
   copyCompletedExerciseCategory,
   deleteCompletedExercise,
+  loadCompletedExercisesForRange,
 } from '@/app/completed-exercises/actions'
 import { formatDateRange, shiftWeekRange } from '@/lib/trainingDateRange'
 import { formatDuration, formatDurationHoursMinutes, formatPace, formatWeekdayDate } from '@/lib/trainingFormatters'
@@ -78,7 +78,6 @@ type CompletedExercisesClientProps = {
   initialExerciseCategories: ExerciseCategory[]
   initialEntryComparisons: EntryComparisons
   initialErrorMessage?: string
-  initialExerciseCategoriesLoaded?: boolean
 }
 
 export default function CompletedExercisesClient({
@@ -88,12 +87,11 @@ export default function CompletedExercisesClient({
   initialExerciseCategories,
   initialEntryComparisons,
   initialErrorMessage = '',
-  initialExerciseCategoriesLoaded = false,
 }: CompletedExercisesClientProps) {
   const router = useRouter()
   const [{ dateFrom, dateTo }, setDateRange] = useState({ dateFrom: initialDateFrom, dateTo: initialDateTo })
   const [entries, setEntries] = useState<CompletedExerciseRow[]>(initialEntries)
-  const [exerciseCategories, setExerciseCategories] = useState<ExerciseCategory[]>(initialExerciseCategories)
+  const [exerciseCategories] = useState<ExerciseCategory[]>(initialExerciseCategories)
   const [errorMessage, setErrorMessage] = useState(initialErrorMessage)
   const [selectedExerciseCategory, setSelectedExerciseCategory] = useState('all')
   const [deleteOpen, setDeleteOpen] = useState(false)
@@ -105,41 +103,10 @@ export default function CompletedExercisesClient({
   const [copyLoading, setCopyLoading] = useState(false)
   const [successMessage, setSuccessMessage] = useState('')
   const [entryComparisons, setEntryComparisons] = useState<EntryComparisons>(initialEntryComparisons)
-  const didUseInitialEntriesRef = useRef(true)
-  const didUseInitialComparisonsRef = useRef(true)
   const isCopyDateSameAsSource = Boolean(copyTarget && copyDate === copyTarget.sourceDate)
 
   const loadData = useCallback(() => {
-    void supabase
-      .from('completed_exercises')
-      .select(
-        `
-          id,
-          exercise_id,
-          performed_at,
-          created_at,
-          sets,
-          reps_per_set,
-          duration_per_set_seconds,
-          load_kg,
-          distance_km,
-          pace_min_per_km,
-          note,
-          exercise:exercises (
-            id,
-            name,
-            exercise_category_id,
-            exercise_type,
-            exercise_category:exercise_categories (
-              name
-            )
-          )
-        `,
-      )
-      .gte('performed_at', dateFrom)
-      .lte('performed_at', dateTo)
-      .order('performed_at', { ascending: false })
-      .order('created_at', { ascending: false })
+    void loadCompletedExercisesForRange(dateFrom, dateTo)
       .then(({ data, error }) => {
         if (error) {
           setErrorMessage('Could not load data.')
@@ -148,101 +115,19 @@ export default function CompletedExercisesClient({
         }
 
         setErrorMessage('')
-        setEntries((data as unknown as CompletedExerciseRow[]) || [])
+        setEntries(data?.entries || [])
+        setEntryComparisons(data?.entryComparisons || {})
       })
   }, [dateFrom, dateTo])
 
-  useEffect(() => {
-    if (didUseInitialEntriesRef.current) {
-      didUseInitialEntriesRef.current = false
-      return
-    }
-
-    loadData()
-  }, [loadData])
-
-  useEffect(() => {
-    if (didUseInitialComparisonsRef.current) {
-      didUseInitialComparisonsRef.current = false
-      return
-    }
-
-    const exerciseIds = Array.from(new Set(entries.map((entry) => entry.exercise_id)))
-
-    if (exerciseIds.length === 0) {
-      return
-    }
-
-    let isActive = true
-
-    void supabase
-      .from('completed_exercises')
-      .select(
-        `
-          id,
-          exercise_id,
-          performed_at,
-          created_at,
-          sets,
-          reps_per_set,
-          duration_per_set_seconds,
-          load_kg,
-          distance_km,
-          pace_min_per_km,
-          note,
-          exercise:exercises (
-            id,
-            name,
-            exercise_category_id,
-            exercise_type,
-            exercise_category:exercise_categories (
-              name
-            )
-          )
-        `,
-      )
-      .in('exercise_id', exerciseIds)
-      .lte('performed_at', dateTo)
-      .order('performed_at', { ascending: false })
-      .order('created_at', { ascending: false })
-      .then(({ data, error }) => {
-        if (!isActive) return
-
-        if (error) {
-          setEntryComparisons({})
-          return
-        }
-
-        setEntryComparisons(
-          getEntryComparisons((data as unknown as CompletedExerciseRow[]) || [], new Set(entries.map((entry) => entry.id))),
-        )
-      })
-
-    return () => {
-      isActive = false
-    }
-  }, [dateTo, entries])
-
-  useEffect(() => {
-    if (initialExerciseCategoriesLoaded) return
-
-    supabase
-      .from('exercise_categories')
-      .select('id, name')
-      .order('created_at')
-      .then(({ data, error }) => {
-        if (error) {
-          setErrorMessage('Could not load exercise categories.')
-          setSuccessMessage('')
-          return
-        }
-
-        setExerciseCategories(data || [])
-      })
-  }, [initialExerciseCategoriesLoaded])
+  const updateDateRange = (nextDateRange: { dateFrom: string; dateTo: string }) => {
+    setDateRange(nextDateRange)
+    const searchParams = new URLSearchParams(nextDateRange)
+    router.push(`/completed-exercises?${searchParams.toString()}`)
+  }
 
   const shiftDateRangeByWeek = (direction: -1 | 1) => {
-    setDateRange(shiftWeekRange(dateFrom, direction))
+    updateDateRange(shiftWeekRange(dateFrom, direction))
   }
 
   const exerciseCategoryOptions = useMemo(() => {
@@ -400,7 +285,7 @@ export default function CompletedExercisesClient({
                     <DatePicker
                       id="dateFrom"
                       value={dateFrom}
-                      onChange={(value) => setDateRange((current) => ({ ...current, dateFrom: value }))}
+                      onChange={(value) => updateDateRange({ dateFrom: value, dateTo })}
                     />
                   </div>
                   <div className={styles.datePickerGroup}>
@@ -410,7 +295,7 @@ export default function CompletedExercisesClient({
                     <DatePicker
                       id="dateTo"
                       value={dateTo}
-                      onChange={(value) => setDateRange((current) => ({ ...current, dateTo: value }))}
+                      onChange={(value) => updateDateRange({ dateFrom, dateTo: value })}
                     />
                   </div>
                 </div>

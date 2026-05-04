@@ -31,6 +31,10 @@ The app is used to track workouts, muscle groups, exercises, sets, reps, and tra
 
 - Use SCSS Modules for component-specific styles.
 - Keep styles close to the component they belong to.
+- Use PascalCase class names based on the component and its elements, for example `Header`, `HeaderLogo`,
+  `HeaderButton`.
+- In SCSS Modules, nest related element styles under the base component class when it matches the class naming pattern:
+  `.Header { &Logo { ... } }`.
 - Avoid large global styles unless truly shared.
 - Do not duplicate the same visual patterns in multiple places. Extract reusable styling or components when appropriate.
 
