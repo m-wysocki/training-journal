@@ -251,6 +251,7 @@
   width: 100%;
   min-height: 3rem;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
@@ -268,6 +269,7 @@
 }
 
 .exerciseCategoryName {
+  min-width: 0;
   font-size: 0.9375rem;
   color: #111827;
 }
@@ -336,7 +338,6 @@
   }
 
   .breakdownTrigger {
-    flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
   }
 }
