@@ -1,6 +1,12 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
+const PUBLIC_ROUTES = ['/login', '/auth/callback', '/api/auth/new-user']
+
+const isPublicRoute = (pathname: string) =>
+  pathname === '/' ||
+  PUBLIC_ROUTES.some((route) => pathname === route || pathname.startsWith(`${route}/`))
+
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
@@ -27,7 +33,17 @@ export async function updateSession(request: NextRequest) {
     },
   )
 
-  await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user && !isPublicRoute(request.nextUrl.pathname)) {
+    const redirectUrl = request.nextUrl.clone()
+    redirectUrl.pathname = '/login'
+    redirectUrl.searchParams.set('next', `${request.nextUrl.pathname}${request.nextUrl.search}`)
+
+    return NextResponse.redirect(redirectUrl)
+  }
 
   return supabaseResponse
 }

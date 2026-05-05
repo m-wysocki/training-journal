@@ -44,6 +44,9 @@ export default function ExerciseCategoryClient({
   const [editExerciseType, setEditExerciseType] = useState<'strength' | 'cardio' | 'duration'>('strength')
   const [message, setMessage] = useState('')
   const [isError, setIsError] = useState(false)
+  const [isAdding, setIsAdding] = useState(false)
+  const [updatingExerciseId, setUpdatingExerciseId] = useState<string | null>(null)
+  const [deletingExerciseId, setDeletingExerciseId] = useState<string | null>(null)
 
   const addExercise = async () => {
     const trimmedName = newExercise.trim()
@@ -52,8 +55,10 @@ export default function ExerciseCategoryClient({
 
     setMessage('')
     setIsError(false)
+    setIsAdding(true)
 
     const result = await addExerciseAction(exerciseCategoryId, trimmedName, newExerciseType)
+    setIsAdding(false)
 
     if (result.error) {
       setIsError(true)
@@ -75,8 +80,10 @@ export default function ExerciseCategoryClient({
   const deleteExercise = async (id: string) => {
     setMessage('')
     setIsError(false)
+    setDeletingExerciseId(id)
 
     const result = await deleteExerciseAction(id, exerciseCategoryId)
+    setDeletingExerciseId(null)
 
     if (result.error) {
       setIsError(true)
@@ -105,6 +112,7 @@ export default function ExerciseCategoryClient({
 
     setMessage('')
     setIsError(false)
+    setUpdatingExerciseId(editingExercise.id)
 
     const result = await updateExerciseAction(
       editingExercise.id,
@@ -112,6 +120,7 @@ export default function ExerciseCategoryClient({
       trimmedName,
       editExerciseType,
     )
+    setUpdatingExerciseId(null)
 
     if (result.error) {
       setIsError(true)
@@ -190,9 +199,10 @@ export default function ExerciseCategoryClient({
                       </DropdownMenu.Item>
                       <DropdownMenu.Item
                         className={styles.menuItemDanger}
+                        disabled={deletingExerciseId === exercise.id}
                         onSelect={() => deleteExercise(exercise.id)}
                       >
-                        Delete
+                        {deletingExerciseId === exercise.id ? 'Deleting...' : 'Delete'}
                       </DropdownMenu.Item>
                     </DropdownMenu.Content>
                   </DropdownMenu.Portal>
@@ -246,10 +256,12 @@ export default function ExerciseCategoryClient({
                     </button>
                   </Dialog.Close>
                   <button
+                    type="button"
                     onClick={addExercise}
                     className={styles.primaryButton}
+                    disabled={isAdding}
                   >
-                    Add
+                    {isAdding ? 'Adding...' : 'Add'}
                   </button>
                 </div>
               </div>
@@ -298,8 +310,9 @@ export default function ExerciseCategoryClient({
                     type="button"
                     onClick={updateExercise}
                     className={styles.primaryButton}
+                    disabled={updatingExerciseId === editingExercise?.id}
                   >
-                    Save
+                    {updatingExerciseId === editingExercise?.id ? 'Saving...' : 'Save'}
                   </button>
                 </div>
               </div>

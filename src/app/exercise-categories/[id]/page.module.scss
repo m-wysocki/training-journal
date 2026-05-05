@@ -148,6 +148,11 @@
   background: #fef2f2;
 }
 
+.menuItemDanger[data-disabled] {
+  opacity: 0.65;
+  pointer-events: none;
+}
+
 .primaryButton {
   width: 100%;
   padding: 0.625rem 1.25rem;
@@ -163,6 +168,11 @@
 
 .primaryButton:hover {
   background: var(--primary-hover);
+}
+
+.primaryButton:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
 }
 
 .overlay {

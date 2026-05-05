@@ -2,6 +2,7 @@ import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import BackLink from '@/components/BackLink'
 import PageContainer from '@/components/PageContainer'
+import { requireUser } from '@/lib/supabase/auth'
 import styles from './page.module.scss'
 
 const settingsRoutes = [
@@ -12,7 +13,9 @@ const settingsRoutes = [
   },
 ]
 
-export default function SettingsPage() {
+export default async function SettingsPage() {
+  await requireUser()
+
   return (
     <PageContainer className={styles.container}>
       <BackLink href="/" label="← Back to Home" />

@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { requireUser } from '@/lib/supabase/auth'
 import { getCurrentWeekRange } from '@/lib/trainingDateRange'
 import {
   getEntryComparisons,
@@ -43,12 +43,13 @@ export default async function CompletedExercisesPage({ searchParams }: Completed
   const currentWeekRange = getCurrentWeekRange()
   const dateFrom = params?.dateFrom || currentWeekRange.dateFrom
   const dateTo = params?.dateTo || currentWeekRange.dateTo
-  const supabase = await createClient()
+  const { supabase, user } = await requireUser()
 
   const [entriesResult, categoriesResult] = await Promise.all([
     supabase
       .from('completed_exercises')
       .select(COMPLETED_EXERCISES_SELECT)
+      .eq('user_id', user.id)
       .gte('performed_at', dateFrom)
       .lte('performed_at', dateTo)
       .order('performed_at', { ascending: false })
@@ -56,6 +57,7 @@ export default async function CompletedExercisesPage({ searchParams }: Completed
     supabase
       .from('exercise_categories')
       .select('id, name')
+      .eq('user_id', user.id)
       .order('created_at'),
   ])
 
@@ -68,6 +70,7 @@ export default async function CompletedExercisesPage({ searchParams }: Completed
     const { data } = await supabase
       .from('completed_exercises')
       .select(COMPLETED_EXERCISES_SELECT)
+      .eq('user_id', user.id)
       .in('exercise_id', exerciseIds)
       .lte('performed_at', dateTo)
       .order('performed_at', { ascending: false })

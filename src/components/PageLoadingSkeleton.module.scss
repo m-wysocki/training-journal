@@ -1,0 +1,102 @@
+.PageLoadingSkeleton {
+  min-height: 100vh;
+  padding-block: 2rem;
+}
+
+.PageLoadingSkeletonContainer {
+  width: 100%;
+}
+
+.PageLoadingSkeletonHeader {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.PageLoadingSkeletonBackLink,
+.PageLoadingSkeletonIcon,
+.PageLoadingSkeletonText,
+.PageLoadingSkeletonFilters,
+.PageLoadingSkeletonCard,
+.PageLoadingSkeletonLineLarge,
+.PageLoadingSkeletonLine,
+.PageLoadingSkeletonLineShort {
+  border-radius: 0.5rem;
+  background: linear-gradient(90deg, #eef2f5 0%, #f8fafc 50%, #eef2f5 100%);
+  background-size: 200% 100%;
+  animation: PageLoadingSkeletonPulse 1.2s ease-in-out infinite;
+}
+
+.PageLoadingSkeletonBackLink {
+  width: 7rem;
+  height: 1rem;
+}
+
+.PageLoadingSkeletonTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.PageLoadingSkeletonIcon {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.PageLoadingSkeletonTitle {
+  margin: 0;
+  color: #111827;
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+
+.PageLoadingSkeletonText {
+  width: min(18rem, 60vw);
+  height: 0.875rem;
+  margin-top: 0.5rem;
+}
+
+.PageLoadingSkeletonFilters {
+  width: min(22rem, 100%);
+  height: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.PageLoadingSkeletonList {
+  display: grid;
+  gap: 1rem;
+}
+
+.PageLoadingSkeletonCard {
+  display: grid;
+  gap: 0.75rem;
+  min-height: 7rem;
+  padding: 1rem;
+  border: 1px solid var(--card-border);
+  background-color: var(--card-bg);
+}
+
+.PageLoadingSkeletonLineLarge {
+  width: 55%;
+  height: 1rem;
+}
+
+.PageLoadingSkeletonLine {
+  width: 82%;
+  height: 0.875rem;
+}
+
+.PageLoadingSkeletonLineShort {
+  width: 38%;
+  height: 0.875rem;
+}
+
+@keyframes PageLoadingSkeletonPulse {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}

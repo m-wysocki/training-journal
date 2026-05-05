@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { requireUser } from '@/lib/supabase/auth'
 import type { CompletedExerciseFormValues } from '@/components/CompletedExerciseForm'
 import EditCompletedExerciseClient from './EditCompletedExerciseClient'
 
@@ -40,7 +40,7 @@ const mapEntryToInitialValues = (entry: CompletedExerciseRecord): CompletedExerc
 
 export default async function EditCompletedExercisePage({ params }: EditCompletedExercisePageProps) {
   const { id } = await params
-  const supabase = await createClient()
+  const { supabase, user } = await requireUser()
   const [entryResult, categoriesResult, exercisesResult] = await Promise.all([
     supabase
       .from('completed_exercises')
@@ -61,10 +61,15 @@ export default async function EditCompletedExercisePage({ params }: EditComplete
           )
         `,
       )
+      .eq('user_id', user.id)
       .eq('id', id)
       .single(),
-    supabase.from('exercise_categories').select('id, name').order('created_at'),
-    supabase.from('exercises').select('id, name, exercise_category_id, exercise_type').order('created_at'),
+    supabase.from('exercise_categories').select('id, name').eq('user_id', user.id).order('created_at'),
+    supabase
+      .from('exercises')
+      .select('id, name, exercise_category_id, exercise_type')
+      .eq('user_id', user.id)
+      .order('created_at'),
   ])
 
   if (entryResult.error || !entryResult.data) {

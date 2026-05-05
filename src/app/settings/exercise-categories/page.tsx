@@ -1,14 +1,15 @@
 import BackLink from '@/components/BackLink'
 import ExerciseCategoriesManager from '@/components/ExerciseCategoriesManager'
 import PageContainer from '@/components/PageContainer'
-import { createClient } from '@/lib/supabase/server'
+import { requireUser } from '@/lib/supabase/auth'
 import styles from './page.module.scss'
 
 export default async function SettingsExerciseCategoriesPage() {
-  const supabase = await createClient()
+  const { supabase, user } = await requireUser()
   const { data, error } = await supabase
     .from('exercise_categories')
     .select('id, name')
+    .eq('user_id', user.id)
     .order('created_at')
 
   return (

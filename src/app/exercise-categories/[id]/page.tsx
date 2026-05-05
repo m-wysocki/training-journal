@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
+import { requireUser } from '@/lib/supabase/auth'
 import ExerciseCategoryClient, { type ExerciseCategory } from './ExerciseCategoryClient'
 
 type ExerciseCategoryPageProps = {
@@ -10,7 +10,7 @@ type ExerciseCategoryPageProps = {
 
 export default async function ExerciseCategoryPage({ params }: ExerciseCategoryPageProps) {
   const { id } = await params
-  const supabase = await createClient()
+  const { supabase, user } = await requireUser()
   const { data, error } = await supabase
     .from('exercise_categories')
     .select(`
@@ -22,6 +22,7 @@ export default async function ExerciseCategoryPage({ params }: ExerciseCategoryP
         exercise_type
       )
     `)
+    .eq('user_id', user.id)
     .eq('id', id)
     .single()
 

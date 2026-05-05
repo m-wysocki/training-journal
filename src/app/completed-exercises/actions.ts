@@ -2,8 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import type { CompletedExerciseFormValues } from '@/components/CompletedExerciseForm'
-import { createClient } from '@/lib/supabase/server'
-import { getCurrentUserContext } from '@/lib/supabase/auth'
+import { requireUser } from '@/lib/supabase/auth'
 import {
   getEntryComparisons,
   type CompletedExerciseRow,
@@ -43,10 +42,11 @@ const getCompletedExercisePayload = async (
   entries: CompletedExerciseRow[]
   entryComparisons: EntryComparisons
 }> => {
-  const supabase = await createClient()
+  const { supabase, user } = await requireUser()
   const { data, error } = await supabase
     .from('completed_exercises')
     .select(COMPLETED_EXERCISES_SELECT)
+    .eq('user_id', user.id)
     .gte('performed_at', dateFrom)
     .lte('performed_at', dateTo)
     .order('performed_at', { ascending: false })
@@ -66,6 +66,7 @@ const getCompletedExercisePayload = async (
   const { data: historyData, error: historyError } = await supabase
     .from('completed_exercises')
     .select(COMPLETED_EXERCISES_SELECT)
+    .eq('user_id', user.id)
     .in('exercise_id', exerciseIds)
     .lte('performed_at', dateTo)
     .order('performed_at', { ascending: false })
@@ -105,7 +106,7 @@ export async function loadRecentCompletedExercises(
     return { data: [] }
   }
 
-  const supabase = await createClient()
+  const { supabase, user } = await requireUser()
   const { data, error } = await supabase
     .from('completed_exercises')
     .select(
@@ -120,6 +121,7 @@ export async function loadRecentCompletedExercises(
         pace_min_per_km
       `,
     )
+    .eq('user_id', user.id)
     .eq('exercise_id', exerciseId)
     .order('performed_at', { ascending: false })
     .order('created_at', { ascending: false })
@@ -133,11 +135,7 @@ export async function loadRecentCompletedExercises(
 }
 
 export async function createCompletedExercise(values: CompletedExerciseFormValues): ActionResult {
-  const { supabase, user } = await getCurrentUserContext()
-
-  if (!user) {
-    return { error: 'Sign in before logging an exercise.' }
-  }
+  const { supabase, user } = await requireUser()
 
   const { error } = await supabase.from('completed_exercises').insert({
     exercise_id: values.exerciseId,
@@ -178,11 +176,7 @@ export async function updateCompletedExercise(
   entryId: string,
   values: CompletedExerciseFormValues,
 ): ActionResult {
-  const { supabase, user } = await getCurrentUserContext()
-
-  if (!user) {
-    return { error: 'Sign in before saving changes.' }
-  }
+  const { supabase, user } = await requireUser()
 
   const { error } = await supabase
     .from('completed_exercises')
@@ -197,6 +191,7 @@ export async function updateCompletedExercise(
       note: values.note,
       performed_at: values.performedAt,
     })
+    .eq('user_id', user.id)
     .eq('id', entryId)
 
   if (error) {
@@ -211,13 +206,9 @@ export async function updateCompletedExercise(
 }
 
 export async function deleteCompletedExercise(entryId: string): ActionResult {
-  const { supabase, user } = await getCurrentUserContext()
+  const { supabase, user } = await requireUser()
 
-  if (!user) {
-    return { error: 'Sign in before deleting an entry.' }
-  }
-
-  const { error } = await supabase.from('completed_exercises').delete().eq('id', entryId)
+  const { error } = await supabase.from('completed_exercises').delete().eq('user_id', user.id).eq('id', entryId)
 
   if (error) {
     return { error: 'Could not delete the entry.' }
@@ -233,13 +224,36 @@ export async function copyCompletedExerciseCategory(
   entries: CompletedExerciseRow[],
   performedAt: string,
 ): ActionResult<{ copiedCount: number }> {
-  const { supabase, user } = await getCurrentUserContext()
+  const { supabase, user } = await requireUser()
 
-  if (!user) {
-    return { error: 'Sign in before copying exercises.' }
+  const sourceEntryIds = Array.from(new Set(entries.map((entry) => entry.id)))
+
+  if (sourceEntryIds.length === 0) {
+    return { error: 'Choose exercises to copy.' }
   }
 
-  const rowsToInsert = entries.map((entry) => ({
+  const { data: sourceEntries, error: sourceError } = await supabase
+    .from('completed_exercises')
+    .select(
+      `
+        exercise_id,
+        sets,
+        reps_per_set,
+        duration_per_set_seconds,
+        load_kg,
+        distance_km,
+        pace_min_per_km,
+        note
+      `,
+    )
+    .eq('user_id', user.id)
+    .in('id', sourceEntryIds)
+
+  if (sourceError || !sourceEntries?.length) {
+    return { error: 'Could not load exercises to copy.' }
+  }
+
+  const rowsToInsert = sourceEntries.map((entry) => ({
     exercise_id: entry.exercise_id,
     sets: entry.sets,
     reps_per_set: entry.reps_per_set,

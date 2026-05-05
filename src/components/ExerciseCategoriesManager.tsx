@@ -34,6 +34,9 @@ export default function ExerciseCategoriesManager({
   const [editName, setEditName] = useState('')
   const [message, setMessage] = useState(initialErrorMessage)
   const [isError, setIsError] = useState(Boolean(initialErrorMessage))
+  const [isAdding, setIsAdding] = useState(false)
+  const [updatingCategoryId, setUpdatingCategoryId] = useState<string | null>(null)
+  const [deletingCategoryId, setDeletingCategoryId] = useState<string | null>(null)
 
   const addCategory = async () => {
     const trimmedName = name.trim()
@@ -42,8 +45,10 @@ export default function ExerciseCategoriesManager({
 
     setMessage('')
     setIsError(false)
+    setIsAdding(true)
 
     const result = await addExerciseCategory(trimmedName)
+    setIsAdding(false)
 
     if (result.error) {
       setIsError(true)
@@ -60,8 +65,10 @@ export default function ExerciseCategoriesManager({
   const deleteCategory = async (id: string) => {
     setMessage('')
     setIsError(false)
+    setDeletingCategoryId(id)
 
     const result = await deleteExerciseCategory(id)
+    setDeletingCategoryId(null)
 
     if (result.error) {
       setIsError(true)
@@ -87,8 +94,10 @@ export default function ExerciseCategoriesManager({
 
     setMessage('')
     setIsError(false)
+    setUpdatingCategoryId(editingCategory.id)
 
     const result = await updateExerciseCategory(editingCategory.id, trimmedName)
+    setUpdatingCategoryId(null)
 
     if (result.error) {
       setIsError(true)
@@ -145,8 +154,13 @@ export default function ExerciseCategoriesManager({
                       Cancel
                     </button>
                   </Dialog.Close>
-                  <button type="button" onClick={addCategory} className={styles.primaryButton}>
-                    Add
+                  <button
+                    type="button"
+                    onClick={addCategory}
+                    className={styles.primaryButton}
+                    disabled={isAdding}
+                  >
+                    {isAdding ? 'Adding...' : 'Add'}
                   </button>
                 </div>
               </div>
@@ -189,9 +203,10 @@ export default function ExerciseCategoriesManager({
                     </DropdownMenu.Item>
                     <DropdownMenu.Item
                       className={styles.menuItemDanger}
+                      disabled={deletingCategoryId === category.id}
                       onSelect={() => deleteCategory(category.id)}
                     >
-                      Delete
+                      {deletingCategoryId === category.id ? 'Deleting...' : 'Delete'}
                     </DropdownMenu.Item>
                   </DropdownMenu.Content>
                 </DropdownMenu.Portal>
@@ -229,8 +244,13 @@ export default function ExerciseCategoriesManager({
                     Cancel
                   </button>
                 </Dialog.Close>
-                <button type="button" onClick={updateCategory} className={styles.primaryButton}>
-                  Save
+                <button
+                  type="button"
+                  onClick={updateCategory}
+                  className={styles.primaryButton}
+                  disabled={updatingCategoryId === editingCategory?.id}
+                >
+                  {updatingCategoryId === editingCategory?.id ? 'Saving...' : 'Save'}
                 </button>
               </div>
             </div>

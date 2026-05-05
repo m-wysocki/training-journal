@@ -1,7 +1,7 @@
 'use client'
 
 import { ArrowDown, ArrowUp, ClipboardList, Ellipsis } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import * as Accordion from '@radix-ui/react-accordion'
 import * as Dialog from '@radix-ui/react-dialog'
@@ -88,6 +88,7 @@ export default function CompletedExercisesClient({
   initialErrorMessage = '',
 }: CompletedExercisesClientProps) {
   const router = useRouter()
+  const [isRoutePending, startRouteTransition] = useTransition()
   const [{ dateFrom, dateTo }, setDateRange] = useState({ dateFrom: initialDateFrom, dateTo: initialDateTo })
   const [entries, setEntries] = useState<CompletedExerciseRow[]>(initialEntries)
   const [exerciseCategories] = useState<ExerciseCategory[]>(initialExerciseCategories)
@@ -107,7 +108,9 @@ export default function CompletedExercisesClient({
   const updateDateRange = (nextDateRange: { dateFrom: string; dateTo: string }) => {
     setDateRange(nextDateRange)
     const searchParams = new URLSearchParams(nextDateRange)
-    router.push(`/completed-exercises?${searchParams.toString()}`)
+    startRouteTransition(() => {
+      router.push(`/completed-exercises?${searchParams.toString()}`)
+    })
   }
 
   const shiftDateRangeByWeek = (direction: -1 | 1) => {
@@ -232,7 +235,9 @@ export default function CompletedExercisesClient({
       `Copied ${copiedCount} ${copiedCount === 1 ? 'exercise' : 'exercises'} from ${copyTarget.categoryName} to ${formatWeekdayDate(copyDate)}.`,
     )
     closeCopyCategory()
-    router.push(getCompletedExercisesHrefForDate(copyDate))
+    startRouteTransition(() => {
+      router.push(getCompletedExercisesHrefForDate(copyDate))
+    })
   }
 
   return (
@@ -337,6 +342,7 @@ export default function CompletedExercisesClient({
 
         {errorMessage && <div className={styles.errorBox}>{errorMessage}</div>}
         {successMessage && <div className={styles.successBox}>{successMessage}</div>}
+        {isRoutePending && <div className={styles.loadingBox}>Loading workouts...</div>}
 
         {!errorMessage && groupedByDate.length === 0 && (
           <div className={styles.emptyState}>No completed exercises for this date range.</div>

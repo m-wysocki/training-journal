@@ -14,7 +14,7 @@ const routeIcons = {
 export default async function Home() {
   const { supabase, user } = await getCurrentUserContext()
   const { data: userAccess } = user
-    ? await supabase.from('user_access').select('approved').maybeSingle()
+    ? await supabase.from('user_access').select('approved').eq('user_id', user.id).maybeSingle()
     : { data: null }
   const accessStatus = userAccess?.approved ? 'approved' : 'pending'
 

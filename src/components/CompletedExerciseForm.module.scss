@@ -138,6 +138,19 @@
   color: #6b7280;
 }
 
+.recentHistorySkeleton {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.recentHistorySkeleton span {
+  height: 2.25rem;
+  border-radius: 0.5rem;
+  background: linear-gradient(90deg, #eef2f5 0%, #f8fafc 50%, #eef2f5 100%);
+  background-size: 200% 100%;
+  animation: RecentHistorySkeletonPulse 1.2s ease-in-out infinite;
+}
+
 .sectionBody {
   display: grid;
   gap: 0.9rem;
@@ -446,6 +459,16 @@
   position: fixed;
   inset: 0;
   background: rgba(17, 24, 39, 0.45);
+}
+
+@keyframes RecentHistorySkeletonPulse {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 .dialogContent {

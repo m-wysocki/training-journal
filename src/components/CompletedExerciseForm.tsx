@@ -1,7 +1,7 @@
 'use client'
 
 import type { LucideIcon } from 'lucide-react'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import * as Dialog from '@radix-ui/react-dialog'
 import BackLink from '@/components/BackLink'
@@ -136,6 +136,7 @@ export function CompletedExerciseForm({
   onSuccess,
 }: CompletedExerciseFormProps) {
   const router = useRouter()
+  const [isRoutePending, startRouteTransition] = useTransition()
   const [exerciseCategories, setExerciseCategories] = useState<ExerciseCategory[]>(initialExerciseCategories)
   const [exercises, setExercises] = useState<Exercise[]>(initialExercises)
   const [selectedExerciseCategoryId, setSelectedExerciseCategoryId] = useState(initialValues.exerciseCategoryId)
@@ -445,12 +446,16 @@ export function CompletedExerciseForm({
 
     if (mode === 'create') {
       onSuccess?.()
-      router.push(getCompletedExercisesHrefForDate(performedAt))
+      startRouteTransition(() => {
+        router.push(getCompletedExercisesHrefForDate(performedAt))
+      })
       return
     }
 
     onSuccess?.()
-    router.push(getCompletedExercisesHrefForDate(performedAt))
+    startRouteTransition(() => {
+      router.push(getCompletedExercisesHrefForDate(performedAt))
+    })
   }
 
   return (
@@ -654,7 +659,11 @@ export function CompletedExerciseForm({
                 <div className={styles.recentHistory}>
                   <p className={styles.recentHistoryTitle}>Last 3 entries</p>
                   {isRecentExercisesLoading ? (
-                    <p className={styles.recentHistoryEmpty}>Loading recent history...</p>
+                    <div className={styles.recentHistorySkeleton} aria-label="Loading recent history">
+                      <span />
+                      <span />
+                      <span />
+                    </div>
                   ) : recentExercises.length === 0 ? (
                     <p className={styles.recentHistoryEmpty}>No previous entries for this exercise yet.</p>
                   ) : (
@@ -879,8 +888,8 @@ export function CompletedExerciseForm({
               </div>
             )}
 
-            <button type="submit" className={styles.submit} disabled={loading}>
-              {loading ? submittingLabel : submitLabel}
+            <button type="submit" className={styles.submit} disabled={loading || isRoutePending}>
+              {loading || isRoutePending ? submittingLabel : submitLabel}
             </button>
           </div>
         </form>

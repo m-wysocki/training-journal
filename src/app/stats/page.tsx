@@ -2,7 +2,7 @@ import { BarChart3, ChevronDown } from 'lucide-react'
 import * as Accordion from '@radix-ui/react-accordion'
 import BackLink from '@/components/BackLink'
 import PageContainer from '@/components/PageContainer'
-import { createClient } from '@/lib/supabase/server'
+import { requireUser } from '@/lib/supabase/auth'
 import { getCurrentWeekRange } from '@/lib/trainingDateRange'
 import { formatWeekdayDate } from '@/lib/trainingFormatters'
 import StatsFilters from './StatsFilters'
@@ -54,7 +54,7 @@ export default async function StatsPage({ searchParams }: StatsPageProps) {
   const currentWeekRange = getCurrentWeekRange()
   const dateFrom = params?.dateFrom || currentWeekRange.dateFrom
   const dateTo = params?.dateTo || currentWeekRange.dateTo
-  const supabase = await createClient()
+  const { supabase, user } = await requireUser()
   const { data, error } = await supabase
     .from('completed_exercises')
     .select(
@@ -67,6 +67,7 @@ export default async function StatsPage({ searchParams }: StatsPageProps) {
         )
       `,
     )
+    .eq('user_id', user.id)
     .gte('performed_at', dateFrom)
     .lte('performed_at', dateTo)
 

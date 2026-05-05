@@ -1,5 +1,6 @@
 'use client'
 
+import { useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import * as Accordion from '@radix-ui/react-accordion'
 import { DatePicker } from '@/components/DatePicker'
@@ -13,12 +14,15 @@ type StatsFiltersProps = {
 
 export default function StatsFilters({ dateFrom, dateTo }: StatsFiltersProps) {
   const router = useRouter()
+  const [isPending, startTransition] = useTransition()
 
   const updateRange = (nextDateFrom: string, nextDateTo: string) => {
     const params = new URLSearchParams()
     params.set('dateFrom', nextDateFrom)
     params.set('dateTo', nextDateTo)
-    router.push(`/stats?${params.toString()}`)
+    startTransition(() => {
+      router.push(`/stats?${params.toString()}`)
+    })
   }
 
   const shiftDateRangeByWeek = (direction: -1 | 1) => {
@@ -76,6 +80,7 @@ export default function StatsFilters({ dateFrom, dateTo }: StatsFiltersProps) {
           ›
         </button>
       </div>
+      {isPending && <div className={styles.loadingBox}>Loading statistics...</div>}
     </div>
   )
 }
