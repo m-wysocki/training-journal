@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import BackLink from '@/components/BackLink'
 import PageContainer from '@/components/PageContainer'
 import { requireUser } from '@/lib/supabase/auth'
+import { getCachedExerciseSetup } from '@/lib/supabase/cachedTrainingData'
 import type { CompletedExerciseFormValues } from '@/components/CompletedExerciseForm'
 import EditCompletedExerciseClient from './EditCompletedExerciseClient'
 import styles from '@/components/CompletedExerciseForm.module.scss'
@@ -44,8 +45,8 @@ const mapEntryToInitialValues = (entry: CompletedExerciseRecord): CompletedExerc
 
 async function EditCompletedExerciseData({ params }: EditCompletedExercisePageProps) {
   const { id } = await params
-  const { supabase, user } = await requireUser()
-  const [entryResult, categoriesResult, exercisesResult] = await Promise.all([
+  const { supabase, user, accessToken } = await requireUser()
+  const [entryResult, exerciseSetup] = await Promise.all([
     supabase
       .from('completed_exercises')
       .select(
@@ -68,12 +69,7 @@ async function EditCompletedExerciseData({ params }: EditCompletedExercisePagePr
       .eq('user_id', user.id)
       .eq('id', id)
       .single(),
-    supabase.from('exercise_categories').select('id, name').eq('user_id', user.id).order('created_at'),
-    supabase
-      .from('exercises')
-      .select('id, name, exercise_category_id, exercise_type')
-      .eq('user_id', user.id)
-      .order('created_at'),
+    getCachedExerciseSetup(user.id, accessToken),
   ])
 
   if (entryResult.error || !entryResult.data) {
@@ -84,8 +80,8 @@ async function EditCompletedExerciseData({ params }: EditCompletedExercisePagePr
     <EditCompletedExerciseClient
       entryId={id}
       initialValues={mapEntryToInitialValues(entryResult.data as unknown as CompletedExerciseRecord)}
-      exerciseCategories={categoriesResult.data || []}
-      exercises={exercisesResult.data || []}
+      exerciseCategories={exerciseSetup.exerciseCategories}
+      exercises={exerciseSetup.exercises}
     />
   )
 }

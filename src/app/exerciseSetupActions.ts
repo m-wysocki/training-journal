@@ -1,7 +1,9 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
+import { updateTag } from 'next/cache'
 import type { ExerciseType } from '@/components/CompletedExerciseForm'
+import { cacheTags } from '@/lib/cacheTags'
 import { requireUser } from '@/lib/supabase/auth'
 
 type ActionResult<T = undefined> = Promise<{
@@ -40,6 +42,7 @@ export async function addExerciseCategory(name: string): ActionResult<{ id: stri
     }
   }
 
+  updateTag(cacheTags.exerciseCategories(user.id))
   revalidatePath('/settings/exercise-categories')
   revalidatePath('/completed-exercises/new')
   revalidatePath('/completed-exercises/[id]/edit', 'page')
@@ -64,6 +67,10 @@ export async function updateExerciseCategory(id: string, name: string): ActionRe
     return { error: getRlsErrorMessage(error.message, 'exercise category', 'update') }
   }
 
+  updateTag(cacheTags.exerciseCategories(user.id))
+  updateTag(cacheTags.exerciseCategory(user.id, id))
+  updateTag(cacheTags.completedExercises(user.id))
+  updateTag(cacheTags.stats(user.id))
   revalidatePath('/settings/exercise-categories')
   revalidatePath('/completed-exercises')
   revalidatePath('/stats')
@@ -80,6 +87,11 @@ export async function deleteExerciseCategory(id: string): ActionResult {
     return { error: getRlsErrorMessage(error.message, 'exercise category', 'delete') }
   }
 
+  updateTag(cacheTags.exerciseCategories(user.id))
+  updateTag(cacheTags.exercises(user.id))
+  updateTag(cacheTags.exerciseCategory(user.id, id))
+  updateTag(cacheTags.completedExercises(user.id))
+  updateTag(cacheTags.stats(user.id))
   revalidatePath('/settings/exercise-categories')
   revalidatePath('/completed-exercises')
   revalidatePath('/stats')
@@ -123,6 +135,10 @@ export async function addExercise(
     }
   }
 
+  updateTag(cacheTags.exercises(user.id))
+  updateTag(cacheTags.exerciseCategory(user.id, exerciseCategoryId))
+  updateTag(cacheTags.completedExercises(user.id))
+  updateTag(cacheTags.stats(user.id))
   revalidatePath(`/exercise-categories/${exerciseCategoryId}`)
   revalidatePath('/completed-exercises/new')
   revalidatePath('/completed-exercises/[id]/edit', 'page')
@@ -155,6 +171,10 @@ export async function updateExercise(
     return { error: getRlsErrorMessage(error.message, 'exercise', 'update') }
   }
 
+  updateTag(cacheTags.exercises(user.id))
+  updateTag(cacheTags.exerciseCategory(user.id, exerciseCategoryId))
+  updateTag(cacheTags.completedExercises(user.id))
+  updateTag(cacheTags.stats(user.id))
   revalidatePath(`/exercise-categories/${exerciseCategoryId}`)
   revalidatePath('/completed-exercises')
   revalidatePath('/stats')
@@ -171,6 +191,8 @@ export async function deleteExercise(id: string, exerciseCategoryId: string): Ac
     return { error: getRlsErrorMessage(error.message, 'exercise', 'delete') }
   }
 
+  updateTag(cacheTags.exercises(user.id))
+  updateTag(cacheTags.exerciseCategory(user.id, exerciseCategoryId))
   revalidatePath(`/exercise-categories/${exerciseCategoryId}`)
   revalidatePath('/completed-exercises')
   revalidatePath('/stats')

@@ -1,52 +1,17 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, updateTag } from 'next/cache'
 import type { CompletedExerciseFormValues } from '@/components/CompletedExerciseForm'
+import { cacheTags } from '@/lib/cacheTags'
 import { requireUser } from '@/lib/supabase/auth'
+import { getCachedCompletedExercisesPayload } from '@/lib/supabase/cachedTrainingData'
 import {
-  getEntryComparisons,
   type CompletedExerciseRow,
   type EntryComparisons,
   type RecentCompletedExercise,
 } from '@/lib/completedExercises'
 
 type ActionResult<T = undefined> = Promise<{ data?: T; error?: string | null }>
-
-const COMPLETED_EXERCISES_SELECT = `
-  id,
-  exercise_id,
-  performed_at,
-  created_at,
-  sets,
-  reps_per_set,
-  duration_per_set_seconds,
-  load_kg,
-  distance_km,
-  pace_min_per_km,
-  note,
-  exercise:exercises (
-    id,
-    name,
-    exercise_category_id,
-    exercise_type,
-    exercise_category:exercise_categories (
-      name
-    )
-  )
-`
-
-const COMPARABLE_COMPLETED_EXERCISES_SELECT = `
-  id,
-  exercise_id,
-  performed_at,
-  created_at,
-  sets,
-  reps_per_set,
-  duration_per_set_seconds,
-  load_kg,
-  distance_km,
-  pace_min_per_km
-`
 
 const getCompletedExercisePayload = async (
   dateFrom: string,
@@ -55,46 +20,12 @@ const getCompletedExercisePayload = async (
   entries: CompletedExerciseRow[]
   entryComparisons: EntryComparisons
 }> => {
-  const { supabase, user } = await requireUser()
-  const { data, error } = await supabase
-    .from('completed_exercises')
-    .select(COMPLETED_EXERCISES_SELECT)
-    .eq('user_id', user.id)
-    .gte('performed_at', dateFrom)
-    .lte('performed_at', dateTo)
-    .order('performed_at', { ascending: false })
-    .order('created_at', { ascending: false })
-
-  if (error) {
-    throw error
-  }
-
-  const entries = ((data as unknown as CompletedExerciseRow[]) || [])
-
-  if (entries.length === 0) {
-    return { entries, entryComparisons: {} }
-  }
-
-  const exerciseIds = Array.from(new Set(entries.map((entry) => entry.exercise_id)))
-  const { data: historyData, error: historyError } = await supabase
-    .from('completed_exercises')
-    .select(COMPARABLE_COMPLETED_EXERCISES_SELECT)
-    .eq('user_id', user.id)
-    .in('exercise_id', exerciseIds)
-    .lte('performed_at', dateTo)
-    .order('performed_at', { ascending: false })
-    .order('created_at', { ascending: false })
-
-  if (historyError) {
-    throw historyError
-  }
+  const { user, accessToken } = await requireUser()
+  const payload = await getCachedCompletedExercisesPayload(user.id, accessToken, dateFrom, dateTo)
 
   return {
-    entries,
-    entryComparisons: getEntryComparisons(
-      ((historyData as unknown as CompletedExerciseRow[]) || []),
-      new Set(entries.map((entry) => entry.id)),
-    ),
+    entries: payload.entries,
+    entryComparisons: payload.entryComparisons,
   }
 }
 
@@ -179,6 +110,8 @@ export async function createCompletedExercise(values: CompletedExerciseFormValue
     return { error: 'Could not save the exercise. Check your database configuration.' }
   }
 
+  updateTag(cacheTags.completedExercises(user.id))
+  updateTag(cacheTags.stats(user.id))
   revalidatePath('/completed-exercises')
   revalidatePath('/stats')
 
@@ -211,6 +144,8 @@ export async function updateCompletedExercise(
     return { error: 'Could not save changes.' }
   }
 
+  updateTag(cacheTags.completedExercises(user.id))
+  updateTag(cacheTags.stats(user.id))
   revalidatePath('/completed-exercises')
   revalidatePath(`/completed-exercises/${entryId}/edit`)
   revalidatePath('/stats')
@@ -227,6 +162,8 @@ export async function deleteCompletedExercise(entryId: string): ActionResult {
     return { error: 'Could not delete the entry.' }
   }
 
+  updateTag(cacheTags.completedExercises(user.id))
+  updateTag(cacheTags.stats(user.id))
   revalidatePath('/completed-exercises')
   revalidatePath('/stats')
 
@@ -285,6 +222,8 @@ export async function copyCompletedExerciseCategory(
     return { error: 'Could not copy exercises to the selected date.' }
   }
 
+  updateTag(cacheTags.completedExercises(user.id))
+  updateTag(cacheTags.stats(user.id))
   revalidatePath('/completed-exercises')
   revalidatePath('/stats')
 

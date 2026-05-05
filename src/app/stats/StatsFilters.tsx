@@ -4,7 +4,6 @@ import { useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import * as Accordion from '@radix-ui/react-accordion'
 import { DatePicker } from '@/components/DatePicker'
-import StatusPanel from '@/components/StatusPanel'
 import { formatDateRange, shiftWeekRange } from '@/lib/trainingDateRange'
 import styles from './page.module.scss'
 
@@ -15,7 +14,7 @@ type StatsFiltersProps = {
 
 export default function StatsFilters({ dateFrom, dateTo }: StatsFiltersProps) {
   const router = useRouter()
-  const [isPending, startTransition] = useTransition()
+  const [, startTransition] = useTransition()
 
   const updateRange = (nextDateFrom: string, nextDateTo: string) => {
     const params = new URLSearchParams()
@@ -81,7 +80,6 @@ export default function StatsFilters({ dateFrom, dateTo }: StatsFiltersProps) {
           ›
         </button>
       </div>
-      {isPending && <StatusPanel variant="loading">Loading statistics...</StatusPanel>}
     </div>
   )
 }

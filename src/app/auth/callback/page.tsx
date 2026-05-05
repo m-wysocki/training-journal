@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import type { EmailOtpType } from '@supabase/supabase-js'
 import { redirect } from 'next/navigation'
 import PageContainer from '@/components/PageContainer'
@@ -11,7 +12,7 @@ type AuthCallbackPageProps = {
   }>
 }
 
-export default async function AuthCallbackPage({ searchParams }: AuthCallbackPageProps) {
+async function AuthCallbackContent({ searchParams }: AuthCallbackPageProps) {
   const params = await searchParams
   const supabase = await createClient()
   const code = params?.code
@@ -44,5 +45,21 @@ export default async function AuthCallbackPage({ searchParams }: AuthCallbackPag
     <PageContainer>
       <p>{message}</p>
     </PageContainer>
+  )
+}
+
+function AuthCallbackFallback() {
+  return (
+    <PageContainer>
+      <p>Completing sign-in...</p>
+    </PageContainer>
+  )
+}
+
+export default function AuthCallbackPage(props: AuthCallbackPageProps) {
+  return (
+    <Suspense fallback={<AuthCallbackFallback />}>
+      <AuthCallbackContent {...props} />
+    </Suspense>
   )
 }

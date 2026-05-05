@@ -1,23 +1,14 @@
-import { Suspense } from 'react'
 import { BarChart3, ChevronDown } from 'lucide-react'
 import * as Accordion from '@radix-ui/react-accordion'
 import BackLink from '@/components/BackLink'
 import PageContainer from '@/components/PageContainer'
 import StatusPanel from '@/components/StatusPanel'
 import { requireUser } from '@/lib/supabase/auth'
+import { getCachedStatsEntries, type CachedWeeklyEntry } from '@/lib/supabase/cachedTrainingData'
 import { getCurrentWeekRange } from '@/lib/trainingDateRange'
 import { formatWeekdayDate } from '@/lib/trainingFormatters'
 import StatsFilters from './StatsFilters'
 import styles from './page.module.scss'
-
-type WeeklyEntry = {
-  performed_at: string
-  exercise: {
-    exercise_category: {
-      name: string
-    } | null
-  } | null
-}
 
 type ExerciseCategoryStat = {
   name: string
@@ -32,14 +23,7 @@ type StatsPageProps = {
   }>
 }
 
-type ResolvedStatsPageProps = {
-  searchParams?: {
-    dateFrom?: string
-    dateTo?: string
-  }
-}
-
-const getExerciseCategoryStats = (entries: WeeklyEntry[]): ExerciseCategoryStat[] => {
+const getExerciseCategoryStats = (entries: CachedWeeklyEntry[]): ExerciseCategoryStat[] => {
   const groups = new Map<string, Set<string>>()
 
   entries.forEach((entry) => {
@@ -58,29 +42,15 @@ const getExerciseCategoryStats = (entries: WeeklyEntry[]): ExerciseCategoryStat[
     .sort((a, b) => b.trainingDays - a.trainingDays || a.name.localeCompare(b.name))
 }
 
-async function StatsData({ searchParams }: ResolvedStatsPageProps) {
-  const params = searchParams
+export default async function StatsPage({ searchParams }: StatsPageProps) {
+  const params = await searchParams
   const currentWeekRange = getCurrentWeekRange()
   const dateFrom = params?.dateFrom || currentWeekRange.dateFrom
   const dateTo = params?.dateTo || currentWeekRange.dateTo
-  const { supabase, user } = await requireUser()
-  const { data, error } = await supabase
-    .from('completed_exercises')
-    .select(
-      `
-        performed_at,
-        exercise:exercises (
-          exercise_category:exercise_categories (
-            name
-          )
-        )
-      `,
-    )
-    .eq('user_id', user.id)
-    .gte('performed_at', dateFrom)
-    .lte('performed_at', dateTo)
+  const { user, accessToken } = await requireUser()
+  const { data, error } = await getCachedStatsEntries(user.id, accessToken, dateFrom, dateTo)
 
-  const entries = error ? [] : ((data as unknown as WeeklyEntry[]) || [])
+  const entries = error ? [] : data
   const errorMessage = error ? 'Could not load statistics for the selected date range.' : ''
   const workoutDaysCount = new Set(entries.map((entry) => entry.performed_at)).size
   const exerciseCategoryStats = getExerciseCategoryStats(entries)
@@ -169,64 +139,5 @@ async function StatsData({ searchParams }: ResolvedStatsPageProps) {
         )}
       </PageContainer>
     </div>
-  )
-}
-
-function StatsFallback({ searchParams }: ResolvedStatsPageProps) {
-  const currentWeekRange = getCurrentWeekRange()
-  const dateFrom = searchParams?.dateFrom || currentWeekRange.dateFrom
-  const dateTo = searchParams?.dateTo || currentWeekRange.dateTo
-
-  return (
-    <div className={styles.wrapper}>
-      <PageContainer className={styles.container}>
-        <div className={styles.header}>
-          <BackLink href="/" label="← Back to Home" />
-          <div className={styles.titleRow}>
-            <div className={styles.titleIcon} aria-hidden="true">
-              <BarChart3 size={22} strokeWidth={1.9} />
-            </div>
-            <h1 className={styles.title}>Statistics</h1>
-          </div>
-          <p className={styles.description}>
-            Review your training by date range and see how often you trained each exercise category.
-          </p>
-        </div>
-
-        <StatsFilters dateFrom={dateFrom} dateTo={dateTo} />
-
-        <div className={styles.statsGrid} aria-busy="true">
-          <section className={styles.summaryCard}>
-            <p className={styles.cardLabel}>Workout Days</p>
-            <div className={styles.statsValueSkeleton} />
-            <div className={styles.statsLineSkeleton} />
-          </section>
-
-          <section className={styles.breakdownCard}>
-            <div className={styles.breakdownHeader}>
-              <h2 className={styles.breakdownTitle}>Exercise Category Frequency</h2>
-              <p className={styles.breakdownDescription}>
-                Counted as distinct training days per exercise category within the selected date range.
-              </p>
-            </div>
-            <div className={styles.statsListSkeleton} aria-label="Loading statistics">
-              <span />
-              <span />
-              <span />
-            </div>
-          </section>
-        </div>
-      </PageContainer>
-    </div>
-  )
-}
-
-export default async function StatsPage({ searchParams }: StatsPageProps) {
-  const resolvedSearchParams = await searchParams
-
-  return (
-    <Suspense fallback={<StatsFallback searchParams={resolvedSearchParams} />}>
-      <StatsData searchParams={resolvedSearchParams} />
-    </Suspense>
   )
 }

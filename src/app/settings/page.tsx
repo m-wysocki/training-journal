@@ -1,4 +1,3 @@
-import { Suspense } from 'react'
 import BackLink from '@/components/BackLink'
 import NavigationCard from '@/components/NavigationCard'
 import PageContainer from '@/components/PageContainer'
@@ -13,7 +12,7 @@ const settingsRoutes = [
   },
 ]
 
-async function SettingsData() {
+export default async function SettingsPage() {
   await requireUser()
 
   return (
@@ -34,35 +33,5 @@ async function SettingsData() {
         ))}
       </div>
     </PageContainer>
-  )
-}
-
-function SettingsFallback() {
-  return (
-    <PageContainer className={styles.Settings}>
-      <BackLink href="/" label="← Back to Home" />
-      <div className={styles.SettingsHeader}>
-        <h1 className={styles.SettingsTitle}>Settings</h1>
-        <p className={styles.SettingsDescription}>Manage account-related options and exercise setup.</p>
-      </div>
-      <div className={styles.SettingsList} aria-busy="true">
-        {settingsRoutes.map((route) => (
-          <NavigationCard
-            key={route.path}
-            href={route.path}
-            title={route.name}
-            description={route.description}
-          />
-        ))}
-      </div>
-    </PageContainer>
-  )
-}
-
-export default function SettingsPage() {
-  return (
-    <Suspense fallback={<SettingsFallback />}>
-      <SettingsData />
-    </Suspense>
   )
 }

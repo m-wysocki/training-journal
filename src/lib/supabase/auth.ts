@@ -7,8 +7,11 @@ export const getCurrentUserContext = cache(async () => {
   const {
     data: { user },
   } = await supabase.auth.getUser()
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
 
-  return { supabase, user }
+  return { supabase, user, accessToken: session?.access_token ?? null }
 })
 
 export async function getCurrentUser() {
@@ -18,11 +21,11 @@ export async function getCurrentUser() {
 }
 
 export async function requireUser() {
-  const { supabase, user } = await getCurrentUserContext()
+  const { supabase, user, accessToken } = await getCurrentUserContext()
 
-  if (!user) {
+  if (!user || !accessToken) {
     redirect('/login')
   }
 
-  return { supabase, user }
+  return { supabase, user, accessToken }
 }

@@ -89,7 +89,7 @@ export default function CompletedExercisesClient({
   initialErrorMessage = '',
 }: CompletedExercisesClientProps) {
   const router = useRouter()
-  const [isRoutePending, startRouteTransition] = useTransition()
+  const [, startRouteTransition] = useTransition()
   const [{ dateFrom, dateTo }, setDateRange] = useState({ dateFrom: initialDateFrom, dateTo: initialDateTo })
   const [entries, setEntries] = useState<CompletedExerciseRow[]>(initialEntries)
   const [exerciseCategories] = useState<ExerciseCategory[]>(initialExerciseCategories)
@@ -351,12 +351,6 @@ export default function CompletedExercisesClient({
             {successMessage}
           </StatusPanel>
         )}
-        {isRoutePending && (
-          <StatusPanel variant="loading" withBottomSpacing>
-            Loading workouts...
-          </StatusPanel>
-        )}
-
         {!errorMessage && groupedByDate.length === 0 && (
           <div className={styles.emptyState}>No completed exercises for this date range.</div>
         )}

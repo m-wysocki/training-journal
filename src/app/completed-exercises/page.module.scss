@@ -62,25 +62,6 @@
   margin-bottom: 1rem;
 }
 
-.completedFiltersSkeleton span,
-.completedDayTitleSkeleton,
-.completedEntriesSkeleton span {
-  border-radius: 0.5rem;
-  background: linear-gradient(90deg, #eef2f5 0%, #f8fafc 50%, #eef2f5 100%);
-  background-size: 200% 100%;
-  animation: CompletedExercisesSkeletonPulse 1.2s ease-in-out infinite;
-}
-
-.completedFiltersSkeleton {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.completedFiltersSkeleton span {
-  width: 7rem;
-  height: 2.25rem;
-}
-
 .filterField {
   display: grid;
   gap: 0.5rem;
@@ -262,21 +243,6 @@
   color: #111827;
 }
 
-.completedDayTitleSkeleton {
-  width: 9rem;
-  height: 1rem;
-  margin-bottom: 0.75rem;
-}
-
-.completedEntriesSkeleton {
-  display: grid;
-  gap: 0.5rem;
-}
-
-.completedEntriesSkeleton span {
-  height: 4.25rem;
-}
-
 .exerciseCategorySections {
   display: grid;
   gap: 0.875rem;
@@ -378,16 +344,6 @@
   border-color: #fecaca;
   color: #991b1b;
   background: #fef2f2;
-}
-
-@keyframes CompletedExercisesSkeletonPulse {
-  0% {
-    background-position: 200% 0;
-  }
-
-  100% {
-    background-position: -200% 0;
-  }
 }
 
 .entryNote {
