@@ -1,15 +1,11 @@
-import { requireUser } from '@/lib/supabase/auth'
-import { getCachedExerciseSetup } from '@/lib/supabase/cachedTrainingData'
 import NewCompletedExerciseClient from './NewCompletedExerciseClient'
 
-export default async function NewCompletedExercisePage() {
-  const { user, accessToken } = await requireUser()
-  const { exerciseCategories, exercises } = await getCachedExerciseSetup(user.id, accessToken)
-
+export default function NewCompletedExercisePage() {
   return (
     <NewCompletedExerciseClient
-      exerciseCategories={exerciseCategories}
-      exercises={exercises}
+      exerciseCategories={[]}
+      exercises={[]}
+      initialPerformedAt=""
     />
   )
 }

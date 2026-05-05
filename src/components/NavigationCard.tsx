@@ -8,6 +8,7 @@ type NavigationCardProps = {
   title: string
   description: string
   icon?: LucideIcon
+  prefetch?: boolean | null
 }
 
 export default function NavigationCard({
@@ -15,9 +16,10 @@ export default function NavigationCard({
   title,
   description,
   icon: Icon,
+  prefetch = true,
 }: NavigationCardProps) {
   return (
-    <Link href={href} className={styles.NavigationCard}>
+    <Link href={href} prefetch={prefetch} className={styles.NavigationCard}>
       <div className={styles.NavigationCardInner}>
         <div className={styles.NavigationCardContent}>
           {Icon ? (

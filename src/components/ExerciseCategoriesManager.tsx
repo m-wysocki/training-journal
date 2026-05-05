@@ -184,7 +184,7 @@ export default function ExerciseCategoriesManager({
         <ul className={styles.list}>
           {categories.map((category) => (
             <li key={category.id} className={styles.listItem}>
-              <Link href={`/exercise-categories/${category.id}`} className={styles.categoryLink}>
+              <Link href={`/exercise-categories/${category.id}`} prefetch className={styles.categoryLink}>
                 {category.name}
               </Link>
 

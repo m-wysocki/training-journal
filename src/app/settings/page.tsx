@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import BackLink from '@/components/BackLink'
 import NavigationCard from '@/components/NavigationCard'
 import PageContainer from '@/components/PageContainer'
@@ -12,9 +13,13 @@ const settingsRoutes = [
   },
 ]
 
-export default async function SettingsPage() {
+async function SettingsContent() {
   await requireUser()
 
+  return <SettingsView />
+}
+
+function SettingsView() {
   return (
     <PageContainer className={styles.Settings}>
       <BackLink href="/" label="← Back to Home" />
@@ -33,5 +38,13 @@ export default async function SettingsPage() {
         ))}
       </div>
     </PageContainer>
+  )
+}
+
+export default function SettingsPage() {
+  return (
+    <Suspense fallback={<SettingsView />}>
+      <SettingsContent />
+    </Suspense>
   )
 }

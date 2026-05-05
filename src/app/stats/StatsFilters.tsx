@@ -15,6 +15,7 @@ type StatsFiltersProps = {
 export default function StatsFilters({ dateFrom, dateTo }: StatsFiltersProps) {
   const router = useRouter()
   const [, startTransition] = useTransition()
+  const hasDateRange = Boolean(dateFrom && dateTo)
 
   const updateRange = (nextDateFrom: string, nextDateTo: string) => {
     const params = new URLSearchParams()
@@ -67,15 +68,19 @@ export default function StatsFilters({ dateFrom, dateTo }: StatsFiltersProps) {
           className={styles.weekIconButton}
           onClick={() => shiftDateRangeByWeek(-1)}
           aria-label="Previous week"
+          disabled={!hasDateRange}
         >
           ‹
         </button>
-        <p className={styles.weekRange}>{formatDateRange(dateFrom, dateTo)}</p>
+        <p className={styles.weekRange}>
+          {hasDateRange ? formatDateRange(dateFrom, dateTo) : 'Loading date range...'}
+        </p>
         <button
           type="button"
           className={styles.weekIconButton}
           onClick={() => shiftDateRangeByWeek(1)}
           aria-label="Next week"
+          disabled={!hasDateRange}
         >
           ›
         </button>

@@ -67,6 +67,7 @@ export default function AuthButton({ user }: AuthButtonProps) {
             <div className={styles.menuEmail}>{user.email}</div>
             <Link
               href="/settings"
+              prefetch
               className={styles.menuItem}
               role="menuitem"
               onClick={() => setMenuOpen(false)}
@@ -95,9 +96,8 @@ export default function AuthButton({ user }: AuthButtonProps) {
 
   return (
     <ButtonSquare
-      onClick={() => router.push('/login')}
+      href="/login"
       aria-label="Sign in"
-      type="button"
     >
       <UserIcon size={18} strokeWidth={1.8} aria-hidden="true" />
     </ButtonSquare>

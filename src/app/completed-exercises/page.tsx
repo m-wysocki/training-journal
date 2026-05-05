@@ -1,5 +1,4 @@
-import { requireUser } from '@/lib/supabase/auth'
-import { getCachedCompletedExercisesPayload } from '@/lib/supabase/cachedTrainingData'
+import { Suspense } from 'react'
 import { getCurrentWeekRange } from '@/lib/trainingDateRange'
 import CompletedExercisesClient from './CompletedExercisesClient'
 
@@ -10,23 +9,41 @@ type CompletedExercisesPageProps = {
   }>
 }
 
-export default async function CompletedExercisesPage({ searchParams }: CompletedExercisesPageProps) {
+async function CompletedExercisesData({ searchParams }: CompletedExercisesPageProps) {
   const params = await searchParams
   const currentWeekRange = getCurrentWeekRange()
   const dateFrom = params?.dateFrom || currentWeekRange.dateFrom
   const dateTo = params?.dateTo || currentWeekRange.dateTo
-  const { user, accessToken } = await requireUser()
-  const payload = await getCachedCompletedExercisesPayload(user.id, accessToken, dateFrom, dateTo)
 
   return (
     <CompletedExercisesClient
       key={`${dateFrom}-${dateTo}`}
       initialDateFrom={dateFrom}
       initialDateTo={dateTo}
-      initialEntries={payload.entries}
-      initialExerciseCategories={payload.exerciseCategories}
-      initialEntryComparisons={payload.entryComparisons}
-      initialErrorMessage={payload.errorMessage}
+      initialEntries={[]}
+      initialExerciseCategories={[]}
+      initialEntryComparisons={{}}
+      initialIsLoading
     />
+  )
+}
+
+function CompletedExercisesFallback() {
+  return (
+    <CompletedExercisesClient
+      initialDateFrom=""
+      initialDateTo=""
+      initialEntries={[]}
+      initialExerciseCategories={[]}
+      initialEntryComparisons={{}}
+    />
+  )
+}
+
+export default function CompletedExercisesPage(props: CompletedExercisesPageProps) {
+  return (
+    <Suspense fallback={<CompletedExercisesFallback />}>
+      <CompletedExercisesData {...props} />
+    </Suspense>
   )
 }

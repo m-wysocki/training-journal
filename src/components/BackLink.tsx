@@ -8,7 +8,7 @@ type BackLinkProps = {
 
 export default function BackLink({ href, label }: BackLinkProps) {
   return (
-    <Link href={href} className={styles.backLink}>
+    <Link href={href} prefetch className={styles.backLink}>
       {label}
     </Link>
   )

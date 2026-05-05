@@ -29,7 +29,7 @@ export default function AccessPanel({
       <h2 className={styles.AccessPanelTitle}>{title}</h2>
       <p className={styles.AccessPanelDescription}>{description}</p>
       {action ? (
-        <Link href={action.href} className={styles.AccessPanelAction}>
+        <Link href={action.href} prefetch className={styles.AccessPanelAction}>
           {action.label}
         </Link>
       ) : null}

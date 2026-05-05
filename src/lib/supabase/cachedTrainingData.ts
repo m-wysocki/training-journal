@@ -1,4 +1,4 @@
-import { unstable_cache } from 'next/cache'
+import { cacheLife, cacheTag } from 'next/cache'
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { cacheTags } from '@/lib/cacheTags'
 import {
@@ -98,46 +98,46 @@ const createAuthenticatedCachedClient = (accessToken: string) =>
   )
 
 export const getCachedExerciseCategories = (userId: string, accessToken: string) =>
-  unstable_cache(
-    async () => {
-      const supabase = createAuthenticatedCachedClient(accessToken)
-      const { data, error } = await supabase
-        .from('exercise_categories')
-        .select('id, name')
-        .eq('user_id', userId)
-        .order('created_at')
+  getCachedExerciseCategoriesData(userId, accessToken)
 
-      return {
-        data: (data as CachedExerciseCategory[] | null) || [],
-        error,
-      }
-    },
-    ['exercise-categories', userId],
-    {
-      tags: [cacheTags.exerciseCategories(userId)],
-    },
-  )()
+async function getCachedExerciseCategoriesData(userId: string, accessToken: string) {
+  'use cache'
+  cacheLife('minutes')
+  cacheTag(cacheTags.exerciseCategories(userId))
+
+  const supabase = createAuthenticatedCachedClient(accessToken)
+  const { data, error } = await supabase
+    .from('exercise_categories')
+    .select('id, name')
+    .eq('user_id', userId)
+    .order('created_at')
+
+  return {
+    data: (data as CachedExerciseCategory[] | null) || [],
+    error,
+  }
+}
 
 export const getCachedExercises = (userId: string, accessToken: string) =>
-  unstable_cache(
-    async () => {
-      const supabase = createAuthenticatedCachedClient(accessToken)
-      const { data, error } = await supabase
-        .from('exercises')
-        .select('id, name, exercise_category_id, exercise_type')
-        .eq('user_id', userId)
-        .order('created_at')
+  getCachedExercisesData(userId, accessToken)
 
-      return {
-        data: (data as CachedExercise[] | null) || [],
-        error,
-      }
-    },
-    ['exercises', userId],
-    {
-      tags: [cacheTags.exercises(userId)],
-    },
-  )()
+async function getCachedExercisesData(userId: string, accessToken: string) {
+  'use cache'
+  cacheLife('minutes')
+  cacheTag(cacheTags.exercises(userId))
+
+  const supabase = createAuthenticatedCachedClient(accessToken)
+  const { data, error } = await supabase
+    .from('exercises')
+    .select('id, name, exercise_category_id, exercise_type')
+    .eq('user_id', userId)
+    .order('created_at')
+
+  return {
+    data: (data as CachedExercise[] | null) || [],
+    error,
+  }
+}
 
 export async function getCachedExerciseSetup(userId: string, accessToken: string) {
   const [categoriesResult, exercisesResult] = await Promise.all([
@@ -157,38 +157,42 @@ export const getCachedExerciseCategoryDetail = (
   accessToken: string,
   exerciseCategoryId: string,
 ) =>
-  unstable_cache(
-    async () => {
-      const supabase = createAuthenticatedCachedClient(accessToken)
-      const { data, error } = await supabase
-        .from('exercise_categories')
-        .select(`
-          id,
-          name,
-          exercises (
-            id,
-            name,
-            exercise_type
-          )
-        `)
-        .eq('user_id', userId)
-        .eq('id', exerciseCategoryId)
-        .single()
+  getCachedExerciseCategoryDetailData(userId, accessToken, exerciseCategoryId)
 
-      return {
-        data: data as CachedExerciseCategoryDetail | null,
-        error,
-      }
-    },
-    ['exercise-category', userId, exerciseCategoryId],
-    {
-      tags: [
-        cacheTags.exerciseCategories(userId),
-        cacheTags.exercises(userId),
-        cacheTags.exerciseCategory(userId, exerciseCategoryId),
-      ],
-    },
-  )()
+async function getCachedExerciseCategoryDetailData(
+  userId: string,
+  accessToken: string,
+  exerciseCategoryId: string,
+) {
+  'use cache'
+  cacheLife('minutes')
+  cacheTag(
+    cacheTags.exerciseCategories(userId),
+    cacheTags.exercises(userId),
+    cacheTags.exerciseCategory(userId, exerciseCategoryId),
+  )
+
+  const supabase = createAuthenticatedCachedClient(accessToken)
+  const { data, error } = await supabase
+    .from('exercise_categories')
+    .select(`
+      id,
+      name,
+      exercises (
+        id,
+        name,
+        exercise_type
+      )
+    `)
+    .eq('user_id', userId)
+    .eq('id', exerciseCategoryId)
+    .single()
+
+  return {
+    data: data as CachedExerciseCategoryDetail | null,
+    error,
+  }
+}
 
 export const getCachedCompletedExercisesPayload = (
   userId: string,
@@ -196,58 +200,63 @@ export const getCachedCompletedExercisesPayload = (
   dateFrom: string,
   dateTo: string,
 ) =>
-  unstable_cache(
-    async (): Promise<CachedCompletedExercisesPayload> => {
-      const supabase = createAuthenticatedCachedClient(accessToken)
-      const [entriesResult, categoriesResult] = await Promise.all([
-        supabase
-          .from('completed_exercises')
-          .select(COMPLETED_EXERCISES_SELECT)
-          .eq('user_id', userId)
-          .gte('performed_at', dateFrom)
-          .lte('performed_at', dateTo)
-          .order('performed_at', { ascending: false })
-          .order('created_at', { ascending: false }),
-        getCachedExerciseCategories(userId, accessToken),
-      ])
+  getCachedCompletedExercisesPayloadData(userId, accessToken, dateFrom, dateTo)
 
-      const entries = entriesResult.error ? [] : ((entriesResult.data as unknown as CompletedExerciseRow[]) || [])
-      let entryComparisons: EntryComparisons = {}
+async function getCachedCompletedExercisesPayloadData(
+  userId: string,
+  accessToken: string,
+  dateFrom: string,
+  dateTo: string,
+): Promise<CachedCompletedExercisesPayload> {
+  'use cache'
+  cacheLife('minutes')
+  cacheTag(
+    cacheTags.completedExercises(userId),
+    cacheTags.completedExercisesRange(userId, dateFrom, dateTo),
+    cacheTags.exerciseCategories(userId),
+    cacheTags.exercises(userId),
+  )
 
-      if (entries.length > 0) {
-        const exerciseIds = Array.from(new Set(entries.map((entry) => entry.exercise_id)))
-        const { data } = await supabase
-          .from('completed_exercises')
-          .select(COMPARABLE_COMPLETED_EXERCISES_SELECT)
-          .eq('user_id', userId)
-          .in('exercise_id', exerciseIds)
-          .lte('performed_at', dateTo)
-          .order('performed_at', { ascending: false })
-          .order('created_at', { ascending: false })
+  const supabase = createAuthenticatedCachedClient(accessToken)
+  const [entriesResult, categoriesResult] = await Promise.all([
+    supabase
+      .from('completed_exercises')
+      .select(COMPLETED_EXERCISES_SELECT)
+      .eq('user_id', userId)
+      .gte('performed_at', dateFrom)
+      .lte('performed_at', dateTo)
+      .order('performed_at', { ascending: false })
+      .order('created_at', { ascending: false }),
+    getCachedExerciseCategories(userId, accessToken),
+  ])
 
-        entryComparisons = getEntryComparisons(
-          ((data as unknown as CompletedExerciseRow[]) || []),
-          new Set(entries.map((entry) => entry.id)),
-        )
-      }
+  const entries = entriesResult.error ? [] : ((entriesResult.data as unknown as CompletedExerciseRow[]) || [])
+  let entryComparisons: EntryComparisons = {}
 
-      return {
-        entries,
-        exerciseCategories: categoriesResult.data,
-        entryComparisons,
-        errorMessage: entriesResult.error || categoriesResult.error ? 'Could not load data.' : '',
-      }
-    },
-    ['completed-exercises', userId, dateFrom, dateTo],
-    {
-      tags: [
-        cacheTags.completedExercises(userId),
-        cacheTags.completedExercisesRange(userId, dateFrom, dateTo),
-        cacheTags.exerciseCategories(userId),
-        cacheTags.exercises(userId),
-      ],
-    },
-  )()
+  if (entries.length > 0) {
+    const exerciseIds = Array.from(new Set(entries.map((entry) => entry.exercise_id)))
+    const { data } = await supabase
+      .from('completed_exercises')
+      .select(COMPARABLE_COMPLETED_EXERCISES_SELECT)
+      .eq('user_id', userId)
+      .in('exercise_id', exerciseIds)
+      .lte('performed_at', dateTo)
+      .order('performed_at', { ascending: false })
+      .order('created_at', { ascending: false })
+
+    entryComparisons = getEntryComparisons(
+      ((data as unknown as CompletedExerciseRow[]) || []),
+      new Set(entries.map((entry) => entry.id)),
+    )
+  }
+
+  return {
+    entries,
+    exerciseCategories: categoriesResult.data,
+    entryComparisons,
+    errorMessage: entriesResult.error || categoriesResult.error ? 'Could not load data.' : '',
+  }
+}
 
 export const getCachedStatsEntries = (
   userId: string,
@@ -255,37 +264,42 @@ export const getCachedStatsEntries = (
   dateFrom: string,
   dateTo: string,
 ) =>
-  unstable_cache(
-    async () => {
-      const supabase = createAuthenticatedCachedClient(accessToken)
-      const { data, error } = await supabase
-        .from('completed_exercises')
-        .select(
-          `
-            performed_at,
-            exercise:exercises (
-              exercise_category:exercise_categories (
-                name
-              )
-            )
-          `,
-        )
-        .eq('user_id', userId)
-        .gte('performed_at', dateFrom)
-        .lte('performed_at', dateTo)
+  getCachedStatsEntriesData(userId, accessToken, dateFrom, dateTo)
 
-      return {
-        data: error ? [] : ((data as unknown as CachedWeeklyEntry[]) || []),
-        error,
-      }
-    },
-    ['stats', userId, dateFrom, dateTo],
-    {
-      tags: [
-        cacheTags.stats(userId),
-        cacheTags.statsRange(userId, dateFrom, dateTo),
-        cacheTags.exerciseCategories(userId),
-        cacheTags.exercises(userId),
-      ],
-    },
-  )()
+async function getCachedStatsEntriesData(
+  userId: string,
+  accessToken: string,
+  dateFrom: string,
+  dateTo: string,
+) {
+  'use cache'
+  cacheLife('minutes')
+  cacheTag(
+    cacheTags.stats(userId),
+    cacheTags.statsRange(userId, dateFrom, dateTo),
+    cacheTags.exerciseCategories(userId),
+    cacheTags.exercises(userId),
+  )
+
+  const supabase = createAuthenticatedCachedClient(accessToken)
+  const { data, error } = await supabase
+    .from('completed_exercises')
+    .select(
+      `
+        performed_at,
+        exercise:exercises (
+          exercise_category:exercise_categories (
+            name
+          )
+        )
+      `,
+    )
+    .eq('user_id', userId)
+    .gte('performed_at', dateFrom)
+    .lte('performed_at', dateTo)
+
+  return {
+    data: error ? [] : ((data as unknown as CachedWeeklyEntry[]) || []),
+    error,
+  }
+}

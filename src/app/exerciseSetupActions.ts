@@ -5,11 +5,43 @@ import { updateTag } from 'next/cache'
 import type { ExerciseType } from '@/components/CompletedExerciseForm'
 import { cacheTags } from '@/lib/cacheTags'
 import { requireUser } from '@/lib/supabase/auth'
+import { getCachedExerciseSetup } from '@/lib/supabase/cachedTrainingData'
 
 type ActionResult<T = undefined> = Promise<{
   data?: T
   error?: string | null
 }>
+
+export async function loadExerciseSetup(): ActionResult<{
+  exerciseCategories: {
+    id: string
+    name: string
+  }[]
+  exercises: {
+    id: string
+    name: string
+    exercise_category_id: string
+    exercise_type: ExerciseType
+  }[]
+}> {
+  try {
+    const { user, accessToken } = await requireUser()
+    const { exerciseCategories, exercises, error } = await getCachedExerciseSetup(user.id, accessToken)
+
+    if (error) {
+      return { error: 'Could not load exercise setup.' }
+    }
+
+    return {
+      data: {
+        exerciseCategories,
+        exercises,
+      },
+    }
+  } catch {
+    return { error: 'Could not load exercise setup.' }
+  }
+}
 
 const getRlsErrorMessage = (errorMessage: string, resource: string, action: string) =>
   errorMessage.includes('row-level security policy')

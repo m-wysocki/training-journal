@@ -18,6 +18,10 @@ const getCompletedExercisePayload = async (
   dateTo: string,
 ): Promise<{
   entries: CompletedExerciseRow[]
+  exerciseCategories: {
+    id: string
+    name: string
+  }[]
   entryComparisons: EntryComparisons
 }> => {
   const { user, accessToken } = await requireUser()
@@ -25,6 +29,7 @@ const getCompletedExercisePayload = async (
 
   return {
     entries: payload.entries,
+    exerciseCategories: payload.exerciseCategories,
     entryComparisons: payload.entryComparisons,
   }
 }
@@ -34,6 +39,10 @@ export async function loadCompletedExercisesForRange(
   dateTo: string,
 ): ActionResult<{
   entries: CompletedExerciseRow[]
+  exerciseCategories: {
+    id: string
+    name: string
+  }[]
   entryComparisons: EntryComparisons
 }> {
   try {

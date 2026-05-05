@@ -9,6 +9,7 @@ type ButtonSquareSharedProps = AriaAttributes & {
 
 type ButtonSquareLinkProps = ButtonSquareSharedProps & {
   href: string
+  prefetch?: boolean | null
 }
 
 type ButtonSquareButtonProps = ButtonSquareSharedProps & {
@@ -27,10 +28,10 @@ export default function ButtonSquare({
   const buttonClassName = [styles.buttonSquare, className].filter(Boolean).join(' ')
 
   if ('href' in props) {
-    const { href, ...linkProps } = props
+    const { href, prefetch = true, ...linkProps } = props
 
     return (
-      <Link href={href} {...linkProps} className={buttonClassName}>
+      <Link href={href} prefetch={prefetch} {...linkProps} className={buttonClassName}>
         {children}
       </Link>
     )

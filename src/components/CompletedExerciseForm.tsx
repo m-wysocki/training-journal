@@ -59,6 +59,7 @@ type CompletedExerciseFormProps = {
   initialValues: CompletedExerciseFormValues
   initialExerciseCategories: ExerciseCategory[]
   initialExercises: Exercise[]
+  isExerciseSetupLoading?: boolean
   onSubmit: (values: CompletedExerciseFormValues) => Promise<{ error?: string | null }>
   onSuccess?: () => void
 }
@@ -133,6 +134,7 @@ export function CompletedExerciseForm({
   initialValues,
   initialExerciseCategories,
   initialExercises,
+  isExerciseSetupLoading = false,
   onSubmit,
   onSuccess,
 }: CompletedExerciseFormProps) {
@@ -491,9 +493,15 @@ export function CompletedExerciseForm({
               <div className={styles.badgeField}>
                 <p className={styles.label}>Exercise Category</p>
                 <div className={styles.badgeGroup} role="group" aria-label="Exercise category">
-                  {exerciseCategories.length === 0 && (
+                  {isExerciseSetupLoading ? (
+                    <div className={styles.formDataSkeleton} aria-label="Loading exercise categories">
+                      <span />
+                      <span />
+                      <span />
+                    </div>
+                  ) : exerciseCategories.length === 0 ? (
                     <p className={styles.badgeEmpty}>No exercise categories yet.</p>
-                  )}
+                  ) : null}
                   {exerciseCategories.map((category) => (
                     <button
                       key={category.id}

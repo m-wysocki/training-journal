@@ -1,7 +1,8 @@
 'use client'
 
 import { ArrowDown, ArrowUp, ClipboardList, Ellipsis } from 'lucide-react'
-import { useMemo, useState, useTransition } from 'react'
+import Link from 'next/link'
+import { useEffect, useMemo, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import * as Accordion from '@radix-ui/react-accordion'
 import * as Dialog from '@radix-ui/react-dialog'
@@ -15,6 +16,7 @@ import type { CompletedExerciseRow, EntryComparisons, ExerciseCategory } from '@
 import {
   copyCompletedExerciseCategory,
   deleteCompletedExercise,
+  loadCompletedExercisesForRange,
 } from '@/app/completed-exercises/actions'
 import { formatDateRange, getCompletedExercisesHrefForDate, shiftWeekRange } from '@/lib/trainingDateRange'
 import { formatDuration, formatDurationHoursMinutes, formatPace, formatWeekdayDate } from '@/lib/trainingFormatters'
@@ -78,6 +80,44 @@ type CompletedExercisesClientProps = {
   initialExerciseCategories: ExerciseCategory[]
   initialEntryComparisons: EntryComparisons
   initialErrorMessage?: string
+  initialIsLoading?: boolean
+}
+
+type CompletedExercisesPayload = {
+  entries: CompletedExerciseRow[]
+  exerciseCategories: ExerciseCategory[]
+  entryComparisons: EntryComparisons
+}
+
+const completedExercisesCache = new Map<string, CompletedExercisesPayload>()
+const completedExercisesPromises = new Map<string, Promise<CompletedExercisesPayload>>()
+
+const getCompletedExercisesCacheKey = (dateFrom: string, dateTo: string) => `${dateFrom}:${dateTo}`
+
+const loadCompletedExercisesPayload = async (dateFrom: string, dateTo: string) => {
+  const cacheKey = getCompletedExercisesCacheKey(dateFrom, dateTo)
+  const cachedPayload = completedExercisesCache.get(cacheKey)
+
+  if (cachedPayload) {
+    return cachedPayload
+  }
+
+  if (!completedExercisesPromises.has(cacheKey)) {
+    completedExercisesPromises.set(
+      cacheKey,
+      loadCompletedExercisesForRange(dateFrom, dateTo).then(({ data, error }) => {
+        if (error || !data) {
+          throw new Error(error || 'Could not load data.')
+        }
+
+        completedExercisesCache.set(cacheKey, data)
+        completedExercisesPromises.delete(cacheKey)
+        return data
+      }),
+    )
+  }
+
+  return completedExercisesPromises.get(cacheKey)!
 }
 
 export default function CompletedExercisesClient({
@@ -87,13 +127,15 @@ export default function CompletedExercisesClient({
   initialExerciseCategories,
   initialEntryComparisons,
   initialErrorMessage = '',
+  initialIsLoading = false,
 }: CompletedExercisesClientProps) {
   const router = useRouter()
   const [, startRouteTransition] = useTransition()
   const [{ dateFrom, dateTo }, setDateRange] = useState({ dateFrom: initialDateFrom, dateTo: initialDateTo })
   const [entries, setEntries] = useState<CompletedExerciseRow[]>(initialEntries)
-  const [exerciseCategories] = useState<ExerciseCategory[]>(initialExerciseCategories)
+  const [exerciseCategories, setExerciseCategories] = useState<ExerciseCategory[]>(initialExerciseCategories)
   const [errorMessage, setErrorMessage] = useState(initialErrorMessage)
+  const [isDataLoading, setIsDataLoading] = useState(initialIsLoading)
   const [selectedExerciseCategory, setSelectedExerciseCategory] = useState('all')
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [deletingEntryId, setDeletingEntryId] = useState<string | null>(null)
@@ -103,11 +145,59 @@ export default function CompletedExercisesClient({
   const [copyDate, setCopyDate] = useState('')
   const [copyLoading, setCopyLoading] = useState(false)
   const [successMessage, setSuccessMessage] = useState('')
-  const [entryComparisons] = useState<EntryComparisons>(initialEntryComparisons)
+  const [entryComparisons, setEntryComparisons] = useState<EntryComparisons>(initialEntryComparisons)
   const isCopyDateSameAsSource = Boolean(copyTarget && copyDate === copyTarget.sourceDate)
+  const hasDateRange = Boolean(dateFrom && dateTo)
+
+  useEffect(() => {
+    let isActive = true
+
+    if (!dateFrom || !dateTo) {
+      return () => {
+        isActive = false
+      }
+    }
+
+    const cacheKey = getCompletedExercisesCacheKey(dateFrom, dateTo)
+
+    if (initialEntries.length > 0 || initialExerciseCategories.length > 0) {
+      completedExercisesCache.set(cacheKey, {
+        entries: initialEntries,
+        exerciseCategories: initialExerciseCategories,
+        entryComparisons: initialEntryComparisons,
+      })
+      return () => {
+        isActive = false
+      }
+    }
+
+    loadCompletedExercisesPayload(dateFrom, dateTo)
+      .then((payload) => {
+        if (!isActive) return
+
+        setEntries(payload.entries)
+        setExerciseCategories(payload.exerciseCategories)
+        setEntryComparisons(payload.entryComparisons)
+        setIsDataLoading(false)
+      })
+      .catch((error: Error) => {
+        if (!isActive) return
+
+        setEntries([])
+        setEntryComparisons({})
+        setErrorMessage(error.message)
+        setIsDataLoading(false)
+      })
+
+    return () => {
+      isActive = false
+    }
+  }, [dateFrom, dateTo, initialEntries, initialExerciseCategories, initialEntryComparisons])
 
   const updateDateRange = (nextDateRange: { dateFrom: string; dateTo: string }) => {
     setDateRange(nextDateRange)
+    setIsDataLoading(true)
+    setErrorMessage('')
     const searchParams = new URLSearchParams(nextDateRange)
     startRouteTransition(() => {
       router.push(`/completed-exercises?${searchParams.toString()}`)
@@ -326,15 +416,19 @@ export default function CompletedExercisesClient({
               className={styles.weekIconButton}
               onClick={() => shiftDateRangeByWeek(-1)}
               aria-label="Previous week"
+              disabled={!hasDateRange}
             >
               ‹
             </button>
-            <p className={styles.weekRange}>{formatDateRange(dateFrom, dateTo)}</p>
+            <p className={styles.weekRange}>
+              {hasDateRange ? formatDateRange(dateFrom, dateTo) : 'Loading date range...'}
+            </p>
             <button
               type="button"
               className={styles.weekIconButton}
               onClick={() => shiftDateRangeByWeek(1)}
               aria-label="Next week"
+              disabled={!hasDateRange}
             >
               ›
             </button>
@@ -351,10 +445,16 @@ export default function CompletedExercisesClient({
             {successMessage}
           </StatusPanel>
         )}
-        {!errorMessage && groupedByDate.length === 0 && (
+        {isDataLoading ? (
+          <StatusPanel variant="loading" withBottomSpacing>
+            Loading completed exercises...
+          </StatusPanel>
+        ) : null}
+        {!errorMessage && !isDataLoading && groupedByDate.length === 0 && (
           <div className={styles.emptyState}>No completed exercises for this date range.</div>
         )}
 
+        {!isDataLoading ? (
         <div className={styles.daysList}>
           {groupedByDate.map((group) => (
             <section key={group.date} className={styles.dayCard}>
@@ -435,11 +535,14 @@ export default function CompletedExercisesClient({
                             </DropdownMenu.Trigger>
                               <DropdownMenu.Portal>
                                 <DropdownMenu.Content className={styles.menuContent} align="end">
-                                  <DropdownMenu.Item
-                                    className={styles.menuItem}
-                                    onSelect={() => router.push(`/completed-exercises/${entry.id}/edit`)}
-                                  >
-                                    Edit
+                                  <DropdownMenu.Item asChild>
+                                    <Link
+                                      href={`/completed-exercises/${entry.id}/edit`}
+                                      prefetch
+                                      className={styles.menuItem}
+                                    >
+                                      Edit
+                                    </Link>
                                   </DropdownMenu.Item>
                                   <DropdownMenu.Item
                                     className={styles.menuItemDanger}
@@ -460,6 +563,7 @@ export default function CompletedExercisesClient({
             </section>
           ))}
         </div>
+        ) : null}
 
         <Dialog.Root open={deleteOpen} onOpenChange={(open) => !open && closeDelete()}>
           <Dialog.Portal>
