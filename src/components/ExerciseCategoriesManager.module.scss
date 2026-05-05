@@ -141,6 +141,19 @@
   padding: 0;
 }
 
+.listSkeleton {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.listSkeleton span {
+  height: 3rem;
+  border-radius: 0.375rem;
+  background: linear-gradient(90deg, #eef2f5 0%, #f8fafc 50%, #eef2f5 100%);
+  background-size: 200% 100%;
+  animation: ExerciseCategoriesSkeletonPulse 1.2s ease-in-out infinite;
+}
+
 .listItem {
   display: flex;
   align-items: center;
@@ -223,6 +236,16 @@
 .menuItemDanger[data-disabled] {
   opacity: 0.65;
   pointer-events: none;
+}
+
+@keyframes ExerciseCategoriesSkeletonPulse {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 @media (max-width: 640px) {

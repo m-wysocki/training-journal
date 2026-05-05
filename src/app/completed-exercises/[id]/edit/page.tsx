@@ -1,7 +1,11 @@
+import { Suspense } from 'react'
 import { notFound } from 'next/navigation'
+import BackLink from '@/components/BackLink'
+import PageContainer from '@/components/PageContainer'
 import { requireUser } from '@/lib/supabase/auth'
 import type { CompletedExerciseFormValues } from '@/components/CompletedExerciseForm'
 import EditCompletedExerciseClient from './EditCompletedExerciseClient'
+import styles from '@/components/CompletedExerciseForm.module.scss'
 
 type CompletedExerciseRecord = {
   id: string
@@ -38,7 +42,7 @@ const mapEntryToInitialValues = (entry: CompletedExerciseRecord): CompletedExerc
   performedAt: entry.performed_at,
 })
 
-export default async function EditCompletedExercisePage({ params }: EditCompletedExercisePageProps) {
+async function EditCompletedExerciseData({ params }: EditCompletedExercisePageProps) {
   const { id } = await params
   const { supabase, user } = await requireUser()
   const [entryResult, categoriesResult, exercisesResult] = await Promise.all([
@@ -83,5 +87,67 @@ export default async function EditCompletedExercisePage({ params }: EditComplete
       exerciseCategories={categoriesResult.data || []}
       exercises={exercisesResult.data || []}
     />
+  )
+}
+
+function EditCompletedExerciseFallback() {
+  return (
+    <div className={styles.wrapper}>
+      <PageContainer className={styles.container}>
+        <div className={styles.header}>
+          <BackLink href="/completed-exercises" label="← Back to Completed Exercises" />
+          <div className={styles.titleRow}>
+            <h1 className={styles.title}>Edit Completed Exercise</h1>
+          </div>
+          <p className={styles.description}>
+            Update the exercise, workout details, or notes using the same view as the create form.
+          </p>
+        </div>
+
+        <form className={styles.form} aria-busy="true">
+          <section className={styles.section}>
+            <div className={styles.sectionHeader}>
+              <h2 className={styles.sectionTitle}>Exercise</h2>
+              <p className={styles.sectionDescription}>
+                Start by choosing an exercise category and a specific exercise.
+              </p>
+            </div>
+
+            <div className={styles.sectionBody}>
+              <div className={styles.badgeField}>
+                <p className={styles.label}>Exercise Category</p>
+                <div className={styles.formDataSkeleton} aria-label="Loading exercise categories">
+                  <span />
+                  <span />
+                  <span />
+                </div>
+              </div>
+
+              <div className={styles.badgeField}>
+                <p className={styles.label}>Exercise</p>
+                <div className={styles.formDataSkeleton} aria-label="Loading exercises">
+                  <span />
+                  <span />
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <div className={styles.formFooter}>
+            <button type="button" className={styles.submit} disabled>
+              Save Changes
+            </button>
+          </div>
+        </form>
+      </PageContainer>
+    </div>
+  )
+}
+
+export default function EditCompletedExercisePage(props: EditCompletedExercisePageProps) {
+  return (
+    <Suspense fallback={<EditCompletedExerciseFallback />}>
+      <EditCompletedExerciseData {...props} />
+    </Suspense>
   )
 }

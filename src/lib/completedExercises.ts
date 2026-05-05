@@ -23,6 +23,20 @@ export type CompletedExerciseRow = {
   } | null
 }
 
+export type ComparableCompletedExerciseRow = Pick<
+  CompletedExerciseRow,
+  | 'id'
+  | 'exercise_id'
+  | 'performed_at'
+  | 'created_at'
+  | 'sets'
+  | 'reps_per_set'
+  | 'duration_per_set_seconds'
+  | 'load_kg'
+  | 'distance_km'
+  | 'pace_min_per_km'
+>
+
 export type ExerciseCategory = {
   id: string
   name: string
@@ -90,8 +104,8 @@ const createComparisonMetric = (
 }
 
 const getEntryComparisonMetrics = (
-  currentEntry: CompletedExerciseRow,
-  previousEntry: CompletedExerciseRow | undefined,
+  currentEntry: ComparableCompletedExerciseRow,
+  previousEntry: ComparableCompletedExerciseRow | undefined,
 ) => {
   if (!previousEntry) return []
 
@@ -139,7 +153,10 @@ const getEntryComparisonMetrics = (
   return metrics
 }
 
-const compareEntriesByRecency = (firstEntry: CompletedExerciseRow, secondEntry: CompletedExerciseRow) => {
+const compareEntriesByRecency = (
+  firstEntry: ComparableCompletedExerciseRow,
+  secondEntry: ComparableCompletedExerciseRow,
+) => {
   const performedAtComparison = secondEntry.performed_at.localeCompare(firstEntry.performed_at)
 
   if (performedAtComparison !== 0) return performedAtComparison
@@ -147,8 +164,11 @@ const compareEntriesByRecency = (firstEntry: CompletedExerciseRow, secondEntry: 
   return secondEntry.created_at.localeCompare(firstEntry.created_at)
 }
 
-export const getEntryComparisons = (historyEntries: CompletedExerciseRow[], visibleEntryIds: Set<string>) => {
-  const entriesByExercise = new Map<string, CompletedExerciseRow[]>()
+export const getEntryComparisons = (
+  historyEntries: ComparableCompletedExerciseRow[],
+  visibleEntryIds: Set<string>,
+) => {
+  const entriesByExercise = new Map<string, ComparableCompletedExerciseRow[]>()
   const comparisons: EntryComparisons = {}
 
   historyEntries.forEach((entry) => {

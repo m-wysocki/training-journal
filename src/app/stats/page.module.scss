@@ -172,6 +172,36 @@
   gap: 1rem;
 }
 
+.statsValueSkeleton,
+.statsLineSkeleton,
+.statsListSkeleton span {
+  border-radius: 0.5rem;
+  background: linear-gradient(90deg, #eef2f5 0%, #f8fafc 50%, #eef2f5 100%);
+  background-size: 200% 100%;
+  animation: StatsSkeletonPulse 1.2s ease-in-out infinite;
+}
+
+.statsValueSkeleton {
+  width: 4rem;
+  height: 2.75rem;
+  margin-top: 0.5rem;
+}
+
+.statsLineSkeleton {
+  width: min(18rem, 100%);
+  height: 0.875rem;
+  margin-top: 0.75rem;
+}
+
+.statsListSkeleton {
+  display: grid;
+  gap: 0.625rem;
+}
+
+.statsListSkeleton span {
+  height: 3rem;
+}
+
 .summaryCard {
   padding: 1rem;
 }
@@ -257,6 +287,16 @@
 
 .breakdownTrigger:hover {
   background: #f9fafb;
+}
+
+@keyframes StatsSkeletonPulse {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 .exerciseCategoryName {

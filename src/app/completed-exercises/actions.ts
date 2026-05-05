@@ -35,6 +35,19 @@ const COMPLETED_EXERCISES_SELECT = `
   )
 `
 
+const COMPARABLE_COMPLETED_EXERCISES_SELECT = `
+  id,
+  exercise_id,
+  performed_at,
+  created_at,
+  sets,
+  reps_per_set,
+  duration_per_set_seconds,
+  load_kg,
+  distance_km,
+  pace_min_per_km
+`
+
 const getCompletedExercisePayload = async (
   dateFrom: string,
   dateTo: string,
@@ -65,7 +78,7 @@ const getCompletedExercisePayload = async (
   const exerciseIds = Array.from(new Set(entries.map((entry) => entry.exercise_id)))
   const { data: historyData, error: historyError } = await supabase
     .from('completed_exercises')
-    .select(COMPLETED_EXERCISES_SELECT)
+    .select(COMPARABLE_COMPLETED_EXERCISES_SELECT)
     .eq('user_id', user.id)
     .in('exercise_id', exerciseIds)
     .lte('performed_at', dateTo)

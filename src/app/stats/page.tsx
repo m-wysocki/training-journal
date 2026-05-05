@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import { BarChart3, ChevronDown } from 'lucide-react'
 import * as Accordion from '@radix-ui/react-accordion'
 import BackLink from '@/components/BackLink'
@@ -31,6 +32,13 @@ type StatsPageProps = {
   }>
 }
 
+type ResolvedStatsPageProps = {
+  searchParams?: {
+    dateFrom?: string
+    dateTo?: string
+  }
+}
+
 const getExerciseCategoryStats = (entries: WeeklyEntry[]): ExerciseCategoryStat[] => {
   const groups = new Map<string, Set<string>>()
 
@@ -50,8 +58,8 @@ const getExerciseCategoryStats = (entries: WeeklyEntry[]): ExerciseCategoryStat[
     .sort((a, b) => b.trainingDays - a.trainingDays || a.name.localeCompare(b.name))
 }
 
-export default async function StatsPage({ searchParams }: StatsPageProps) {
-  const params = await searchParams
+async function StatsData({ searchParams }: ResolvedStatsPageProps) {
+  const params = searchParams
   const currentWeekRange = getCurrentWeekRange()
   const dateFrom = params?.dateFrom || currentWeekRange.dateFrom
   const dateTo = params?.dateTo || currentWeekRange.dateTo
@@ -161,5 +169,64 @@ export default async function StatsPage({ searchParams }: StatsPageProps) {
         )}
       </PageContainer>
     </div>
+  )
+}
+
+function StatsFallback({ searchParams }: ResolvedStatsPageProps) {
+  const currentWeekRange = getCurrentWeekRange()
+  const dateFrom = searchParams?.dateFrom || currentWeekRange.dateFrom
+  const dateTo = searchParams?.dateTo || currentWeekRange.dateTo
+
+  return (
+    <div className={styles.wrapper}>
+      <PageContainer className={styles.container}>
+        <div className={styles.header}>
+          <BackLink href="/" label="← Back to Home" />
+          <div className={styles.titleRow}>
+            <div className={styles.titleIcon} aria-hidden="true">
+              <BarChart3 size={22} strokeWidth={1.9} />
+            </div>
+            <h1 className={styles.title}>Statistics</h1>
+          </div>
+          <p className={styles.description}>
+            Review your training by date range and see how often you trained each exercise category.
+          </p>
+        </div>
+
+        <StatsFilters dateFrom={dateFrom} dateTo={dateTo} />
+
+        <div className={styles.statsGrid} aria-busy="true">
+          <section className={styles.summaryCard}>
+            <p className={styles.cardLabel}>Workout Days</p>
+            <div className={styles.statsValueSkeleton} />
+            <div className={styles.statsLineSkeleton} />
+          </section>
+
+          <section className={styles.breakdownCard}>
+            <div className={styles.breakdownHeader}>
+              <h2 className={styles.breakdownTitle}>Exercise Category Frequency</h2>
+              <p className={styles.breakdownDescription}>
+                Counted as distinct training days per exercise category within the selected date range.
+              </p>
+            </div>
+            <div className={styles.statsListSkeleton} aria-label="Loading statistics">
+              <span />
+              <span />
+              <span />
+            </div>
+          </section>
+        </div>
+      </PageContainer>
+    </div>
+  )
+}
+
+export default async function StatsPage({ searchParams }: StatsPageProps) {
+  const resolvedSearchParams = await searchParams
+
+  return (
+    <Suspense fallback={<StatsFallback searchParams={resolvedSearchParams} />}>
+      <StatsData searchParams={resolvedSearchParams} />
+    </Suspense>
   )
 }

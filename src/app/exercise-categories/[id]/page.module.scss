@@ -36,6 +36,20 @@
   color: #000;
 }
 
+.titleSkeleton,
+.listSkeleton span {
+  border-radius: 0.5rem;
+  background: linear-gradient(90deg, #eef2f5 0%, #f8fafc 50%, #eef2f5 100%);
+  background-size: 200% 100%;
+  animation: ExerciseCategorySkeletonPulse 1.2s ease-in-out infinite;
+}
+
+.titleSkeleton {
+  width: min(18rem, 70vw);
+  height: 2rem;
+  margin-top: 0.5rem;
+}
+
 .emptyState {
   padding: 4rem 0;
   text-align: center;
@@ -53,6 +67,16 @@
   padding: 0;
   display: grid;
   gap: 0.25rem;
+}
+
+.listSkeleton {
+  display: grid;
+  gap: 0.25rem;
+  margin-bottom: 2rem;
+}
+
+.listSkeleton span {
+  height: 3rem;
 }
 
 .listItem {
@@ -231,6 +255,16 @@
 
 .ghostButton:hover {
   color: #000;
+}
+
+@keyframes ExerciseCategorySkeletonPulse {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 @media (max-width: 640px) {
