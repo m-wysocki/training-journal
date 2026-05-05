@@ -9,6 +9,7 @@ import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import BackLink from '@/components/BackLink'
 import { DatePicker } from '@/components/DatePicker'
 import PageContainer from '@/components/PageContainer'
+import StatusPanel from '@/components/StatusPanel'
 import { formatLocalDateOnly } from '@/lib/dateOnly'
 import type { CompletedExerciseRow, EntryComparisons, ExerciseCategory } from '@/lib/completedExercises'
 import {
@@ -340,9 +341,21 @@ export default function CompletedExercisesClient({
           </div>
         </div>
 
-        {errorMessage && <div className={styles.errorBox}>{errorMessage}</div>}
-        {successMessage && <div className={styles.successBox}>{successMessage}</div>}
-        {isRoutePending && <div className={styles.loadingBox}>Loading workouts...</div>}
+        {errorMessage && (
+          <StatusPanel variant="error" withBottomSpacing>
+            {errorMessage}
+          </StatusPanel>
+        )}
+        {successMessage && (
+          <StatusPanel variant="success" withBottomSpacing>
+            {successMessage}
+          </StatusPanel>
+        )}
+        {isRoutePending && (
+          <StatusPanel variant="loading" withBottomSpacing>
+            Loading workouts...
+          </StatusPanel>
+        )}
 
         {!errorMessage && groupedByDate.length === 0 && (
           <div className={styles.emptyState}>No completed exercises for this date range.</div>

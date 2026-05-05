@@ -10,6 +10,7 @@ import { DurationStepper } from '@/components/DurationStepper'
 import { NumericStepper } from '@/components/NumericStepper'
 import { PaceStepper } from '@/components/PaceStepper'
 import PageContainer from '@/components/PageContainer'
+import StatusPanel from '@/components/StatusPanel'
 import { loadRecentCompletedExercises } from '@/app/completed-exercises/actions'
 import {
   addExercise,
@@ -883,9 +884,9 @@ export function CompletedExerciseForm({
 
           <div className={styles.formFooter}>
             {message && (
-              <div className={isError ? styles.messageError : styles.messageSuccess}>
+              <StatusPanel variant={isError ? 'error' : 'success'} withTopSpacing>
                 {message}
-              </div>
+              </StatusPanel>
             )}
 
             <button type="submit" className={styles.submit} disabled={loading || isRoutePending}>

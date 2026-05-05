@@ -1,0 +1,63 @@
+.NavigationCard {
+  display: block;
+  padding: 1rem;
+  border: 1px solid var(--card-border);
+  border-radius: 0.375rem;
+  background: var(--card-bg);
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background: var(--card-hover);
+  }
+
+  &:hover &Title,
+  &:hover &ArrowIcon {
+    color: #2c5f7c;
+  }
+
+  &Inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  &Content {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    min-width: 0;
+  }
+
+  &Icon {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.75rem;
+    color: var(--primary);
+    background: color-mix(in srgb, var(--primary) 10%, white);
+  }
+
+  &Title {
+    margin: 0;
+    font-size: 1.125rem;
+    font-weight: 500;
+    color: #000;
+    transition: color 0.2s ease;
+  }
+
+  &Description {
+    margin: 0.25rem 0 0;
+    font-size: 0.875rem;
+    color: #4b5563;
+  }
+
+  &ArrowIcon {
+    flex: 0 0 auto;
+    color: var(--primary);
+    transition: color 0.2s ease;
+  }
+}

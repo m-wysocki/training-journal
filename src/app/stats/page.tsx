@@ -2,6 +2,7 @@ import { BarChart3, ChevronDown } from 'lucide-react'
 import * as Accordion from '@radix-ui/react-accordion'
 import BackLink from '@/components/BackLink'
 import PageContainer from '@/components/PageContainer'
+import StatusPanel from '@/components/StatusPanel'
 import { requireUser } from '@/lib/supabase/auth'
 import { getCurrentWeekRange } from '@/lib/trainingDateRange'
 import { formatWeekdayDate } from '@/lib/trainingFormatters'
@@ -94,7 +95,11 @@ export default async function StatsPage({ searchParams }: StatsPageProps) {
 
         <StatsFilters dateFrom={dateFrom} dateTo={dateTo} />
 
-        {errorMessage && <div className={styles.errorBox}>{errorMessage}</div>}
+        {errorMessage && (
+          <StatusPanel variant="error" withBottomSpacing>
+            {errorMessage}
+          </StatusPanel>
+        )}
 
         {!errorMessage && (
           <div className={styles.statsGrid}>

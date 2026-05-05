@@ -6,6 +6,7 @@ import * as Dialog from '@radix-ui/react-dialog'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import BackLink from '@/components/BackLink'
 import PageContainer from '@/components/PageContainer'
+import StatusPanel from '@/components/StatusPanel'
 import {
   addExercise as addExerciseAction,
   deleteExercise as deleteExerciseAction,
@@ -161,9 +162,9 @@ export default function ExerciseCategoryClient({
         </div>
 
         {message && (
-          <div className={isError ? styles.messageError : styles.messageSuccess}>
+          <StatusPanel variant={isError ? 'error' : 'success'} withBottomSpacing>
             {message}
-          </div>
+          </StatusPanel>
         )}
 
         {category.exercises.length === 0 ? (

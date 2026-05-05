@@ -10,6 +10,7 @@ import {
   deleteExerciseCategory,
   updateExerciseCategory,
 } from '@/app/exerciseSetupActions'
+import StatusPanel from '@/components/StatusPanel'
 import styles from './ExerciseCategoriesManager.module.scss'
 
 type ExerciseCategory = {
@@ -170,9 +171,9 @@ export default function ExerciseCategoriesManager({
       </div>
 
       {message ? (
-        <div className={isError ? styles.messageError : styles.messageSuccess}>
+        <StatusPanel variant={isError ? 'error' : 'success'}>
           {message}
-        </div>
+        </StatusPanel>
       ) : null}
 
       {categories.length === 0 ? (
