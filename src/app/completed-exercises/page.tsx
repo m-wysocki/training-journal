@@ -17,7 +17,6 @@ async function CompletedExercisesData({ searchParams }: CompletedExercisesPagePr
 
   return (
     <CompletedExercisesClient
-      key={`${dateFrom}-${dateTo}`}
       initialDateFrom={dateFrom}
       initialDateTo={dateTo}
       initialEntries={[]}

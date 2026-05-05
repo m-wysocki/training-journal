@@ -22,7 +22,7 @@ export default function StatsFilters({ dateFrom, dateTo }: StatsFiltersProps) {
     params.set('dateFrom', nextDateFrom)
     params.set('dateTo', nextDateTo)
     startTransition(() => {
-      router.push(`/stats?${params.toString()}`)
+      router.push(`/stats?${params.toString()}`, { scroll: false })
     })
   }
 

@@ -200,7 +200,7 @@ export default function CompletedExercisesClient({
     setErrorMessage('')
     const searchParams = new URLSearchParams(nextDateRange)
     startRouteTransition(() => {
-      router.push(`/completed-exercises?${searchParams.toString()}`)
+      router.push(`/completed-exercises?${searchParams.toString()}`, { scroll: false })
     })
   }
 
