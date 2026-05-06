@@ -10,6 +10,7 @@ import {
   deleteExerciseCategory,
   updateExerciseCategory,
 } from '@/lib/actions/exerciseSetupActions'
+import LoadingSkeleton from '@/components/LoadingSkeleton'
 import StatusPanel from '@/components/StatusPanel'
 import styles from './ExerciseCategoriesManager.module.scss'
 
@@ -21,11 +22,13 @@ type ExerciseCategory = {
 type ExerciseCategoriesManagerProps = {
   initialCategories: ExerciseCategory[]
   initialErrorMessage?: string
+  isLoading?: boolean
 }
 
 export default function ExerciseCategoriesManager({
   initialCategories,
   initialErrorMessage = '',
+  isLoading = false,
 }: ExerciseCategoriesManagerProps) {
   const [name, setName] = useState('')
   const [categories, setCategories] = useState<ExerciseCategory[]>(initialCategories)
@@ -176,7 +179,9 @@ export default function ExerciseCategoriesManager({
         </StatusPanel>
       ) : null}
 
-      {categories.length === 0 ? (
+      {isLoading ? (
+        <LoadingSkeleton ariaLabel="Loading exercise categories" count={4} />
+      ) : categories.length === 0 ? (
         <div className={styles.emptyState}>
           <p className={styles.emptyText}>No exercise categories yet</p>
         </div>
@@ -184,7 +189,7 @@ export default function ExerciseCategoriesManager({
         <ul className={styles.list}>
           {categories.map((category) => (
             <li key={category.id} className={styles.listItem}>
-              <Link href={`/exercise-categories/${category.id}`} prefetch={false} className={styles.categoryLink}>
+              <Link href={`/exercise-categories/${category.id}`} className={styles.categoryLink}>
                 {category.name}
               </Link>
 

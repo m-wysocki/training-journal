@@ -4,16 +4,20 @@ import Link from 'next/link'
 import { LogOut, Settings, User as UserIcon } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import type { User } from '@supabase/supabase-js'
 import ButtonSquare from '@/components/ButtonSquare'
 import { signOut } from '@/components/authActions'
 import styles from './AuthButton.module.scss'
 
-type AuthButtonProps = {
-  user: User | null
+export type AuthButtonUser = {
+  email: string | null
 }
 
-export default function AuthButton({ user }: AuthButtonProps) {
+type AuthButtonProps = {
+  user: AuthButtonUser | null
+  onUserChange?: (user: AuthButtonUser | null) => void
+}
+
+export default function AuthButton({ user, onUserChange }: AuthButtonProps) {
   const [menuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement | null>(null)
   const router = useRouter()
@@ -44,6 +48,7 @@ export default function AuthButton({ user }: AuthButtonProps) {
 
   const handleLogout = async () => {
     setMenuOpen(false)
+    onUserChange?.(null)
     await signOut()
     router.push('/')
     router.refresh()
@@ -67,7 +72,6 @@ export default function AuthButton({ user }: AuthButtonProps) {
             <div className={styles.menuEmail}>{user.email}</div>
             <Link
               href="/settings"
-              prefetch={false}
               className={styles.menuItem}
               role="menuitem"
               onClick={() => setMenuOpen(false)}

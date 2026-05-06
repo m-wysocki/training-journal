@@ -16,7 +16,7 @@ export default function NavigationCard({
   title,
   description,
   icon: Icon,
-  prefetch = false,
+  prefetch,
 }: NavigationCardProps) {
   return (
     <Link href={href} prefetch={prefetch} className={styles.NavigationCard}>

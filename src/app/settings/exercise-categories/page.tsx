@@ -19,7 +19,7 @@ async function ExerciseCategoriesData() {
 }
 
 function ExerciseCategoriesFallback() {
-  return <ExerciseCategoriesManager initialCategories={[]} />
+  return <ExerciseCategoriesManager initialCategories={[]} isLoading />
 }
 
 export default function SettingsExerciseCategoriesPage() {

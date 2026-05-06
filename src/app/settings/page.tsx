@@ -1,8 +1,6 @@
-import { Suspense } from 'react'
 import BackLink from '@/components/BackLink'
 import NavigationCard from '@/components/NavigationCard'
 import PageContainer from '@/components/PageContainer'
-import { requireUser } from '@/lib/supabase/auth'
 import styles from './page.module.scss'
 
 const settingsRoutes = [
@@ -13,13 +11,7 @@ const settingsRoutes = [
   },
 ]
 
-async function SettingsContent() {
-  await requireUser()
-
-  return <SettingsView />
-}
-
-function SettingsView() {
+export default function SettingsPage() {
   return (
     <PageContainer className={styles.Settings}>
       <BackLink href="/" label="← Back to Home" />
@@ -38,13 +30,5 @@ function SettingsView() {
         ))}
       </div>
     </PageContainer>
-  )
-}
-
-export default function SettingsPage() {
-  return (
-    <Suspense fallback={<SettingsView />}>
-      <SettingsContent />
-    </Suspense>
   )
 }

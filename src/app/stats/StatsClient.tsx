@@ -4,6 +4,7 @@ import { BarChart3, ChevronDown } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import * as Accordion from '@radix-ui/react-accordion'
 import BackLink from '@/components/BackLink'
+import LoadingSkeleton from '@/components/LoadingSkeleton'
 import PageContainer from '@/components/PageContainer'
 import StatusPanel from '@/components/StatusPanel'
 import type { WeeklyEntry } from '@/lib/supabase/trainingData'
@@ -116,9 +117,7 @@ export default function StatsClient({ dateFrom, dateTo }: StatsClientProps) {
         <StatsFilters dateFrom={dateFrom} dateTo={dateTo} />
 
         {isLoading ? (
-          <StatusPanel variant="loading" withBottomSpacing>
-            Loading statistics...
-          </StatusPanel>
+          <LoadingSkeleton ariaLabel="Loading statistics" count={2} variant="card" />
         ) : null}
 
         {errorMessage ? (

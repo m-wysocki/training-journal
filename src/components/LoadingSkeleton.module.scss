@@ -1,0 +1,51 @@
+.LoadingSkeleton {
+  display: grid;
+  gap: 0.5rem;
+
+  &Item {
+    display: block;
+    min-width: 0;
+    border-radius: 0.5rem;
+    background: linear-gradient(90deg, #eef2f5 0%, #f8fafc 50%, #eef2f5 100%);
+    background-size: 200% 100%;
+    animation: LoadingSkeletonPulse 1.2s ease-in-out infinite;
+  }
+
+  &Block &Item {
+    height: 3rem;
+  }
+
+  &Card {
+    gap: 0.75rem;
+  }
+
+  &Card &Item {
+    height: 6rem;
+    border-radius: 0.75rem;
+  }
+
+  &Line &Item {
+    height: 1rem;
+  }
+
+  &Pill {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  &Pill &Item {
+    width: 6.5rem;
+    height: 2.25rem;
+    border-radius: 999px;
+  }
+}
+
+@keyframes LoadingSkeletonPulse {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}

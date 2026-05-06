@@ -2,13 +2,14 @@
 
 import { ArrowDown, ArrowUp, ClipboardList, Ellipsis } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useMemo, useState, useTransition } from 'react'
+import { useMemo, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import * as Accordion from '@radix-ui/react-accordion'
 import * as Dialog from '@radix-ui/react-dialog'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import BackLink from '@/components/BackLink'
 import { DatePicker } from '@/components/DatePicker'
+import LoadingSkeleton from '@/components/LoadingSkeleton'
 import PageContainer from '@/components/PageContainer'
 import StatusPanel from '@/components/StatusPanel'
 import { formatLocalDateOnly } from '@/lib/dateOnly'
@@ -141,54 +142,6 @@ export default function CompletedExercisesClient({
   const [entryComparisons, setEntryComparisons] = useState<EntryComparisons>(initialEntryComparisons)
   const isCopyDateSameAsSource = Boolean(copyTarget && copyDate === copyTarget.sourceDate)
   const hasDateRange = Boolean(dateFrom && dateTo)
-
-  useEffect(() => {
-    let isActive = true
-
-    if (!dateFrom || !dateTo) {
-      return () => {
-        isActive = false
-      }
-    }
-
-    if (!initialIsLoading && dateFrom === initialDateFrom && dateTo === initialDateTo) {
-      return () => {
-        isActive = false
-      }
-    }
-
-    loadCompletedExercisesPayload(dateFrom, dateTo)
-      .then((payload) => {
-        if (!isActive) return
-
-        setEntries(payload.entries)
-        setExerciseCategories(payload.exerciseCategories)
-        setEntryComparisons(payload.entryComparisons)
-        setIsDataLoading(false)
-      })
-      .catch((error: Error) => {
-        if (!isActive) return
-
-        setEntries([])
-        setEntryComparisons({})
-        setErrorMessage(error.message)
-        setIsDataLoading(false)
-      })
-
-    return () => {
-      isActive = false
-    }
-  }, [
-    dateFrom,
-    dateTo,
-    initialDateFrom,
-    initialDateTo,
-    initialEntries,
-    initialExerciseCategories,
-    initialEntryComparisons,
-    initialErrorMessage,
-    initialIsLoading,
-  ])
 
   const updateDateRange = (nextDateRange: { dateFrom: string; dateTo: string }) => {
     setDateRange(nextDateRange)
@@ -491,9 +444,7 @@ export default function CompletedExercisesClient({
           </StatusPanel>
         )}
         {isDataLoading ? (
-          <StatusPanel variant="loading" withBottomSpacing>
-            Loading completed exercises...
-          </StatusPanel>
+          <LoadingSkeleton ariaLabel="Loading completed exercise entries" count={3} variant="card" />
         ) : null}
         {!errorMessage && !isDataLoading && groupedByDate.length === 0 && (
           <div className={styles.emptyState}>No completed exercises for this date range.</div>
@@ -583,7 +534,6 @@ export default function CompletedExercisesClient({
                                   <DropdownMenu.Item asChild>
                                     <Link
                                       href={`/completed-exercises/${entry.id}/edit`}
-                                      prefetch={false}
                                       className={styles.menuItem}
                                     >
                                       Edit

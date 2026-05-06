@@ -1,6 +1,7 @@
 import { Suspense } from 'react'
 import { notFound } from 'next/navigation'
 import BackLink from '@/components/BackLink'
+import LoadingSkeleton from '@/components/LoadingSkeleton'
 import PageContainer from '@/components/PageContainer'
 import { requireUser } from '@/lib/supabase/auth'
 import { getExerciseCategoryDetail } from '@/lib/supabase/trainingData'
@@ -35,8 +36,9 @@ function ExerciseCategoryFallback() {
     <PageContainer className={styles.container}>
       <div className={styles.header}>
         <BackLink href="/settings/exercise-categories" label="← Back to Exercise Categories" />
-        <h1 className={styles.title}>Loading exercise category...</h1>
+        <h1 className={styles.title}>Exercise Category</h1>
       </div>
+      <LoadingSkeleton ariaLabel="Loading exercise category" count={4} />
     </PageContainer>
   )
 }

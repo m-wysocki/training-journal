@@ -33,11 +33,10 @@ export async function updateSession(request: NextRequest) {
     },
   )
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { data, error } = await supabase.auth.getClaims()
+  const isAuthenticated = Boolean(data?.claims && !error)
 
-  if (!user && !isPublicRoute(request.nextUrl.pathname)) {
+  if (!isAuthenticated && !isPublicRoute(request.nextUrl.pathname)) {
     const redirectUrl = request.nextUrl.clone()
     redirectUrl.pathname = '/login'
     redirectUrl.searchParams.set('next', `${request.nextUrl.pathname}${request.nextUrl.search}`)
