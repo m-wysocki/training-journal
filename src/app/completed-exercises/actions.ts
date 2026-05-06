@@ -1,10 +1,8 @@
 'use server'
 
-import { revalidatePath, updateTag } from 'next/cache'
 import type { CompletedExerciseFormValues } from '@/components/CompletedExerciseForm'
-import { cacheTags } from '@/lib/cacheTags'
 import { requireUser } from '@/lib/supabase/auth'
-import { getCachedCompletedExercisesPayload } from '@/lib/supabase/cachedTrainingData'
+import { getCompletedExercisesPayload } from '@/lib/supabase/trainingData'
 import {
   type CompletedExerciseRow,
   type EntryComparisons,
@@ -24,8 +22,8 @@ const getCompletedExercisePayload = async (
   }[]
   entryComparisons: EntryComparisons
 }> => {
-  const { user, accessToken } = await requireUser()
-  const payload = await getCachedCompletedExercisesPayload(user.id, accessToken, dateFrom, dateTo)
+  const { supabase, user } = await requireUser()
+  const payload = await getCompletedExercisesPayload(supabase, user.id, dateFrom, dateTo)
 
   return {
     entries: payload.entries,
@@ -119,11 +117,6 @@ export async function createCompletedExercise(values: CompletedExerciseFormValue
     return { error: 'Could not save the exercise. Check your database configuration.' }
   }
 
-  updateTag(cacheTags.completedExercises(user.id))
-  updateTag(cacheTags.stats(user.id))
-  revalidatePath('/completed-exercises')
-  revalidatePath('/stats')
-
   return {}
 }
 
@@ -153,12 +146,6 @@ export async function updateCompletedExercise(
     return { error: 'Could not save changes.' }
   }
 
-  updateTag(cacheTags.completedExercises(user.id))
-  updateTag(cacheTags.stats(user.id))
-  revalidatePath('/completed-exercises')
-  revalidatePath(`/completed-exercises/${entryId}/edit`)
-  revalidatePath('/stats')
-
   return {}
 }
 
@@ -170,11 +157,6 @@ export async function deleteCompletedExercise(entryId: string): ActionResult {
   if (error) {
     return { error: 'Could not delete the entry.' }
   }
-
-  updateTag(cacheTags.completedExercises(user.id))
-  updateTag(cacheTags.stats(user.id))
-  revalidatePath('/completed-exercises')
-  revalidatePath('/stats')
 
   return {}
 }
@@ -230,11 +212,6 @@ export async function copyCompletedExerciseCategory(
   if (error) {
     return { error: 'Could not copy exercises to the selected date.' }
   }
-
-  updateTag(cacheTags.completedExercises(user.id))
-  updateTag(cacheTags.stats(user.id))
-  revalidatePath('/completed-exercises')
-  revalidatePath('/stats')
 
   return { data: { copiedCount: rowsToInsert.length } }
 }

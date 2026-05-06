@@ -3,12 +3,12 @@ import BackLink from '@/components/BackLink'
 import ExerciseCategoriesManager from '@/components/ExerciseCategoriesManager'
 import PageContainer from '@/components/PageContainer'
 import { requireUser } from '@/lib/supabase/auth'
-import { getCachedExerciseCategories } from '@/lib/supabase/cachedTrainingData'
+import { getExerciseCategories } from '@/lib/supabase/trainingData'
 import styles from './page.module.scss'
 
 async function ExerciseCategoriesData() {
-  const { user, accessToken } = await requireUser()
-  const { data, error } = await getCachedExerciseCategories(user.id, accessToken)
+  const { supabase, user } = await requireUser()
+  const { data, error } = await getExerciseCategories(supabase, user.id)
 
   return (
     <ExerciseCategoriesManager

@@ -18,7 +18,11 @@ import {
   deleteCompletedExercise,
   loadCompletedExercisesForRange,
 } from '@/app/completed-exercises/actions'
-import { formatDateRange, getCompletedExercisesHrefForDate, shiftWeekRange } from '@/lib/trainingDateRange'
+import {
+  formatDateRange,
+  getWeekRangeForDate,
+  shiftWeekRange,
+} from '@/lib/trainingDateRange'
 import { formatDuration, formatDurationHoursMinutes, formatPace, formatWeekdayDate } from '@/lib/trainingFormatters'
 import styles from './page.module.scss'
 
@@ -83,41 +87,14 @@ type CompletedExercisesClientProps = {
   initialIsLoading?: boolean
 }
 
-type CompletedExercisesPayload = {
-  entries: CompletedExerciseRow[]
-  exerciseCategories: ExerciseCategory[]
-  entryComparisons: EntryComparisons
-}
-
-const completedExercisesCache = new Map<string, CompletedExercisesPayload>()
-const completedExercisesPromises = new Map<string, Promise<CompletedExercisesPayload>>()
-
-const getCompletedExercisesCacheKey = (dateFrom: string, dateTo: string) => `${dateFrom}:${dateTo}`
-
 const loadCompletedExercisesPayload = async (dateFrom: string, dateTo: string) => {
-  const cacheKey = getCompletedExercisesCacheKey(dateFrom, dateTo)
-  const cachedPayload = completedExercisesCache.get(cacheKey)
+  const { data, error } = await loadCompletedExercisesForRange(dateFrom, dateTo)
 
-  if (cachedPayload) {
-    return cachedPayload
+  if (error || !data) {
+    throw new Error(error || 'Could not load data.')
   }
 
-  if (!completedExercisesPromises.has(cacheKey)) {
-    completedExercisesPromises.set(
-      cacheKey,
-      loadCompletedExercisesForRange(dateFrom, dateTo).then(({ data, error }) => {
-        if (error || !data) {
-          throw new Error(error || 'Could not load data.')
-        }
-
-        completedExercisesCache.set(cacheKey, data)
-        completedExercisesPromises.delete(cacheKey)
-        return data
-      }),
-    )
-  }
-
-  return completedExercisesPromises.get(cacheKey)!
+  return data
 }
 
 export default function CompletedExercisesClient({
@@ -158,14 +135,7 @@ export default function CompletedExercisesClient({
       }
     }
 
-    const cacheKey = getCompletedExercisesCacheKey(dateFrom, dateTo)
-
-    if (initialEntries.length > 0 || initialExerciseCategories.length > 0) {
-      completedExercisesCache.set(cacheKey, {
-        entries: initialEntries,
-        exerciseCategories: initialExerciseCategories,
-        entryComparisons: initialEntryComparisons,
-      })
+    if (!initialIsLoading && dateFrom === initialDateFrom && dateTo === initialDateTo) {
       return () => {
         isActive = false
       }
@@ -192,7 +162,17 @@ export default function CompletedExercisesClient({
     return () => {
       isActive = false
     }
-  }, [dateFrom, dateTo, initialEntries, initialExerciseCategories, initialEntryComparisons])
+  }, [
+    dateFrom,
+    dateTo,
+    initialDateFrom,
+    initialDateTo,
+    initialEntries,
+    initialExerciseCategories,
+    initialEntryComparisons,
+    initialErrorMessage,
+    initialIsLoading,
+  ])
 
   const updateDateRange = (nextDateRange: { dateFrom: string; dateTo: string }) => {
     setDateRange(nextDateRange)
@@ -202,6 +182,27 @@ export default function CompletedExercisesClient({
     startRouteTransition(() => {
       router.push(`/completed-exercises?${searchParams.toString()}`, { scroll: false })
     })
+  }
+
+  const refreshCurrentDateRange = async () => {
+    if (!dateFrom || !dateTo) return
+
+    setIsDataLoading(true)
+    setErrorMessage('')
+
+    try {
+      const payload = await loadCompletedExercisesPayload(dateFrom, dateTo)
+
+      setEntries(payload.entries)
+      setExerciseCategories(payload.exerciseCategories)
+      setEntryComparisons(payload.entryComparisons)
+    } catch (error) {
+      setEntries([])
+      setEntryComparisons({})
+      setErrorMessage(error instanceof Error ? error.message : 'Could not load data.')
+    } finally {
+      setIsDataLoading(false)
+    }
   }
 
   const shiftDateRangeByWeek = (direction: -1 | 1) => {
@@ -285,6 +286,7 @@ export default function CompletedExercisesClient({
     setSuccessMessage('Deleted entry.')
     setEntries((prev) => prev.filter((row) => row.id !== deletingEntryId))
     closeDelete()
+    await refreshCurrentDateRange()
   }
 
   const openCopyCategory = (sourceDate: string, categoryName: string, categoryEntries: CompletedExerciseRow[]) => {
@@ -326,9 +328,15 @@ export default function CompletedExercisesClient({
       `Copied ${copiedCount} ${copiedCount === 1 ? 'exercise' : 'exercises'} from ${copyTarget.categoryName} to ${formatWeekdayDate(copyDate)}.`,
     )
     closeCopyCategory()
-    startRouteTransition(() => {
-      router.push(getCompletedExercisesHrefForDate(copyDate))
-    })
+
+    const targetDateRange = getWeekRangeForDate(copyDate)
+
+    if (targetDateRange.dateFrom === dateFrom && targetDateRange.dateTo === dateTo) {
+      await refreshCurrentDateRange()
+      return
+    }
+
+    updateDateRange(targetDateRange)
   }
 
   return (
@@ -538,7 +546,7 @@ export default function CompletedExercisesClient({
                                   <DropdownMenu.Item asChild>
                                     <Link
                                       href={`/completed-exercises/${entry.id}/edit`}
-                                      prefetch
+                                      prefetch={false}
                                       className={styles.menuItem}
                                     >
                                       Edit

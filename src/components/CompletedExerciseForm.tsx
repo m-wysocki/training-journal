@@ -1,7 +1,7 @@
 'use client'
 
 import type { LucideIcon } from 'lucide-react'
-import { useEffect, useMemo, useRef, useState, useTransition } from 'react'
+import { useEffect, useMemo, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import * as Dialog from '@radix-ui/react-dialog'
 import BackLink from '@/components/BackLink'
@@ -180,7 +180,6 @@ export function CompletedExerciseForm({
     exerciseId: '',
     entries: [],
   })
-  const recentExercisesCacheRef = useRef(new Map<string, RecentCompletedExercise[]>())
 
   const filteredExercises = useMemo(
     () => exercises.filter((exercise) => exercise.exercise_category_id === selectedExerciseCategoryId),
@@ -209,19 +208,6 @@ export function CompletedExerciseForm({
       }
     }
 
-    const cachedEntries = recentExercisesCacheRef.current.get(selectedExerciseId)
-
-    if (cachedEntries) {
-      setRecentExercisesState({
-        exerciseId: selectedExerciseId,
-        entries: cachedEntries,
-      })
-
-      return () => {
-        isActive = false
-      }
-    }
-
     loadRecentCompletedExercises(selectedExerciseId)
       .then(({ data, error }) => {
         if (!isActive) return
@@ -231,12 +217,10 @@ export function CompletedExerciseForm({
             exerciseId: selectedExerciseId,
             entries: [],
           })
-          recentExercisesCacheRef.current.set(selectedExerciseId, [])
           return
         }
 
         const entries = data || []
-        recentExercisesCacheRef.current.set(selectedExerciseId, entries)
         setRecentExercisesState({
           exerciseId: selectedExerciseId,
           entries,
@@ -451,6 +435,7 @@ export function CompletedExerciseForm({
       onSuccess?.()
       startRouteTransition(() => {
         router.push(getCompletedExercisesHrefForDate(performedAt))
+        router.refresh()
       })
       return
     }
@@ -458,6 +443,7 @@ export function CompletedExerciseForm({
     onSuccess?.()
     startRouteTransition(() => {
       router.push(getCompletedExercisesHrefForDate(performedAt))
+      router.refresh()
     })
   }
 

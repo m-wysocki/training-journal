@@ -29,29 +29,14 @@ type NewCompletedExerciseClientProps = {
   initialPerformedAt: string
 }
 
-type ExerciseSetup = {
-  exerciseCategories: ExerciseCategory[]
-  exercises: Exercise[]
-}
-
-let exerciseSetupCache: ExerciseSetup | null = null
-let exerciseSetupPromise: Promise<ExerciseSetup> | null = null
-
 const getExerciseSetup = async () => {
-  if (exerciseSetupCache) {
-    return exerciseSetupCache
+  const { data, error } = await loadExerciseSetup()
+
+  if (error || !data) {
+    throw new Error(error || 'Could not load exercise setup.')
   }
 
-  exerciseSetupPromise ??= loadExerciseSetup().then(({ data, error }) => {
-    if (error || !data) {
-      throw new Error(error || 'Could not load exercise setup.')
-    }
-
-    exerciseSetupCache = data
-    return data
-  })
-
-  return exerciseSetupPromise
+  return data
 }
 
 export default function NewCompletedExerciseClient({
@@ -71,7 +56,6 @@ export default function NewCompletedExerciseClient({
     let isActive = true
 
     if (exerciseCategories.length > 0 || exercises.length > 0) {
-      exerciseSetupCache = { exerciseCategories, exercises }
       return () => {
         isActive = false
       }

@@ -6,7 +6,7 @@ import * as Accordion from '@radix-ui/react-accordion'
 import BackLink from '@/components/BackLink'
 import PageContainer from '@/components/PageContainer'
 import StatusPanel from '@/components/StatusPanel'
-import type { CachedWeeklyEntry } from '@/lib/supabase/cachedTrainingData'
+import type { WeeklyEntry } from '@/lib/supabase/trainingData'
 import { formatWeekdayDate } from '@/lib/trainingFormatters'
 import { loadStatsEntries } from './actions'
 import StatsFilters from './StatsFilters'
@@ -23,12 +23,9 @@ type StatsClientProps = {
   dateTo: string
 }
 
-const statsEntriesCache = new Map<string, CachedWeeklyEntry[]>()
-const statsEntriesPromises = new Map<string, Promise<CachedWeeklyEntry[]>>()
+const getStatsRangeKey = (dateFrom: string, dateTo: string) => `${dateFrom}:${dateTo}`
 
-const getStatsCacheKey = (dateFrom: string, dateTo: string) => `${dateFrom}:${dateTo}`
-
-const getExerciseCategoryStats = (entries: CachedWeeklyEntry[]): ExerciseCategoryStat[] => {
+const getExerciseCategoryStats = (entries: WeeklyEntry[]): ExerciseCategoryStat[] => {
   const groups = new Map<string, Set<string>>()
 
   entries.forEach((entry) => {
@@ -48,37 +45,21 @@ const getExerciseCategoryStats = (entries: CachedWeeklyEntry[]): ExerciseCategor
 }
 
 const loadStatsPayload = async (dateFrom: string, dateTo: string) => {
-  const cacheKey = getStatsCacheKey(dateFrom, dateTo)
-  const cachedEntries = statsEntriesCache.get(cacheKey)
+  const { data, error } = await loadStatsEntries(dateFrom, dateTo)
 
-  if (cachedEntries) {
-    return cachedEntries
+  if (error || !data) {
+    throw new Error(error || 'Could not load statistics for the selected date range.')
   }
 
-  if (!statsEntriesPromises.has(cacheKey)) {
-    statsEntriesPromises.set(
-      cacheKey,
-      loadStatsEntries(dateFrom, dateTo).then(({ data, error }) => {
-        if (error || !data) {
-          throw new Error(error || 'Could not load statistics for the selected date range.')
-        }
-
-        statsEntriesCache.set(cacheKey, data)
-        statsEntriesPromises.delete(cacheKey)
-        return data
-      }),
-    )
-  }
-
-  return statsEntriesPromises.get(cacheKey)!
+  return data
 }
 
 export default function StatsClient({ dateFrom, dateTo }: StatsClientProps) {
-  const [entries, setEntries] = useState<CachedWeeklyEntry[]>([])
+  const [entries, setEntries] = useState<WeeklyEntry[]>([])
   const [errorMessage, setErrorMessage] = useState('')
-  const [loadedCacheKey, setLoadedCacheKey] = useState('')
-  const currentCacheKey = getStatsCacheKey(dateFrom, dateTo)
-  const isLoading = loadedCacheKey !== currentCacheKey
+  const [loadedRangeKey, setLoadedRangeKey] = useState('')
+  const currentRangeKey = getStatsRangeKey(dateFrom, dateTo)
+  const isLoading = loadedRangeKey !== currentRangeKey
 
   useEffect(() => {
     let isActive = true
@@ -95,20 +76,20 @@ export default function StatsClient({ dateFrom, dateTo }: StatsClientProps) {
 
         setEntries(nextEntries)
         setErrorMessage('')
-        setLoadedCacheKey(currentCacheKey)
+        setLoadedRangeKey(currentRangeKey)
       })
       .catch((error: Error) => {
         if (!isActive) return
 
         setEntries([])
         setErrorMessage(error.message)
-        setLoadedCacheKey(currentCacheKey)
+        setLoadedRangeKey(currentRangeKey)
       })
 
     return () => {
       isActive = false
     }
-  }, [dateFrom, dateTo, currentCacheKey])
+  }, [dateFrom, dateTo, currentRangeKey])
 
   const workoutDaysCount = useMemo(
     () => new Set(entries.map((entry) => entry.performed_at)).size,

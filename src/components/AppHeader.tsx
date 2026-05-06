@@ -39,7 +39,7 @@ export default function AppHeader() {
   return (
     <header className={styles.appHeader}>
       <PageContainer className={styles.appHeaderInner}>
-        <Link href="/" prefetch className={styles.appHeaderBrand}>
+        <Link href="/" prefetch={false} className={styles.appHeaderBrand}>
           <Image
             src={trainingJournalLogo}
             alt="Training Journal"

@@ -1,26 +1,26 @@
-import { cacheLife, cacheTag } from 'next/cache'
-import { createClient as createSupabaseClient } from '@supabase/supabase-js'
-import { cacheTags } from '@/lib/cacheTags'
 import {
   getEntryComparisons,
   type CompletedExerciseRow,
   type EntryComparisons,
 } from '@/lib/completedExercises'
 import type { ExerciseType } from '@/lib/exerciseTypes'
+import type { createClient } from '@/lib/supabase/server'
 
-export type CachedExerciseCategory = {
+type ServerSupabaseClient = Awaited<ReturnType<typeof createClient>>
+
+export type TrainingExerciseCategory = {
   id: string
   name: string
 }
 
-export type CachedExercise = {
+export type TrainingExercise = {
   id: string
   name: string
   exercise_category_id: string
   exercise_type: ExerciseType
 }
 
-export type CachedExerciseCategoryDetail = CachedExerciseCategory & {
+export type TrainingExerciseCategoryDetail = TrainingExerciseCategory & {
   exercises: {
     id: string
     name: string
@@ -28,7 +28,7 @@ export type CachedExerciseCategoryDetail = CachedExerciseCategory & {
   }[]
 }
 
-export type CachedWeeklyEntry = {
+export type WeeklyEntry = {
   performed_at: string
   exercise: {
     exercise_category: {
@@ -37,9 +37,9 @@ export type CachedWeeklyEntry = {
   } | null
 }
 
-export type CachedCompletedExercisesPayload = {
+export type CompletedExercisesPayload = {
   entries: CompletedExerciseRow[]
-  exerciseCategories: CachedExerciseCategory[]
+  exerciseCategories: TrainingExerciseCategory[]
   entryComparisons: EntryComparisons
   errorMessage: string
 }
@@ -80,32 +80,7 @@ const COMPARABLE_COMPLETED_EXERCISES_SELECT = `
   pace_min_per_km
 `
 
-const createAuthenticatedCachedClient = (accessToken: string) =>
-  createSupabaseClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false,
-      },
-      global: {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      },
-    },
-  )
-
-export const getCachedExerciseCategories = (userId: string, accessToken: string) =>
-  getCachedExerciseCategoriesData(userId, accessToken)
-
-async function getCachedExerciseCategoriesData(userId: string, accessToken: string) {
-  'use cache'
-  cacheLife('minutes')
-  cacheTag(cacheTags.exerciseCategories(userId))
-
-  const supabase = createAuthenticatedCachedClient(accessToken)
+export async function getExerciseCategories(supabase: ServerSupabaseClient, userId: string) {
   const { data, error } = await supabase
     .from('exercise_categories')
     .select('id, name')
@@ -113,20 +88,12 @@ async function getCachedExerciseCategoriesData(userId: string, accessToken: stri
     .order('created_at')
 
   return {
-    data: (data as CachedExerciseCategory[] | null) || [],
+    data: (data as TrainingExerciseCategory[] | null) || [],
     error,
   }
 }
 
-export const getCachedExercises = (userId: string, accessToken: string) =>
-  getCachedExercisesData(userId, accessToken)
-
-async function getCachedExercisesData(userId: string, accessToken: string) {
-  'use cache'
-  cacheLife('minutes')
-  cacheTag(cacheTags.exercises(userId))
-
-  const supabase = createAuthenticatedCachedClient(accessToken)
+export async function getExercises(supabase: ServerSupabaseClient, userId: string) {
   const { data, error } = await supabase
     .from('exercises')
     .select('id, name, exercise_category_id, exercise_type')
@@ -134,15 +101,15 @@ async function getCachedExercisesData(userId: string, accessToken: string) {
     .order('created_at')
 
   return {
-    data: (data as CachedExercise[] | null) || [],
+    data: (data as TrainingExercise[] | null) || [],
     error,
   }
 }
 
-export async function getCachedExerciseSetup(userId: string, accessToken: string) {
+export async function getExerciseSetup(supabase: ServerSupabaseClient, userId: string) {
   const [categoriesResult, exercisesResult] = await Promise.all([
-    getCachedExerciseCategories(userId, accessToken),
-    getCachedExercises(userId, accessToken),
+    getExerciseCategories(supabase, userId),
+    getExercises(supabase, userId),
   ])
 
   return {
@@ -152,27 +119,11 @@ export async function getCachedExerciseSetup(userId: string, accessToken: string
   }
 }
 
-export const getCachedExerciseCategoryDetail = (
+export async function getExerciseCategoryDetail(
+  supabase: ServerSupabaseClient,
   userId: string,
-  accessToken: string,
-  exerciseCategoryId: string,
-) =>
-  getCachedExerciseCategoryDetailData(userId, accessToken, exerciseCategoryId)
-
-async function getCachedExerciseCategoryDetailData(
-  userId: string,
-  accessToken: string,
   exerciseCategoryId: string,
 ) {
-  'use cache'
-  cacheLife('minutes')
-  cacheTag(
-    cacheTags.exerciseCategories(userId),
-    cacheTags.exercises(userId),
-    cacheTags.exerciseCategory(userId, exerciseCategoryId),
-  )
-
-  const supabase = createAuthenticatedCachedClient(accessToken)
   const { data, error } = await supabase
     .from('exercise_categories')
     .select(`
@@ -189,35 +140,17 @@ async function getCachedExerciseCategoryDetailData(
     .single()
 
   return {
-    data: data as CachedExerciseCategoryDetail | null,
+    data: data as TrainingExerciseCategoryDetail | null,
     error,
   }
 }
 
-export const getCachedCompletedExercisesPayload = (
+export async function getCompletedExercisesPayload(
+  supabase: ServerSupabaseClient,
   userId: string,
-  accessToken: string,
   dateFrom: string,
   dateTo: string,
-) =>
-  getCachedCompletedExercisesPayloadData(userId, accessToken, dateFrom, dateTo)
-
-async function getCachedCompletedExercisesPayloadData(
-  userId: string,
-  accessToken: string,
-  dateFrom: string,
-  dateTo: string,
-): Promise<CachedCompletedExercisesPayload> {
-  'use cache'
-  cacheLife('minutes')
-  cacheTag(
-    cacheTags.completedExercises(userId),
-    cacheTags.completedExercisesRange(userId, dateFrom, dateTo),
-    cacheTags.exerciseCategories(userId),
-    cacheTags.exercises(userId),
-  )
-
-  const supabase = createAuthenticatedCachedClient(accessToken)
+): Promise<CompletedExercisesPayload> {
   const [entriesResult, categoriesResult] = await Promise.all([
     supabase
       .from('completed_exercises')
@@ -227,7 +160,7 @@ async function getCachedCompletedExercisesPayloadData(
       .lte('performed_at', dateTo)
       .order('performed_at', { ascending: false })
       .order('created_at', { ascending: false }),
-    getCachedExerciseCategories(userId, accessToken),
+    getExerciseCategories(supabase, userId),
   ])
 
   const entries = entriesResult.error ? [] : ((entriesResult.data as unknown as CompletedExerciseRow[]) || [])
@@ -258,30 +191,12 @@ async function getCachedCompletedExercisesPayloadData(
   }
 }
 
-export const getCachedStatsEntries = (
+export async function getStatsEntries(
+  supabase: ServerSupabaseClient,
   userId: string,
-  accessToken: string,
-  dateFrom: string,
-  dateTo: string,
-) =>
-  getCachedStatsEntriesData(userId, accessToken, dateFrom, dateTo)
-
-async function getCachedStatsEntriesData(
-  userId: string,
-  accessToken: string,
   dateFrom: string,
   dateTo: string,
 ) {
-  'use cache'
-  cacheLife('minutes')
-  cacheTag(
-    cacheTags.stats(userId),
-    cacheTags.statsRange(userId, dateFrom, dateTo),
-    cacheTags.exerciseCategories(userId),
-    cacheTags.exercises(userId),
-  )
-
-  const supabase = createAuthenticatedCachedClient(accessToken)
   const { data, error } = await supabase
     .from('completed_exercises')
     .select(
@@ -299,7 +214,7 @@ async function getCachedStatsEntriesData(
     .lte('performed_at', dateTo)
 
   return {
-    data: error ? [] : ((data as unknown as CachedWeeklyEntry[]) || []),
+    data: error ? [] : ((data as unknown as WeeklyEntry[]) || []),
     error,
   }
 }

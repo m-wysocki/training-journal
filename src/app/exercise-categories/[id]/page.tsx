@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import BackLink from '@/components/BackLink'
 import PageContainer from '@/components/PageContainer'
 import { requireUser } from '@/lib/supabase/auth'
-import { getCachedExerciseCategoryDetail } from '@/lib/supabase/cachedTrainingData'
+import { getExerciseCategoryDetail } from '@/lib/supabase/trainingData'
 import ExerciseCategoryClient, { type ExerciseCategory } from './ExerciseCategoryClient'
 import styles from './page.module.scss'
 
@@ -15,8 +15,8 @@ type ExerciseCategoryPageProps = {
 
 async function ExerciseCategoryData({ params }: ExerciseCategoryPageProps) {
   const { id } = await params
-  const { user, accessToken } = await requireUser()
-  const { data, error } = await getCachedExerciseCategoryDetail(user.id, accessToken, id)
+  const { supabase, user } = await requireUser()
+  const { data, error } = await getExerciseCategoryDetail(supabase, user.id, id)
 
   if (error || !data) {
     notFound()

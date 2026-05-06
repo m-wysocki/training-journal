@@ -1,18 +1,14 @@
-import { cache } from 'react'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 
-export const getCurrentUserContext = cache(async () => {
+export async function getCurrentUserContext() {
   const supabase = await createClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
 
-  return { supabase, user, accessToken: session?.access_token ?? null }
-})
+  return { supabase, user }
+}
 
 export async function getCurrentUser() {
   const { user } = await getCurrentUserContext()
@@ -21,11 +17,11 @@ export async function getCurrentUser() {
 }
 
 export async function requireUser() {
-  const { supabase, user, accessToken } = await getCurrentUserContext()
+  const { supabase, user } = await getCurrentUserContext()
 
-  if (!user || !accessToken) {
+  if (!user) {
     redirect('/login')
   }
 
-  return { supabase, user, accessToken }
+  return { supabase, user }
 }

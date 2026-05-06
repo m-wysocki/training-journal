@@ -1,17 +1,17 @@
 'use server'
 
 import { requireUser } from '@/lib/supabase/auth'
-import { getCachedStatsEntries, type CachedWeeklyEntry } from '@/lib/supabase/cachedTrainingData'
+import { getStatsEntries, type WeeklyEntry } from '@/lib/supabase/trainingData'
 
 type ActionResult<T = undefined> = Promise<{ data?: T; error?: string | null }>
 
 export async function loadStatsEntries(
   dateFrom: string,
   dateTo: string,
-): ActionResult<CachedWeeklyEntry[]> {
+): ActionResult<WeeklyEntry[]> {
   try {
-    const { user, accessToken } = await requireUser()
-    const { data, error } = await getCachedStatsEntries(user.id, accessToken, dateFrom, dateTo)
+    const { supabase, user } = await requireUser()
+    const { data, error } = await getStatsEntries(supabase, user.id, dateFrom, dateTo)
 
     if (error) {
       return { error: 'Could not load statistics for the selected date range.' }

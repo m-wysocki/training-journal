@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import BackLink from '@/components/BackLink'
 import PageContainer from '@/components/PageContainer'
 import { requireUser } from '@/lib/supabase/auth'
-import { getCachedExerciseSetup } from '@/lib/supabase/cachedTrainingData'
+import { getExerciseSetup } from '@/lib/supabase/trainingData'
 import type { CompletedExerciseFormValues } from '@/components/CompletedExerciseForm'
 import EditCompletedExerciseClient from './EditCompletedExerciseClient'
 import styles from '@/components/CompletedExerciseForm.module.scss'
@@ -45,7 +45,7 @@ const mapEntryToInitialValues = (entry: CompletedExerciseRecord): CompletedExerc
 
 async function EditCompletedExerciseData({ params }: EditCompletedExercisePageProps) {
   const { id } = await params
-  const { supabase, user, accessToken } = await requireUser()
+  const { supabase, user } = await requireUser()
   const [entryResult, exerciseSetup] = await Promise.all([
     supabase
       .from('completed_exercises')
@@ -69,7 +69,7 @@ async function EditCompletedExerciseData({ params }: EditCompletedExercisePagePr
       .eq('user_id', user.id)
       .eq('id', id)
       .single(),
-    getCachedExerciseSetup(user.id, accessToken),
+    getExerciseSetup(supabase, user.id),
   ])
 
   if (entryResult.error || !entryResult.data) {

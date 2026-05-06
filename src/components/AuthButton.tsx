@@ -67,7 +67,7 @@ export default function AuthButton({ user }: AuthButtonProps) {
             <div className={styles.menuEmail}>{user.email}</div>
             <Link
               href="/settings"
-              prefetch
+              prefetch={false}
               className={styles.menuItem}
               role="menuitem"
               onClick={() => setMenuOpen(false)}

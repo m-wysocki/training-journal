@@ -1,10 +1,8 @@
 'use server'
 
-import { revalidatePath, updateTag } from 'next/cache'
-import { cacheTags } from '@/lib/cacheTags'
 import { isExerciseType, type ExerciseType } from '@/lib/exerciseTypes'
 import { requireUser } from '@/lib/supabase/auth'
-import { getCachedExerciseSetup } from '@/lib/supabase/cachedTrainingData'
+import { getExerciseSetup } from '@/lib/supabase/trainingData'
 
 type ActionResult<T = undefined> = Promise<{
   data?: T
@@ -28,8 +26,8 @@ export async function loadExerciseSetup(): ActionResult<{
   exercises: ExerciseSetupExercise[]
 }> {
   try {
-    const { user, accessToken } = await requireUser()
-    const { exerciseCategories, exercises, error } = await getCachedExerciseSetup(user.id, accessToken)
+    const { supabase, user } = await requireUser()
+    const { exerciseCategories, exercises, error } = await getExerciseSetup(supabase, user.id)
 
     if (error) {
       return { error: 'Could not load exercise setup.' }
@@ -80,11 +78,6 @@ export async function addExerciseCategory(name: string): ActionResult<{ id: stri
     }
   }
 
-  updateTag(cacheTags.exerciseCategories(user.id))
-  revalidatePath('/settings/exercise-categories')
-  revalidatePath('/completed-exercises/new')
-  revalidatePath('/completed-exercises/[id]/edit', 'page')
-
   return { data }
 }
 
@@ -105,14 +98,6 @@ export async function updateExerciseCategory(id: string, name: string): ActionRe
     return { error: getRlsErrorMessage(error.message, 'exercise category', 'update') }
   }
 
-  updateTag(cacheTags.exerciseCategories(user.id))
-  updateTag(cacheTags.exerciseCategory(user.id, id))
-  updateTag(cacheTags.completedExercises(user.id))
-  updateTag(cacheTags.stats(user.id))
-  revalidatePath('/settings/exercise-categories')
-  revalidatePath('/completed-exercises')
-  revalidatePath('/stats')
-
   return {}
 }
 
@@ -124,15 +109,6 @@ export async function deleteExerciseCategory(id: string): ActionResult {
   if (error) {
     return { error: getRlsErrorMessage(error.message, 'exercise category', 'delete') }
   }
-
-  updateTag(cacheTags.exerciseCategories(user.id))
-  updateTag(cacheTags.exercises(user.id))
-  updateTag(cacheTags.exerciseCategory(user.id, id))
-  updateTag(cacheTags.completedExercises(user.id))
-  updateTag(cacheTags.stats(user.id))
-  revalidatePath('/settings/exercise-categories')
-  revalidatePath('/completed-exercises')
-  revalidatePath('/stats')
 
   return {}
 }
@@ -169,14 +145,6 @@ export async function addExercise(
         : 'Could not add the exercise.',
     }
   }
-
-  updateTag(cacheTags.exercises(user.id))
-  updateTag(cacheTags.exerciseCategory(user.id, exerciseCategoryId))
-  updateTag(cacheTags.completedExercises(user.id))
-  updateTag(cacheTags.stats(user.id))
-  revalidatePath(`/exercise-categories/${exerciseCategoryId}`)
-  revalidatePath('/completed-exercises/new')
-  revalidatePath('/completed-exercises/[id]/edit', 'page')
 
   return { data: data as ExerciseSetupExercise }
 }
@@ -215,14 +183,6 @@ export async function updateExercise(
     return { error: 'Could not update the exercise.' }
   }
 
-  updateTag(cacheTags.exercises(user.id))
-  updateTag(cacheTags.exerciseCategory(user.id, exerciseCategoryId))
-  updateTag(cacheTags.completedExercises(user.id))
-  updateTag(cacheTags.stats(user.id))
-  revalidatePath(`/exercise-categories/${exerciseCategoryId}`)
-  revalidatePath('/completed-exercises')
-  revalidatePath('/stats')
-
   return {}
 }
 
@@ -245,12 +205,6 @@ export async function deleteExercise(id: string, exerciseCategoryId: string): Ac
   if (!data) {
     return { error: 'Could not delete the exercise.' }
   }
-
-  updateTag(cacheTags.exercises(user.id))
-  updateTag(cacheTags.exerciseCategory(user.id, exerciseCategoryId))
-  revalidatePath(`/exercise-categories/${exerciseCategoryId}`)
-  revalidatePath('/completed-exercises')
-  revalidatePath('/stats')
 
   return {}
 }
