@@ -8,6 +8,7 @@ type CompletedExercisesPageProps = {
   searchParams?: Promise<{
     dateFrom?: string
     dateTo?: string
+    category?: string
   }>
 }
 
@@ -36,6 +37,7 @@ async function CompletedExercisesData({ searchParams }: CompletedExercisesPagePr
   const currentWeekRange = getCurrentWeekRange()
   const dateFrom = params?.dateFrom || currentWeekRange.dateFrom
   const dateTo = params?.dateTo || currentWeekRange.dateTo
+  const selectedExerciseCategory = params?.category || 'all'
   const { supabase, user } = await requireUser()
   const payload = await getCompletedExercisesPayload(supabase, user.id, dateFrom, dateTo)
 
@@ -48,6 +50,7 @@ async function CompletedExercisesData({ searchParams }: CompletedExercisesPagePr
       initialExerciseCategories={payload.exerciseCategories}
       initialEntryComparisons={payload.entryComparisons}
       initialErrorMessage={payload.errorMessage}
+      initialSelectedExerciseCategory={selectedExerciseCategory}
     />
   )
 }
@@ -60,6 +63,7 @@ function CompletedExercisesFallback() {
       initialEntries={[]}
       initialExerciseCategories={[]}
       initialEntryComparisons={{}}
+      initialIsLoading
     />
   )
 }

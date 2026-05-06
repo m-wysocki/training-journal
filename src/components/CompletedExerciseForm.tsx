@@ -1,7 +1,7 @@
 'use client'
 
 import type { LucideIcon } from 'lucide-react'
-import { useEffect, useMemo, useState, useTransition } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import * as Dialog from '@radix-ui/react-dialog'
 import BackLink from '@/components/BackLink'
@@ -139,7 +139,6 @@ export function CompletedExerciseForm({
   onSuccess,
 }: CompletedExerciseFormProps) {
   const router = useRouter()
-  const [isRoutePending, startRouteTransition] = useTransition()
   const [exerciseCategories, setExerciseCategories] = useState<ExerciseCategory[]>(initialExerciseCategories)
   const [exercises, setExercises] = useState<Exercise[]>(initialExercises)
   const [selectedExerciseCategoryId, setSelectedExerciseCategoryId] = useState(initialValues.exerciseCategoryId)
@@ -431,20 +430,8 @@ export function CompletedExerciseForm({
       return
     }
 
-    if (mode === 'create') {
-      onSuccess?.()
-      startRouteTransition(() => {
-        router.push(getCompletedExercisesHrefForDate(performedAt))
-        router.refresh()
-      })
-      return
-    }
-
     onSuccess?.()
-    startRouteTransition(() => {
-      router.push(getCompletedExercisesHrefForDate(performedAt))
-      router.refresh()
-    })
+    router.push(getCompletedExercisesHrefForDate(performedAt))
   }
 
   return (
@@ -883,8 +870,8 @@ export function CompletedExerciseForm({
               </StatusPanel>
             )}
 
-            <button type="submit" className={styles.submit} disabled={loading || isRoutePending}>
-              {loading || isRoutePending ? submittingLabel : submitLabel}
+            <button type="submit" className={styles.submit} disabled={loading}>
+              {loading ? submittingLabel : submitLabel}
             </button>
           </div>
         </form>

@@ -85,6 +85,7 @@ type CompletedExercisesClientProps = {
   initialEntryComparisons: EntryComparisons
   initialErrorMessage?: string
   initialIsLoading?: boolean
+  initialSelectedExerciseCategory?: string
 }
 
 const loadCompletedExercisesPayload = async (dateFrom: string, dateTo: string) => {
@@ -97,6 +98,19 @@ const loadCompletedExercisesPayload = async (dateFrom: string, dateTo: string) =
   return data
 }
 
+const getCompletedExercisesSearchParams = (
+  dateRange: { dateFrom: string; dateTo: string },
+  exerciseCategory: string,
+) => {
+  const searchParams = new URLSearchParams(dateRange)
+
+  if (exerciseCategory !== 'all') {
+    searchParams.set('category', exerciseCategory)
+  }
+
+  return searchParams
+}
+
 export default function CompletedExercisesClient({
   initialDateFrom,
   initialDateTo,
@@ -105,6 +119,7 @@ export default function CompletedExercisesClient({
   initialEntryComparisons,
   initialErrorMessage = '',
   initialIsLoading = false,
+  initialSelectedExerciseCategory = 'all',
 }: CompletedExercisesClientProps) {
   const router = useRouter()
   const [, startRouteTransition] = useTransition()
@@ -113,7 +128,8 @@ export default function CompletedExercisesClient({
   const [exerciseCategories, setExerciseCategories] = useState<ExerciseCategory[]>(initialExerciseCategories)
   const [errorMessage, setErrorMessage] = useState(initialErrorMessage)
   const [isDataLoading, setIsDataLoading] = useState(initialIsLoading)
-  const [selectedExerciseCategory, setSelectedExerciseCategory] = useState('all')
+  const [selectedExerciseCategory, setSelectedExerciseCategory] = useState(initialSelectedExerciseCategory)
+  const [filtersValue, setFiltersValue] = useState(initialSelectedExerciseCategory === 'all' ? '' : 'filters')
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [deletingEntryId, setDeletingEntryId] = useState<string | null>(null)
   const [deleteLoading, setDeleteLoading] = useState(false)
@@ -178,9 +194,24 @@ export default function CompletedExercisesClient({
     setDateRange(nextDateRange)
     setIsDataLoading(true)
     setErrorMessage('')
-    const searchParams = new URLSearchParams(nextDateRange)
+    const searchParams = getCompletedExercisesSearchParams(nextDateRange, selectedExerciseCategory)
     startRouteTransition(() => {
       router.push(`/completed-exercises?${searchParams.toString()}`, { scroll: false })
+    })
+  }
+
+  const selectExerciseCategory = (exerciseCategory: string) => {
+    setSelectedExerciseCategory(exerciseCategory)
+
+    if (exerciseCategory !== 'all') {
+      setFiltersValue('filters')
+    }
+
+    if (!dateFrom || !dateTo) return
+
+    const searchParams = getCompletedExercisesSearchParams({ dateFrom, dateTo }, exerciseCategory)
+    startRouteTransition(() => {
+      router.replace(`/completed-exercises?${searchParams.toString()}`, { scroll: false })
     })
   }
 
@@ -354,7 +385,13 @@ export default function CompletedExercisesClient({
         </div>
 
         <div className={styles.filtersBar}>
-          <Accordion.Root type="single" collapsible className={styles.filtersAccordion}>
+          <Accordion.Root
+            type="single"
+            collapsible
+            className={styles.filtersAccordion}
+            value={filtersValue}
+            onValueChange={setFiltersValue}
+          >
             <Accordion.Item value="filters" className={styles.filtersAccordionItem}>
               <Accordion.Header className={styles.filtersAccordionHeader}>
                 <Accordion.Trigger className={styles.filtersTrigger}>
@@ -396,7 +433,7 @@ export default function CompletedExercisesClient({
                       className={styles.choiceBadge}
                       aria-pressed={selectedExerciseCategory === 'all'}
                       data-selected={selectedExerciseCategory === 'all' ? 'true' : undefined}
-                      onClick={() => setSelectedExerciseCategory('all')}
+                      onClick={() => selectExerciseCategory('all')}
                     >
                       All
                     </button>
@@ -407,7 +444,7 @@ export default function CompletedExercisesClient({
                         className={styles.choiceBadge}
                         aria-pressed={selectedExerciseCategory === exerciseCategory}
                         data-selected={selectedExerciseCategory === exerciseCategory ? 'true' : undefined}
-                        onClick={() => setSelectedExerciseCategory(exerciseCategory)}
+                        onClick={() => selectExerciseCategory(exerciseCategory)}
                       >
                         {exerciseCategory}
                       </button>
