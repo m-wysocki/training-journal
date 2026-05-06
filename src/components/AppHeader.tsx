@@ -2,10 +2,13 @@ import Image from 'next/image'
 import Link from 'next/link'
 import trainingJournalLogo from '../../public/training-journal-logo.png'
 import AppHeaderActions from '@/components/AppHeaderActions'
+import { getAuthButtonUser } from '@/components/authActions'
 import PageContainer from '@/components/PageContainer'
 import styles from './AppHeader.module.scss'
 
-export default function AppHeader() {
+export default async function AppHeader() {
+  const user = await getAuthButtonUser()
+
   return (
     <header className={styles.appHeader}>
       <PageContainer className={styles.appHeaderInner}>
@@ -21,7 +24,7 @@ export default function AppHeader() {
         </Link>
 
         <div className={styles.appHeaderActions}>
-          <AppHeaderActions />
+          <AppHeaderActions key={user?.id ?? 'anonymous'} initialUser={user} />
         </div>
       </PageContainer>
     </header>

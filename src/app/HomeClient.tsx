@@ -1,12 +1,10 @@
 'use client'
 
 import { BarChart3, ClipboardList, SquarePen } from 'lucide-react'
-import { useEffect, useState } from 'react'
 import AccessPanel from '@/components/AccessPanel'
-import LoadingSkeleton from '@/components/LoadingSkeleton'
 import NavigationCard from '@/components/NavigationCard'
 import { routes } from '@/lib/routes'
-import { getHomeAccessState, type HomeAccessState } from './homeActions'
+import type { HomeAccessState } from './homeActions'
 import styles from './page.module.scss'
 
 const routeIcons = {
@@ -35,33 +33,11 @@ function HomeRoutes() {
   )
 }
 
-export default function HomeClient() {
-  const [accessState, setAccessState] = useState<HomeAccessState | 'loading'>('loading')
+type HomeClientProps = {
+  accessState: HomeAccessState
+}
 
-  useEffect(() => {
-    let isActive = true
-
-    getHomeAccessState()
-      .then((nextAccessState) => {
-        if (!isActive) return
-
-        setAccessState(nextAccessState)
-      })
-      .catch(() => {
-        if (!isActive) return
-
-        setAccessState('signed-out')
-      })
-
-    return () => {
-      isActive = false
-    }
-  }, [])
-
-  if (accessState === 'loading') {
-    return <LoadingSkeleton ariaLabel="Loading training links" count={3} variant="card" />
-  }
-
+export default function HomeClient({ accessState }: HomeClientProps) {
   if (accessState === 'signed-out') {
     return (
       <AccessPanel

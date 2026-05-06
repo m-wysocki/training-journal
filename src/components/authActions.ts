@@ -13,6 +13,7 @@ export async function getAuthButtonUser() {
   }
 
   return {
+    id: user.id,
     email: user.email ?? null,
   }
 }

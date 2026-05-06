@@ -1,33 +1,16 @@
 'use client'
 
 import { Plus } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import AuthButton, { type AuthButtonUser } from '@/components/AuthButton'
 import ButtonSquare from '@/components/ButtonSquare'
-import { getAuthButtonUser } from '@/components/authActions'
 
-export default function AppHeaderActions() {
-  const [user, setUser] = useState<AuthButtonUser | null>(null)
+type AppHeaderActionsProps = {
+  initialUser: AuthButtonUser | null
+}
 
-  useEffect(() => {
-    let isActive = true
-
-    getAuthButtonUser()
-      .then((nextUser) => {
-        if (!isActive) return
-
-        setUser(nextUser)
-      })
-      .catch(() => {
-        if (!isActive) return
-
-        setUser(null)
-      })
-
-    return () => {
-      isActive = false
-    }
-  }, [])
+export default function AppHeaderActions({ initialUser }: AppHeaderActionsProps) {
+  const [user, setUser] = useState<AuthButtonUser | null>(initialUser)
 
   return (
     <>

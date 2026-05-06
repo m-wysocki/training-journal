@@ -9,6 +9,7 @@ import { signOut } from '@/components/authActions'
 import styles from './AuthButton.module.scss'
 
 export type AuthButtonUser = {
+  id: string
   email: string | null
 }
 
