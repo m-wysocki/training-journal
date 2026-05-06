@@ -6,7 +6,7 @@ import {
   type CompletedExerciseRow,
   type EntryComparisons,
 } from '@/lib/completedExercises'
-import type { ExerciseType } from '@/components/CompletedExerciseForm'
+import type { ExerciseType } from '@/lib/exerciseTypes'
 
 export type CachedExerciseCategory = {
   id: string

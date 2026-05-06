@@ -15,8 +15,9 @@ import { loadRecentCompletedExercises } from '@/app/completed-exercises/actions'
 import {
   addExercise,
   addExerciseCategory,
-} from '@/app/exerciseSetupActions'
+} from '@/lib/actions/exerciseSetupActions'
 import type { RecentCompletedExercise } from '@/lib/completedExercises'
+import type { ExerciseType } from '@/lib/exerciseTypes'
 import { getCompletedExercisesHrefForDate } from '@/lib/trainingDateRange'
 import { formatDuration, formatLongDate, formatPace } from '@/lib/trainingFormatters'
 import styles from './CompletedExerciseForm.module.scss'
@@ -26,7 +27,6 @@ type ExerciseCategory = {
   name: string
 }
 
-export type ExerciseType = 'strength' | 'cardio' | 'duration'
 type StrengthDetailMode = 'reps' | 'time'
 
 type Exercise = {

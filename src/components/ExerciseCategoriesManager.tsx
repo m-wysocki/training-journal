@@ -9,7 +9,7 @@ import {
   addExerciseCategory,
   deleteExerciseCategory,
   updateExerciseCategory,
-} from '@/app/exerciseSetupActions'
+} from '@/lib/actions/exerciseSetupActions'
 import StatusPanel from '@/components/StatusPanel'
 import styles from './ExerciseCategoriesManager.module.scss'
 

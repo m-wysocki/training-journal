@@ -8,7 +8,7 @@ import {
   type CompletedExerciseFormValues,
 } from '@/components/CompletedExerciseForm'
 import { createCompletedExercise } from '@/app/completed-exercises/actions'
-import { loadExerciseSetup } from '@/app/exerciseSetupActions'
+import { loadExerciseSetup } from '@/lib/actions/exerciseSetupActions'
 import { formatLocalDateOnly } from '@/lib/dateOnly'
 
 type ExerciseCategory = {

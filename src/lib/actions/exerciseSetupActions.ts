@@ -1,9 +1,8 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
-import { updateTag } from 'next/cache'
-import type { ExerciseType } from '@/components/CompletedExerciseForm'
+import { revalidatePath, updateTag } from 'next/cache'
 import { cacheTags } from '@/lib/cacheTags'
+import { isExerciseType, type ExerciseType } from '@/lib/exerciseTypes'
 import { requireUser } from '@/lib/supabase/auth'
 import { getCachedExerciseSetup } from '@/lib/supabase/cachedTrainingData'
 
@@ -12,17 +11,21 @@ type ActionResult<T = undefined> = Promise<{
   error?: string | null
 }>
 
+type ExerciseSetupCategory = {
+  id: string
+  name: string
+}
+
+type ExerciseSetupExercise = {
+  id: string
+  name: string
+  exercise_category_id: string
+  exercise_type: ExerciseType
+}
+
 export async function loadExerciseSetup(): ActionResult<{
-  exerciseCategories: {
-    id: string
-    name: string
-  }[]
-  exercises: {
-    id: string
-    name: string
-    exercise_category_id: string
-    exercise_type: ExerciseType
-  }[]
+  exerciseCategories: ExerciseSetupCategory[]
+  exercises: ExerciseSetupExercise[]
 }> {
   try {
     const { user, accessToken } = await requireUser()
@@ -47,6 +50,9 @@ const getRlsErrorMessage = (errorMessage: string, resource: string, action: stri
   errorMessage.includes('row-level security policy')
     ? `Could not ${action} the ${resource} because database access rules blocked it.`
     : `Could not ${action} the ${resource}.`
+
+const validateExerciseType = (exerciseType: unknown): ExerciseType | null =>
+  isExerciseType(exerciseType) ? exerciseType : null
 
 export async function addExerciseCategory(name: string): ActionResult<{ id: string; name: string }> {
   const trimmedName = name.trim()
@@ -135,16 +141,13 @@ export async function addExercise(
   exerciseCategoryId: string,
   name: string,
   exerciseType: ExerciseType,
-): ActionResult<{
-  id: string
-  name: string
-  exercise_category_id: string
-  exercise_type: ExerciseType
-}> {
+): ActionResult<ExerciseSetupExercise> {
   const trimmedName = name.trim()
+  const validExerciseType = validateExerciseType(exerciseType)
 
   if (!exerciseCategoryId) return { error: 'Select an exercise category first.' }
   if (!trimmedName) return { error: 'Enter an exercise name.' }
+  if (!validExerciseType) return { error: 'Select a valid exercise type.' }
 
   const { supabase, user } = await requireUser()
 
@@ -153,7 +156,7 @@ export async function addExercise(
     .insert({
       name: trimmedName,
       exercise_category_id: exerciseCategoryId,
-      exercise_type: exerciseType,
+      exercise_type: validExerciseType,
       user_id: user.id,
     })
     .select('id, name, exercise_category_id, exercise_type')
@@ -175,7 +178,7 @@ export async function addExercise(
   revalidatePath('/completed-exercises/new')
   revalidatePath('/completed-exercises/[id]/edit', 'page')
 
-  return { data: data as { id: string; name: string; exercise_category_id: string; exercise_type: ExerciseType } }
+  return { data: data as ExerciseSetupExercise }
 }
 
 export async function updateExercise(
@@ -185,22 +188,31 @@ export async function updateExercise(
   exerciseType: ExerciseType,
 ): ActionResult {
   const trimmedName = name.trim()
+  const validExerciseType = validateExerciseType(exerciseType)
 
   if (!trimmedName) return { error: 'Enter an exercise name.' }
+  if (!validExerciseType) return { error: 'Select a valid exercise type.' }
 
   const { supabase, user } = await requireUser()
 
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from('exercises')
     .update({
       name: trimmedName,
-      exercise_type: exerciseType,
+      exercise_type: validExerciseType,
     })
     .eq('user_id', user.id)
     .eq('id', id)
+    .eq('exercise_category_id', exerciseCategoryId)
+    .select('id')
+    .maybeSingle()
 
   if (error) {
     return { error: getRlsErrorMessage(error.message, 'exercise', 'update') }
+  }
+
+  if (!data) {
+    return { error: 'Could not update the exercise.' }
   }
 
   updateTag(cacheTags.exercises(user.id))
@@ -217,10 +229,21 @@ export async function updateExercise(
 export async function deleteExercise(id: string, exerciseCategoryId: string): ActionResult {
   const { supabase, user } = await requireUser()
 
-  const { error } = await supabase.from('exercises').delete().eq('user_id', user.id).eq('id', id)
+  const { data, error } = await supabase
+    .from('exercises')
+    .delete()
+    .eq('user_id', user.id)
+    .eq('id', id)
+    .eq('exercise_category_id', exerciseCategoryId)
+    .select('id')
+    .maybeSingle()
 
   if (error) {
     return { error: getRlsErrorMessage(error.message, 'exercise', 'delete') }
+  }
+
+  if (!data) {
+    return { error: 'Could not delete the exercise.' }
   }
 
   updateTag(cacheTags.exercises(user.id))

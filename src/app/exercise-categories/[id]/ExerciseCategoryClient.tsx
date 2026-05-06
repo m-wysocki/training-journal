@@ -11,13 +11,14 @@ import {
   addExercise as addExerciseAction,
   deleteExercise as deleteExerciseAction,
   updateExercise as updateExerciseAction,
-} from '@/app/exerciseSetupActions'
+} from '@/lib/actions/exerciseSetupActions'
+import type { ExerciseType } from '@/lib/exerciseTypes'
 import styles from './page.module.scss'
 
 export type Exercise = {
   id: string
   name: string
-  exercise_type: 'strength' | 'cardio' | 'duration'
+  exercise_type: ExerciseType
 }
 
 export type ExerciseCategory = {
@@ -37,12 +38,12 @@ export default function ExerciseCategoryClient({
 }: ExerciseCategoryClientProps) {
   const [category, setCategory] = useState<ExerciseCategory>(initialCategory)
   const [newExercise, setNewExercise] = useState('')
-  const [newExerciseType, setNewExerciseType] = useState<'strength' | 'cardio' | 'duration'>('strength')
+  const [newExerciseType, setNewExerciseType] = useState<ExerciseType>('strength')
   const [open, setOpen] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
   const [editingExercise, setEditingExercise] = useState<Exercise | null>(null)
   const [editExerciseName, setEditExerciseName] = useState('')
-  const [editExerciseType, setEditExerciseType] = useState<'strength' | 'cardio' | 'duration'>('strength')
+  const [editExerciseType, setEditExerciseType] = useState<ExerciseType>('strength')
   const [message, setMessage] = useState('')
   const [isError, setIsError] = useState(false)
   const [isAdding, setIsAdding] = useState(false)
@@ -244,7 +245,7 @@ export default function ExerciseCategoryClient({
                 <select
                   className={styles.input}
                   value={newExerciseType}
-                  onChange={(e) => setNewExerciseType(e.target.value as 'strength' | 'cardio' | 'duration')}
+                  onChange={(e) => setNewExerciseType(e.target.value as ExerciseType)}
                 >
                   <option value="strength">Strength</option>
                   <option value="cardio">Cardio</option>
@@ -295,7 +296,7 @@ export default function ExerciseCategoryClient({
                 <select
                   className={styles.input}
                   value={editExerciseType}
-                  onChange={(e) => setEditExerciseType(e.target.value as 'strength' | 'cardio' | 'duration')}
+                  onChange={(e) => setEditExerciseType(e.target.value as ExerciseType)}
                 >
                   <option value="strength">Strength</option>
                   <option value="cardio">Cardio</option>
