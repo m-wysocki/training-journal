@@ -19,6 +19,8 @@ type StatsClientProps = {
 
 const getStatsRangeKey = (dateFrom: string, dateTo: string) => `${dateFrom}:${dateTo}`
 
+const getEarliestTrainingDate = (trainingDates: string[]) => trainingDates[trainingDates.length - 1] || ''
+
 const getExerciseCategoryStats = (entries: WeeklyEntry[]): ExerciseCategoryStat[] => {
   const groups = new Map<string, Set<string>>()
 
@@ -35,7 +37,12 @@ const getExerciseCategoryStats = (entries: WeeklyEntry[]): ExerciseCategoryStat[
       trainingDays: trainingDates.size,
       trainingDates: Array.from(trainingDates).sort((a, b) => b.localeCompare(a)),
     }))
-    .sort((a, b) => b.trainingDays - a.trainingDays || a.name.localeCompare(b.name))
+    .sort(
+      (a, b) =>
+        b.trainingDays - a.trainingDays ||
+        getEarliestTrainingDate(a.trainingDates).localeCompare(getEarliestTrainingDate(b.trainingDates)) ||
+        a.name.localeCompare(b.name),
+    )
 }
 
 const loadStatsPayload = async (dateFrom: string, dateTo: string) => {
