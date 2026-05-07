@@ -150,16 +150,16 @@ export default function ExerciseCategoryClient({
   }
 
   if (!category) return (
-    <div className={styles.loading}>
-      <p className={styles.loadingText}>Loading…</p>
+    <div className={styles.ExerciseCategoryLoading}>
+      <p className={styles.ExerciseCategoryLoadingText}>Loading…</p>
     </div>
   )
 
   return (
-    <PageContainer className={styles.container}>
-        <div className={styles.header}>
+    <PageContainer className={styles.ExerciseCategoryContainer}>
+        <div className={styles.ExerciseCategoryHeader}>
           <BackLink href="/exercise-categories" label="← Back to Exercise Categories" />
-          <h1 className={styles.title}>{category.name}</h1>
+          <h1 className={styles.ExerciseCategoryTitle}>{category.name}</h1>
         </div>
 
         {message && (
@@ -169,38 +169,38 @@ export default function ExerciseCategoryClient({
         )}
 
         {category.exercises.length === 0 ? (
-          <div className={styles.emptyState}>
-            <p className={styles.emptyText}>No exercises yet</p>
+          <div className={styles.ExerciseCategoryEmptyState}>
+            <p className={styles.ExerciseCategoryEmptyText}>No exercises yet</p>
           </div>
         ) : (
-          <ul className={styles.list}>
+          <ul className={styles.ExerciseCategoryList}>
             {category.exercises.map((exercise) => (
               <li
                 key={exercise.id}
-                className={styles.listItem}
+                className={styles.ExerciseCategoryListItem}
               >
-                <span className={styles.exerciseName}>
+                <span className={styles.ExerciseCategoryExerciseName}>
                   {exercise.name}
                 </span>
                 <DropdownMenu.Root>
                   <DropdownMenu.Trigger asChild>
                     <button
-                      className={styles.menuTrigger}
+                      className={styles.ExerciseCategoryMenuTrigger}
                       aria-label="Options"
                     >
-                      <Ellipsis size={16} strokeWidth={2} className={styles.menuIcon} aria-hidden="true" />
+                      <Ellipsis size={16} strokeWidth={2} className={styles.ExerciseCategoryMenuIcon} aria-hidden="true" />
                     </button>
                   </DropdownMenu.Trigger>
                   <DropdownMenu.Portal>
-                    <DropdownMenu.Content className={styles.menuContent}>
+                    <DropdownMenu.Content className={styles.ExerciseCategoryMenuContent}>
                       <DropdownMenu.Item
-                        className={styles.menuItem}
+                        className={styles.ExerciseCategoryMenuItem}
                         onSelect={() => openEditExercise(exercise)}
                       >
                         Edit
                       </DropdownMenu.Item>
                       <DropdownMenu.Item
-                        className={styles.menuItemDanger}
+                        className={styles.ExerciseCategoryMenuItemDanger}
                         disabled={deletingExerciseId === exercise.id}
                         onSelect={() => deleteExercise(exercise.id)}
                       >
@@ -216,23 +216,23 @@ export default function ExerciseCategoryClient({
 
         <Dialog.Root open={open} onOpenChange={setOpen}>
           <Dialog.Trigger asChild>
-            <button className={styles.primaryButton}>
+            <button className={styles.ExerciseCategoryPrimaryButton}>
               Add Exercise
             </button>
           </Dialog.Trigger>
 
           <Dialog.Portal>
-            <Dialog.Overlay className={styles.overlay} />
-            <Dialog.Content className={styles.dialogContent}>
-              <Dialog.Title className={styles.dialogTitle}>
+            <Dialog.Overlay className={styles.ExerciseCategoryOverlay} />
+            <Dialog.Content className={styles.ExerciseCategoryDialogContent}>
+              <Dialog.Title className={styles.ExerciseCategoryDialogTitle}>
                 Add Exercise
               </Dialog.Title>
-              <Dialog.Description className={styles.dialogDescription}>
+              <Dialog.Description className={styles.ExerciseCategoryDialogDescription}>
                 Enter the name of the exercise you want to add.
               </Dialog.Description>
-              <div className={styles.dialogBody}>
+              <div className={styles.ExerciseCategoryDialogBody}>
                 <input
-                  className={styles.input}
+                  className={styles.ExerciseCategoryInput}
                   placeholder="e.g. Biceps Curls"
                   value={newExercise}
                   onChange={(e) => setNewExercise(e.target.value)}
@@ -243,7 +243,7 @@ export default function ExerciseCategoryClient({
                   }}
                 />
                 <select
-                  className={styles.input}
+                  className={styles.ExerciseCategoryInput}
                   value={newExerciseType}
                   onChange={(e) => setNewExerciseType(e.target.value as ExerciseType)}
                 >
@@ -251,16 +251,16 @@ export default function ExerciseCategoryClient({
                   <option value="cardio">Cardio</option>
                   <option value="duration">Duration only</option>
                 </select>
-                <div className={styles.dialogActions}>
+                <div className={styles.ExerciseCategoryDialogActions}>
                   <Dialog.Close asChild>
-                    <button className={styles.ghostButton}>
+                    <button className={styles.ExerciseCategoryGhostButton}>
                       Cancel
                     </button>
                   </Dialog.Close>
                   <button
                     type="button"
                     onClick={addExercise}
-                    className={styles.primaryButton}
+                    className={styles.ExerciseCategoryPrimaryButton}
                     disabled={isAdding}
                   >
                     {isAdding ? 'Adding...' : 'Add'}
@@ -273,17 +273,17 @@ export default function ExerciseCategoryClient({
 
         <Dialog.Root open={editOpen} onOpenChange={setEditOpen}>
           <Dialog.Portal>
-            <Dialog.Overlay className={styles.overlay} />
-            <Dialog.Content className={styles.dialogContent}>
-              <Dialog.Title className={styles.dialogTitle}>
+            <Dialog.Overlay className={styles.ExerciseCategoryOverlay} />
+            <Dialog.Content className={styles.ExerciseCategoryDialogContent}>
+              <Dialog.Title className={styles.ExerciseCategoryDialogTitle}>
                 Edit Exercise
               </Dialog.Title>
-              <Dialog.Description className={styles.dialogDescription}>
+              <Dialog.Description className={styles.ExerciseCategoryDialogDescription}>
                 Update the exercise name and type.
               </Dialog.Description>
-              <div className={styles.dialogBody}>
+              <div className={styles.ExerciseCategoryDialogBody}>
                 <input
-                  className={styles.input}
+                  className={styles.ExerciseCategoryInput}
                   placeholder="e.g. Biceps Curls"
                   value={editExerciseName}
                   onChange={(e) => setEditExerciseName(e.target.value)}
@@ -294,7 +294,7 @@ export default function ExerciseCategoryClient({
                   }}
                 />
                 <select
-                  className={styles.input}
+                  className={styles.ExerciseCategoryInput}
                   value={editExerciseType}
                   onChange={(e) => setEditExerciseType(e.target.value as ExerciseType)}
                 >
@@ -302,16 +302,16 @@ export default function ExerciseCategoryClient({
                   <option value="cardio">Cardio</option>
                   <option value="duration">Duration only</option>
                 </select>
-                <div className={styles.dialogActions}>
+                <div className={styles.ExerciseCategoryDialogActions}>
                   <Dialog.Close asChild>
-                    <button type="button" className={styles.ghostButton}>
+                    <button type="button" className={styles.ExerciseCategoryGhostButton}>
                       Cancel
                     </button>
                   </Dialog.Close>
                   <button
                     type="button"
                     onClick={updateExercise}
-                    className={styles.primaryButton}
+                    className={styles.ExerciseCategoryPrimaryButton}
                     disabled={updatingExerciseId === editingExercise?.id}
                   >
                     {updatingExerciseId === editingExercise?.id ? 'Saving...' : 'Save'}

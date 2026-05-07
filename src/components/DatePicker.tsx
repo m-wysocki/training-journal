@@ -66,30 +66,30 @@ export function DatePicker({ id, value, onChange, className }: DatePickerProps) 
 
   return (
     <Popover.Root open={open} onOpenChange={setOpen}>
-      <input value={value} readOnly tabIndex={-1} className={styles.hiddenInput} />
+      <input value={value} readOnly tabIndex={-1} className={styles.DatePickerHiddenInput} />
       <Popover.Trigger asChild>
-        <button id={id} type="button" className={[styles.trigger, className].filter(Boolean).join(' ')}>
+        <button id={id} type="button" className={[styles.DatePickerTrigger, className].filter(Boolean).join(' ')}>
           <span>{formatDateLabel(value)}</span>
-          <span className={styles.triggerIcon} aria-hidden="true">
+          <span className={styles.DatePickerTriggerIcon} aria-hidden="true">
             ▾
           </span>
         </button>
       </Popover.Trigger>
       <Popover.Portal>
-        <Popover.Content className={styles.content} sideOffset={8} align="start">
-          <div className={styles.header}>
+        <Popover.Content className={styles.DatePickerContent} sideOffset={8} align="start">
+          <div className={styles.DatePickerHeader}>
             <button
               type="button"
-              className={styles.navButton}
+              className={styles.DatePickerNavButton}
               onClick={() => setVisibleMonth((current) => addMonths(current, -1))}
               aria-label="Previous month"
             >
               ‹
             </button>
-            <div className={styles.monthLabel}>{MONTH_LABEL_FORMATTER.format(visibleMonth)}</div>
+            <div className={styles.DatePickerMonthLabel}>{MONTH_LABEL_FORMATTER.format(visibleMonth)}</div>
             <button
               type="button"
-              className={styles.navButton}
+              className={styles.DatePickerNavButton}
               onClick={() => setVisibleMonth((current) => addMonths(current, 1))}
               aria-label="Next month"
             >
@@ -97,19 +97,19 @@ export function DatePicker({ id, value, onChange, className }: DatePickerProps) 
             </button>
           </div>
 
-          <div className={styles.weekDays} aria-hidden="true">
+          <div className={styles.DatePickerWeekDays} aria-hidden="true">
             {WEEK_DAYS.map((day) => (
               <div key={day}>{day}</div>
             ))}
           </div>
 
-          <div className={styles.daysGrid}>
+          <div className={styles.DatePickerDaysGrid}>
             {monthDays.map((date, index) =>
               date ? (
                 <button
                   key={formatLocalDateOnly(date)}
                   type="button"
-                  className={styles.dayButton}
+                  className={styles.DatePickerDayButton}
                   data-selected={
                     selectedDate && formatLocalDateOnly(selectedDate) === formatLocalDateOnly(date)
                       ? 'true'
@@ -120,7 +120,7 @@ export function DatePicker({ id, value, onChange, className }: DatePickerProps) 
                   {date.getDate()}
                 </button>
               ) : (
-                <div key={`empty-${index}`} className={styles.emptyDay} />
+                <div key={`empty-${index}`} className={styles.DatePickerEmptyDay} />
               ),
             )}
           </div>

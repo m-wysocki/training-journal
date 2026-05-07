@@ -57,7 +57,7 @@ export default function AuthButton({ user, onUserChange }: AuthButtonProps) {
 
   if (user) {
     return (
-      <div className={styles.userMenu} ref={menuRef}>
+      <div className={styles.AuthButton} ref={menuRef}>
         <ButtonSquare
           type="button"
           aria-label="Open account menu"
@@ -69,15 +69,15 @@ export default function AuthButton({ user, onUserChange }: AuthButtonProps) {
         </ButtonSquare>
 
         {menuOpen ? (
-          <div className={styles.menuPanel} role="menu">
-            <div className={styles.menuEmail}>{user.email}</div>
+          <div className={styles.AuthButtonMenuPanel} role="menu">
+            <div className={styles.AuthButtonMenuEmail}>{user.email}</div>
             <Link
               href="/settings"
-              className={styles.menuItem}
+              className={styles.AuthButtonMenuItem}
               role="menuitem"
               onClick={() => setMenuOpen(false)}
             >
-              <span className={styles.menuIcon}>
+              <span className={styles.AuthButtonMenuIcon}>
                 <Settings size={16} strokeWidth={1.9} />
               </span>
               Settings
@@ -85,10 +85,10 @@ export default function AuthButton({ user, onUserChange }: AuthButtonProps) {
             <button
               type="button"
               onClick={handleLogout}
-              className={`${styles.menuItem} ${styles.menuItemPrimary}`}
+              className={`${styles.AuthButtonMenuItem} ${styles.AuthButtonMenuItemPrimary}`}
               role="menuitem"
             >
-              <span className={styles.menuIcon}>
+              <span className={styles.AuthButtonMenuIcon}>
                 <LogOut size={16} strokeWidth={1.9} />
               </span>
               Sign Out

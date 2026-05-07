@@ -10,20 +10,20 @@ export default async function AppHeader() {
   const user = await getAuthButtonUser()
 
   return (
-    <header className={styles.appHeader}>
-      <PageContainer className={styles.appHeaderInner}>
-        <Link href="/" className={styles.appHeaderBrand}>
+    <header className={styles.AppHeader}>
+      <PageContainer className={styles.AppHeaderInner}>
+        <Link href="/" className={styles.AppHeaderBrand}>
           <Image
             src={trainingJournalLogo}
             alt="Training Journal"
             width={187}
             height={43}
-            className={styles.appHeaderBrandLogo}
+            className={styles.AppHeaderBrandLogo}
             priority
           />
         </Link>
 
-        <div className={styles.appHeaderActions}>
+        <div className={styles.AppHeaderActions}>
           <AppHeaderActions key={user?.id ?? 'anonymous'} initialUser={user} />
         </div>
       </PageContainer>

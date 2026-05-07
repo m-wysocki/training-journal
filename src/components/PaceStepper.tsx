@@ -97,11 +97,11 @@ export function PaceStepper({
   }
 
   return (
-    <div className={styles.wrapper}>
-      <div className={styles.paceStepper}>
+    <div className={styles.NumericStepper}>
+      <div className={styles.NumericStepperPaceStepper}>
         <button
           type="button"
-          className={styles.paceStepButton}
+          className={styles.NumericStepperPaceStepButton}
           onClick={() => updateBySeconds(-10)}
           disabled={disabled || value === null || value <= min}
           aria-label="Decrease pace by 10 seconds"
@@ -110,20 +110,20 @@ export function PaceStepper({
         </button>
         <button
           type="button"
-          className={styles.paceStepButton}
+          className={styles.NumericStepperPaceStepButton}
           onClick={() => updateBySeconds(-1)}
           disabled={disabled || value === null || value <= min}
           aria-label="Decrease pace by 1 second"
         >
           -1s
         </button>
-        <div className={styles.inputShell}>
+        <div className={styles.NumericStepperInputShell}>
           <input
             id={id}
             className={[
-              styles.valueInput,
-              styles.valueInputWithUnit,
-              inputValue ? styles.valueInputWithClear : '',
+              styles.NumericStepperValueInput,
+              styles.NumericStepperValueInputWithUnit,
+              inputValue ? styles.NumericStepperValueInputWithClear : '',
               inputClassName,
             ]
               .filter(Boolean)
@@ -147,7 +147,7 @@ export function PaceStepper({
           {inputValue ? (
             <button
               type="button"
-              className={styles.clearAdornment}
+              className={styles.NumericStepperClearAdornment}
               onClick={clearInput}
               disabled={disabled}
               aria-label="Clear pace"
@@ -155,13 +155,13 @@ export function PaceStepper({
               <X size={14} aria-hidden="true" />
             </button>
           ) : null}
-          <span className={styles.unitAdornment} aria-hidden="true">
+          <span className={styles.NumericStepperUnitAdornment} aria-hidden="true">
             min/km
           </span>
         </div>
         <button
           type="button"
-          className={styles.paceStepButton}
+          className={styles.NumericStepperPaceStepButton}
           onClick={() => updateBySeconds(1)}
           disabled={disabled || value === null || value >= max}
           aria-label="Increase pace by 1 second"
@@ -170,7 +170,7 @@ export function PaceStepper({
         </button>
         <button
           type="button"
-          className={styles.paceStepButton}
+          className={styles.NumericStepperPaceStepButton}
           onClick={() => updateBySeconds(10)}
           disabled={disabled || value === null || value >= max}
           aria-label="Increase pace by 10 seconds"

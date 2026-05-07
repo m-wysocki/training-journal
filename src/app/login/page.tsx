@@ -89,20 +89,20 @@ export default function LoginPage() {
   }
 
   return (
-    <div className={styles.wrapper}>
-      <PageContainer className={styles.container}>
-        <div className={styles.header}>
+    <div className={styles.Login}>
+      <PageContainer className={styles.LoginContainer}>
+        <div className={styles.LoginHeader}>
           <BackLink href="/" label="← Back to Home" />
-          <h1 className={styles.title}>Sign In</h1>
-          <p className={styles.description}>
+          <h1 className={styles.LoginTitle}>Sign In</h1>
+          <p className={styles.LoginDescription}>
             Sign in with your email and password or request a new account.
           </p>
         </div>
 
-        <div className={styles.modeTabs}>
+        <div className={styles.LoginModeTabs}>
           <button
             type="button"
-            className={`${styles.modeTab} ${passwordMode === 'sign-in' ? styles.modeTabActive : ''}`}
+            className={`${styles.LoginModeTab} ${passwordMode === 'sign-in' ? styles.LoginModeTabActive : ''}`}
             onClick={() => {
               setPasswordMode('sign-in')
               setConfirmPassword('')
@@ -113,7 +113,7 @@ export default function LoginPage() {
           </button>
           <button
             type="button"
-            className={`${styles.modeTab} ${passwordMode === 'sign-up' ? styles.modeTabActive : ''}`}
+            className={`${styles.LoginModeTab} ${passwordMode === 'sign-up' ? styles.LoginModeTabActive : ''}`}
             onClick={() => {
               setPasswordMode('sign-up')
               setMessage('')
@@ -126,10 +126,10 @@ export default function LoginPage() {
         <form
           onSubmit={handlePasswordAuth}
           onKeyDown={handleFormKeyDown}
-          className={styles.form}
+          className={styles.LoginForm}
         >
           <div>
-            <label htmlFor="email" className={styles.label}>
+            <label htmlFor="email" className={styles.LoginLabel}>
               Email
             </label>
             <input
@@ -139,12 +139,12 @@ export default function LoginPage() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="your@email.com"
               required
-              className={styles.input}
+              className={styles.LoginInput}
             />
           </div>
 
           <div>
-            <label htmlFor="password" className={styles.label}>
+            <label htmlFor="password" className={styles.LoginLabel}>
               Password
             </label>
             <input
@@ -155,13 +155,13 @@ export default function LoginPage() {
               placeholder="At least 6 characters"
               required
               minLength={6}
-              className={styles.input}
+              className={styles.LoginInput}
             />
           </div>
 
           {passwordMode === 'sign-up' ? (
             <div>
-              <label htmlFor="confirmPassword" className={styles.label}>
+              <label htmlFor="confirmPassword" className={styles.LoginLabel}>
                 Repeat Password
               </label>
               <input
@@ -172,14 +172,14 @@ export default function LoginPage() {
                 placeholder="Repeat your password"
                 required
                 minLength={6}
-                className={styles.input}
+                className={styles.LoginInput}
               />
             </div>
           ) : null}
 
           {message && (
             <div
-              className={`${styles.message} ${messageType === 'error' ? styles.messageError : styles.messageSuccess}`}
+              className={`${styles.LoginMessage} ${messageType === 'error' ? styles.LoginMessageError : styles.LoginMessageSuccess}`}
             >
               {message}
             </div>
@@ -188,7 +188,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className={styles.submit}
+            className={styles.LoginSubmit}
           >
             {loading
               ? 'Please wait...'

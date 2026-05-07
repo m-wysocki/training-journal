@@ -33,10 +33,10 @@ async function ExerciseCategoryData({ params }: ExerciseCategoryPageProps) {
 
 function ExerciseCategoryFallback() {
   return (
-    <PageContainer className={styles.container}>
-      <div className={styles.header}>
+    <PageContainer className={styles.ExerciseCategoryContainer}>
+      <div className={styles.ExerciseCategoryHeader}>
         <BackLink href="/settings/exercise-categories" label="← Back to Exercise Categories" />
-        <h1 className={styles.title}>Exercise Category</h1>
+        <h1 className={styles.ExerciseCategoryTitle}>Exercise Category</h1>
       </div>
       <LoadingSkeleton ariaLabel="Loading exercise category" count={4} />
     </PageContainer>

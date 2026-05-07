@@ -92,8 +92,8 @@ export default function StatsClient({ dateFrom, dateTo }: StatsClientProps) {
   const exerciseCategoryStats = useMemo(() => getExerciseCategoryStats(entries), [entries])
 
   return (
-    <div className={styles.wrapper}>
-      <PageContainer className={styles.container}>
+    <div className={styles.Stats}>
+      <PageContainer className={styles.StatsContainer}>
         <PageHeader
           backHref="/"
           backLabel="← Back to Home"
@@ -115,17 +115,17 @@ export default function StatsClient({ dateFrom, dateTo }: StatsClientProps) {
         ) : null}
 
         {!errorMessage && !isLoading && (
-          <div className={styles.statsGrid}>
-            <section className={styles.summaryCard}>
-              <p className={styles.cardLabel}>Workout Days</p>
-              <p className={styles.primaryStat}>{workoutDaysCount}</p>
-              <p className={styles.cardHint}>Number of days you trained during the selected date range.</p>
+          <div className={styles.StatsGrid}>
+            <section className={styles.StatsSummaryCard}>
+              <p className={styles.StatsCardLabel}>Workout Days</p>
+              <p className={styles.StatsPrimaryStat}>{workoutDaysCount}</p>
+              <p className={styles.StatsCardHint}>Number of days you trained during the selected date range.</p>
             </section>
 
-            <section className={styles.breakdownCard}>
-              <div className={styles.breakdownHeader}>
-                <h2 className={styles.breakdownTitle}>Exercise Category Frequency</h2>
-                <p className={styles.breakdownDescription}>
+            <section className={styles.StatsBreakdownCard}>
+              <div className={styles.StatsBreakdownHeader}>
+                <h2 className={styles.StatsBreakdownTitle}>Exercise Category Frequency</h2>
+                <p className={styles.StatsBreakdownDescription}>
                   Counted as distinct training days per exercise category within the selected date range.
                 </p>
               </div>

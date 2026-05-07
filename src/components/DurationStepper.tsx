@@ -91,21 +91,21 @@ export function DurationStepper({
   }
 
   return (
-    <div className={styles.wrapper}>
-      <div className={styles.stepper}>
+    <div className={styles.NumericStepper}>
+      <div className={styles.NumericStepperStepper}>
         <button
           type="button"
-          className={styles.stepButton}
+          className={styles.NumericStepperStepButton}
           onClick={() => updateByStep(-1)}
           disabled={disabled || value <= min}
           aria-label="Decrease duration by 5 minutes"
         >
           -
         </button>
-        <div className={styles.inputShell}>
+        <div className={styles.NumericStepperInputShell}>
           <input
             id={id}
-            className={[styles.valueInput, styles.valueInputWithUnit, inputClassName].filter(Boolean).join(' ')}
+            className={[styles.NumericStepperValueInput, styles.NumericStepperValueInputWithUnit, inputClassName].filter(Boolean).join(' ')}
             type="text"
             inputMode="numeric"
             placeholder="00:10"
@@ -121,13 +121,13 @@ export function DurationStepper({
             required
             aria-label={`${formatDurationInput(value)} hh:mm, editable duration`}
           />
-          <span className={styles.unitAdornment} aria-hidden="true">
+          <span className={styles.NumericStepperUnitAdornment} aria-hidden="true">
             hh:mm
           </span>
         </div>
         <button
           type="button"
-          className={styles.stepButton}
+          className={styles.NumericStepperStepButton}
           onClick={() => updateByStep(1)}
           disabled={disabled || value >= max}
           aria-label="Increase duration by 5 minutes"

@@ -1,139 +1,139 @@
-.wrapper {
+.Login {
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 3rem 0;
-}
 
-.container {
-  padding-block: 0;
-}
+  &Container {
+    padding-block: 0;
+  }
 
-.header {
-  margin-bottom: 2rem;
-}
+  &Header {
+    margin-bottom: 2rem;
+  }
 
-.backLink {
-  display: inline-block;
-  margin-bottom: 1rem;
-  font-size: 0.875rem;
-  color: var(--primary);
-  transition: color 0.2s ease;
-}
+  &BackLink {
+    display: inline-block;
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+    color: var(--primary);
+    transition: color 0.2s ease;
+  }
 
-.backLink:hover {
-  color: var(--primary-hover);
-}
+  &BackLink:hover {
+    color: var(--primary-hover);
+  }
 
-.title {
-  margin: 0;
-  font-size: 1.875rem;
-  font-weight: 300;
-  color: #000;
-}
+  &Title {
+    margin: 0;
+    font-size: 1.875rem;
+    font-weight: 300;
+    color: #000;
+  }
 
-.description {
-  margin-top: 0.5rem;
-  font-size: 0.875rem;
-  color: #4b5563;
-}
+  &Description {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    color: #4b5563;
+  }
 
-.form {
-  display: grid;
-  gap: 1.5rem;
-}
+  &Form {
+    display: grid;
+    gap: 1.5rem;
+  }
 
-.modeTabs {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.5rem;
-  margin-bottom: 1rem;
-}
+  &ModeTabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
 
-.modeTab {
-  border: 1px solid #d1d5db;
-  border-radius: 0.375rem;
-  padding: 0.625rem 0.75rem;
-  font-size: 0.875rem;
-  color: #374151;
-  background: #fff;
-  cursor: pointer;
-}
+  &ModeTab {
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    padding: 0.625rem 0.75rem;
+    font-size: 0.875rem;
+    color: #374151;
+    background: #fff;
+    cursor: pointer;
+  }
 
-.modeTab:hover {
-  border-color: #9ca3af;
-}
+  &ModeTab:hover {
+    border-color: #9ca3af;
+  }
 
-.modeTabActive {
-  border-color: var(--primary);
-  color: #fff;
-  background: var(--primary);
-}
+  &ModeTabActive {
+    border-color: var(--primary);
+    color: #fff;
+    background: var(--primary);
+  }
 
-.label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #000;
-}
+  &Label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #000;
+  }
 
-.input {
-  width: 100%;
-  border: 0;
-  border-bottom: 1px solid #d1d5db;
-  padding: 0.5rem 0;
-  color: #000;
-  background: transparent;
-  transition: border-color 0.2s ease;
-}
+  &Input {
+    width: 100%;
+    border: 0;
+    border-bottom: 1px solid #d1d5db;
+    padding: 0.5rem 0;
+    color: #000;
+    background: transparent;
+    transition: border-color 0.2s ease;
+  }
 
-.input::placeholder {
-  color: #9ca3af;
-}
+  &Input::placeholder {
+    color: #9ca3af;
+  }
 
-.input:focus {
-  outline: none;
-  border-bottom-color: var(--primary);
-}
+  &Input:focus {
+    outline: none;
+    border-bottom-color: var(--primary);
+  }
 
-.message {
-  padding: 0.75rem;
-  border-radius: 0.375rem;
-  font-size: 0.875rem;
-  border: 1px solid transparent;
-}
+  &Message {
+    padding: 0.75rem;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    border: 1px solid transparent;
+  }
 
-.messageError {
-  background: #fef2f2;
-  color: #dc2626;
-  border-color: #fecaca;
-}
+  &MessageError {
+    background: #fef2f2;
+    color: #dc2626;
+    border-color: #fecaca;
+  }
 
-.messageSuccess {
-  background: #e8f4f8;
-  color: #2c5f7c;
-  border-color: #b8e0f0;
-}
+  &MessageSuccess {
+    background: #e8f4f8;
+    color: #2c5f7c;
+    border-color: #b8e0f0;
+  }
 
-.submit {
-  width: 100%;
-  padding: 0.625rem 1.25rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #fff;
-  background: var(--primary);
-  border: 1px solid var(--primary-hover);
-  border-radius: 0.375rem;
-  transition: background-color 0.2s ease, opacity 0.2s ease;
-  cursor: pointer;
-}
+  &Submit {
+    width: 100%;
+    padding: 0.625rem 1.25rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #fff;
+    background: var(--primary);
+    border: 1px solid var(--primary-hover);
+    border-radius: 0.375rem;
+    transition: background-color 0.2s ease, opacity 0.2s ease;
+    cursor: pointer;
+  }
 
-.submit:hover:not(:disabled) {
-  background: var(--primary-hover);
-}
+  &Submit:hover:not(:disabled) {
+    background: var(--primary-hover);
+  }
 
-.submit:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+  &Submit:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 }

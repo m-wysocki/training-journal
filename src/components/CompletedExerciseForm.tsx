@@ -435,8 +435,8 @@ export function CompletedExerciseForm({
   }
 
   return (
-    <div className={styles.wrapper}>
-      <PageContainer className={styles.container}>
+    <div className={styles.CompletedExerciseForm}>
+      <PageContainer className={styles.CompletedExerciseFormContainer}>
         <PageHeader
           backHref={mode === 'edit' ? '/completed-exercises' : '/'}
           backLabel={mode === 'edit' ? '← Back to Completed Exercises' : '← Back to Home'}
@@ -447,33 +447,33 @@ export function CompletedExerciseForm({
           titleRowMobileAlign="start"
         />
 
-        <form onSubmit={handleSubmit} className={styles.form}>
-          <section className={styles.section}>
-            <div className={styles.sectionHeader}>
-              <h2 className={styles.sectionTitle}>Exercise</h2>
-              <p className={styles.sectionDescription}>
+        <form onSubmit={handleSubmit} className={styles.CompletedExerciseFormForm}>
+          <section className={styles.CompletedExerciseFormSection}>
+            <div className={styles.CompletedExerciseFormSectionHeader}>
+              <h2 className={styles.CompletedExerciseFormSectionTitle}>Exercise</h2>
+              <p className={styles.CompletedExerciseFormSectionDescription}>
                 Start by choosing an exercise category and a specific exercise.
               </p>
             </div>
 
-            <div className={styles.sectionBody}>
-              <div className={styles.badgeField}>
-                <p className={styles.label}>Exercise Category</p>
-                <div className={styles.badgeGroup} role="group" aria-label="Exercise category">
+            <div className={styles.CompletedExerciseFormSectionBody}>
+              <div className={styles.CompletedExerciseFormBadgeField}>
+                <p className={styles.CompletedExerciseFormLabel}>Exercise Category</p>
+                <div className={styles.CompletedExerciseFormBadgeGroup} role="group" aria-label="Exercise category">
                   {isExerciseSetupLoading ? (
-                    <div className={styles.formDataSkeleton} aria-label="Loading exercise categories">
+                    <div className={styles.CompletedExerciseFormFormDataSkeleton} aria-label="Loading exercise categories">
                       <span />
                       <span />
                       <span />
                     </div>
                   ) : exerciseCategories.length === 0 ? (
-                    <p className={styles.badgeEmpty}>No exercise categories yet.</p>
+                    <p className={styles.CompletedExerciseFormBadgeEmpty}>No exercise categories yet.</p>
                   ) : null}
                   {exerciseCategories.map((category) => (
                     <button
                       key={category.id}
                       type="button"
-                      className={styles.choiceBadge}
+                      className={styles.CompletedExerciseFormChoiceBadge}
                       aria-pressed={selectedExerciseCategoryId === category.id}
                       data-selected={selectedExerciseCategoryId === category.id ? 'true' : undefined}
                       onClick={() => {
@@ -486,20 +486,20 @@ export function CompletedExerciseForm({
                   ))}
                   <Dialog.Root open={isExerciseCategoryDialogOpen} onOpenChange={setIsExerciseCategoryDialogOpen}>
                     <Dialog.Trigger asChild>
-                      <button type="button" className={styles.addBadge}>
+                      <button type="button" className={styles.CompletedExerciseFormAddBadge}>
                         Add
                       </button>
                     </Dialog.Trigger>
                     <Dialog.Portal>
-                      <Dialog.Overlay className={styles.overlay} />
-                      <Dialog.Content className={styles.dialogContent}>
-                        <Dialog.Title className={styles.dialogTitle}>Add Exercise Category</Dialog.Title>
-                        <Dialog.Description className={styles.dialogDescription}>
+                      <Dialog.Overlay className={styles.CompletedExerciseFormOverlay} />
+                      <Dialog.Content className={styles.CompletedExerciseFormDialogContent}>
+                        <Dialog.Title className={styles.CompletedExerciseFormDialogTitle}>Add Exercise Category</Dialog.Title>
+                        <Dialog.Description className={styles.CompletedExerciseFormDialogDescription}>
                           Enter the name of the new exercise category.
                         </Dialog.Description>
-                        <div className={styles.dialogBody}>
+                        <div className={styles.CompletedExerciseFormDialogBody}>
                           <input
-                            className={styles.input}
+                            className={styles.CompletedExerciseFormInput}
                             value={newExerciseCategoryName}
                             onChange={(e) => setNewExerciseCategoryName(e.target.value)}
                             placeholder="e.g. Back"
@@ -510,16 +510,16 @@ export function CompletedExerciseForm({
                               }
                             }}
                           />
-                          <div className={styles.dialogActions}>
+                          <div className={styles.CompletedExerciseFormDialogActions}>
                             <Dialog.Close asChild>
-                              <button type="button" className={styles.ghostButton}>
+                              <button type="button" className={styles.CompletedExerciseFormGhostButton}>
                                 Cancel
                               </button>
                             </Dialog.Close>
                             <button
                               type="button"
                               onClick={handleAddExerciseCategory}
-                              className={styles.primaryButton}
+                              className={styles.CompletedExerciseFormPrimaryButton}
                               disabled={isAddingExerciseCategory}
                             >
                               {isAddingExerciseCategory ? 'Adding...' : 'Add'}
@@ -532,19 +532,19 @@ export function CompletedExerciseForm({
                 </div>
               </div>
 
-              <div className={styles.badgeField}>
-                <p className={styles.label}>Exercise</p>
-                <div className={styles.badgeGroup} role="group" aria-label="Exercise">
+              <div className={styles.CompletedExerciseFormBadgeField}>
+                <p className={styles.CompletedExerciseFormLabel}>Exercise</p>
+                <div className={styles.CompletedExerciseFormBadgeGroup} role="group" aria-label="Exercise">
                   {!selectedExerciseCategoryId ? (
-                    <p className={styles.badgeEmpty}>Select an exercise category first.</p>
+                    <p className={styles.CompletedExerciseFormBadgeEmpty}>Select an exercise category first.</p>
                   ) : filteredExercises.length === 0 ? (
-                    <p className={styles.badgeEmpty}>No exercises in this category yet.</p>
+                    <p className={styles.CompletedExerciseFormBadgeEmpty}>No exercises in this category yet.</p>
                   ) : (
                     filteredExercises.map((exercise) => (
                       <button
                         key={exercise.id}
                         type="button"
-                        className={styles.choiceBadge}
+                        className={styles.CompletedExerciseFormChoiceBadge}
                         aria-pressed={selectedExerciseId === exercise.id}
                         data-selected={selectedExerciseId === exercise.id ? 'true' : undefined}
                         onClick={() => setSelectedExerciseId(exercise.id)}
@@ -557,22 +557,22 @@ export function CompletedExerciseForm({
                     <Dialog.Trigger asChild>
                       <button
                         type="button"
-                        className={styles.addBadge}
+                        className={styles.CompletedExerciseFormAddBadge}
                         disabled={!selectedExerciseCategoryId}
                       >
                         Add
                       </button>
                     </Dialog.Trigger>
                     <Dialog.Portal>
-                      <Dialog.Overlay className={styles.overlay} />
-                      <Dialog.Content className={styles.dialogContent}>
-                        <Dialog.Title className={styles.dialogTitle}>Add Exercise</Dialog.Title>
-                        <Dialog.Description className={styles.dialogDescription}>
+                      <Dialog.Overlay className={styles.CompletedExerciseFormOverlay} />
+                      <Dialog.Content className={styles.CompletedExerciseFormDialogContent}>
+                        <Dialog.Title className={styles.CompletedExerciseFormDialogTitle}>Add Exercise</Dialog.Title>
+                        <Dialog.Description className={styles.CompletedExerciseFormDialogDescription}>
                           Add a new exercise to the selected exercise category.
                         </Dialog.Description>
-                        <div className={styles.dialogBody}>
+                        <div className={styles.CompletedExerciseFormDialogBody}>
                           <input
-                            className={styles.input}
+                            className={styles.CompletedExerciseFormInput}
                             value={newExerciseName}
                             onChange={(e) => setNewExerciseName(e.target.value)}
                             placeholder="e.g. Barbell Row"
@@ -583,12 +583,12 @@ export function CompletedExerciseForm({
                               }
                             }}
                           />
-                          <label htmlFor="newExerciseType" className={styles.label}>
+                          <label htmlFor="newExerciseType" className={styles.CompletedExerciseFormLabel}>
                             Type
                           </label>
                           <select
                             id="newExerciseType"
-                            className={styles.select}
+                            className={styles.CompletedExerciseFormSelect}
                             value={newExerciseType}
                             onChange={(e) => setNewExerciseType(e.target.value as ExerciseType)}
                           >
@@ -596,16 +596,16 @@ export function CompletedExerciseForm({
                             <option value="cardio">Cardio</option>
                             <option value="duration">Duration only</option>
                           </select>
-                          <div className={styles.dialogActions}>
+                          <div className={styles.CompletedExerciseFormDialogActions}>
                             <Dialog.Close asChild>
-                              <button type="button" className={styles.ghostButton}>
+                              <button type="button" className={styles.CompletedExerciseFormGhostButton}>
                                 Cancel
                               </button>
                             </Dialog.Close>
                             <button
                               type="button"
                               onClick={handleAddExercise}
-                              className={styles.primaryButton}
+                              className={styles.CompletedExerciseFormPrimaryButton}
                               disabled={isAddingExercise}
                             >
                               {isAddingExercise ? 'Adding...' : 'Add'}
@@ -621,10 +621,10 @@ export function CompletedExerciseForm({
           </section>
 
           {selectedExercise ? (
-            <section className={styles.section}>
-              <div className={styles.sectionHeader}>
-                <h2 className={styles.sectionTitle}>Workout Details</h2>
-                <p className={styles.sectionDescription}>
+            <section className={styles.CompletedExerciseFormSection}>
+              <div className={styles.CompletedExerciseFormSectionHeader}>
+                <h2 className={styles.CompletedExerciseFormSectionTitle}>Workout Details</h2>
+                <p className={styles.CompletedExerciseFormSectionDescription}>
                   {isStrengthExercise
                     ? 'Set the number of sets, reps or time, and load for this exercise.'
                     : isCardioExercise
@@ -632,22 +632,22 @@ export function CompletedExerciseForm({
                       : 'Enter the total duration for this activity in hh:mm, using 5-minute steps.'}
                 </p>
 
-                <div className={styles.recentHistory}>
-                  <p className={styles.recentHistoryTitle}>Last 3 entries</p>
+                <div className={styles.CompletedExerciseFormRecentHistory}>
+                  <p className={styles.CompletedExerciseFormRecentHistoryTitle}>Last 3 entries</p>
                   {isRecentExercisesLoading ? (
-                    <div className={styles.recentHistorySkeleton} aria-label="Loading recent history">
+                    <div className={styles.CompletedExerciseFormRecentHistorySkeleton} aria-label="Loading recent history">
                       <span />
                       <span />
                       <span />
                     </div>
                   ) : recentExercises.length === 0 ? (
-                    <p className={styles.recentHistoryEmpty}>No previous entries for this exercise yet.</p>
+                    <p className={styles.CompletedExerciseFormRecentHistoryEmpty}>No previous entries for this exercise yet.</p>
                   ) : (
-                    <div className={styles.recentHistoryList}>
+                    <div className={styles.CompletedExerciseFormRecentHistoryList}>
                       {recentExercises.map((exercise) => (
-                        <div key={exercise.id} className={styles.recentHistoryItem}>
-                          <p className={styles.recentHistoryDate}>{formatLongDate(exercise.performed_at)}</p>
-                          <p className={styles.recentHistoryDetails}>
+                        <div key={exercise.id} className={styles.CompletedExerciseFormRecentHistoryItem}>
+                          <p className={styles.CompletedExerciseFormRecentHistoryDate}>{formatLongDate(exercise.performed_at)}</p>
+                          <p className={styles.CompletedExerciseFormRecentHistoryDetails}>
                             {formatRecentExerciseSummary(selectedExerciseType, exercise)}
                           </p>
                         </div>
@@ -657,16 +657,16 @@ export function CompletedExerciseForm({
                 </div>
               </div>
 
-              <div className={styles.sectionBody}>
+              <div className={styles.CompletedExerciseFormSectionBody}>
                 {isStrengthExercise ? (
                 <>
-                  <div className={styles.field}>
-                    <label htmlFor="sets" className={styles.label}>
+                  <div className={styles.CompletedExerciseFormField}>
+                    <label htmlFor="sets" className={styles.CompletedExerciseFormLabel}>
                       Sets (1-5)
                     </label>
                     <NumericStepper
                       id="sets"
-                      inputClassName={styles.input}
+                      inputClassName={styles.CompletedExerciseFormInput}
                       value={sets}
                       min={MIN_SETS}
                       max={MAX_SETS}
@@ -674,12 +674,12 @@ export function CompletedExerciseForm({
                     />
                   </div>
 
-                  <div className={styles.field}>
-                    <p className={styles.repsHeading}>Set Target</p>
-                    <div className={styles.segmentedControl} role="group" aria-label="Set target type">
+                  <div className={styles.CompletedExerciseFormField}>
+                    <p className={styles.CompletedExerciseFormRepsHeading}>Set Target</p>
+                    <div className={styles.CompletedExerciseFormSegmentedControl} role="group" aria-label="Set target type">
                       <button
                         type="button"
-                        className={styles.segmentButton}
+                        className={styles.CompletedExerciseFormSegmentButton}
                         data-selected={strengthDetailMode === 'reps' ? 'true' : undefined}
                         aria-pressed={strengthDetailMode === 'reps'}
                         onClick={() => setStrengthDetailMode('reps')}
@@ -688,7 +688,7 @@ export function CompletedExerciseForm({
                       </button>
                       <button
                         type="button"
-                        className={styles.segmentButton}
+                        className={styles.CompletedExerciseFormSegmentButton}
                         data-selected={strengthDetailMode === 'time' ? 'true' : undefined}
                         aria-pressed={strengthDetailMode === 'time'}
                         onClick={() => setStrengthDetailMode('time')}
@@ -698,20 +698,20 @@ export function CompletedExerciseForm({
                     </div>
                   </div>
 
-                  <div className={styles.field}>
-                    <p className={styles.repsHeading}>
+                  <div className={styles.CompletedExerciseFormField}>
+                    <p className={styles.CompletedExerciseFormRepsHeading}>
                       {strengthDetailMode === 'reps' ? 'Reps Per Set (1-30)' : 'Time Per Set'}
                     </p>
-                    <div className={styles.repsGrid}>
+                    <div className={styles.CompletedExerciseFormRepsGrid}>
                       {strengthDetailMode === 'reps'
                         ? repsPerSet.map((rep, index) => (
-                            <div key={`rep-${index}`} className={styles.repField}>
-                              <label htmlFor={`rep-${index}`} className={styles.repLabel}>
+                            <div key={`rep-${index}`} className={styles.CompletedExerciseFormRepField}>
+                              <label htmlFor={`rep-${index}`} className={styles.CompletedExerciseFormRepLabel}>
                                 Set {index + 1}
                               </label>
                               <NumericStepper
                                 id={`rep-${index}`}
-                                inputClassName={styles.input}
+                                inputClassName={styles.CompletedExerciseFormInput}
                                 value={rep}
                                 min={MIN_REPS}
                                 max={MAX_REPS}
@@ -720,13 +720,13 @@ export function CompletedExerciseForm({
                             </div>
                           ))
                         : durationPerSetSeconds.map((duration, index) => (
-                            <div key={`duration-${index}`} className={styles.repField}>
-                              <label htmlFor={`duration-${index}`} className={styles.repLabel}>
+                            <div key={`duration-${index}`} className={styles.CompletedExerciseFormRepField}>
+                              <label htmlFor={`duration-${index}`} className={styles.CompletedExerciseFormRepLabel}>
                                 Set {index + 1}
                               </label>
                               <NumericStepper
                                 id={`duration-${index}`}
-                                inputClassName={styles.input}
+                                inputClassName={styles.CompletedExerciseFormInput}
                                 value={duration}
                                 min={MIN_DURATION_SECONDS}
                                 max={MAX_DURATION_SECONDS}
@@ -739,12 +739,12 @@ export function CompletedExerciseForm({
                     </div>
                   </div>
 
-                  <div className={styles.field}>
-                    <div className={styles.fieldHeader}>
-                      <label htmlFor="loadKg" className={styles.label}>
+                  <div className={styles.CompletedExerciseFormField}>
+                    <div className={styles.CompletedExerciseFormFieldHeader}>
+                      <label htmlFor="loadKg" className={styles.CompletedExerciseFormLabel}>
                         Load (kg)
                       </label>
-                      <label className={styles.checkboxRow}>
+                      <label className={styles.CompletedExerciseFormCheckboxRow}>
                         <input
                           type="checkbox"
                           checked={!hasLoad}
@@ -756,7 +756,7 @@ export function CompletedExerciseForm({
                     {hasLoad ? (
                       <NumericStepper
                         id="loadKg"
-                        inputClassName={styles.input}
+                        inputClassName={styles.CompletedExerciseFormInput}
                         value={loadKg}
                         min={MIN_LOAD_KG}
                         max={MAX_LOAD_KG}
@@ -766,19 +766,19 @@ export function CompletedExerciseForm({
                         unit="kg"
                       />
                     ) : (
-                      <div className={styles.emptyValue}>This exercise will be saved without a load value.</div>
+                      <div className={styles.CompletedExerciseFormEmptyValue}>This exercise will be saved without a load value.</div>
                     )}
                   </div>
                 </>
                 ) : isCardioExercise ? (
-                <div className={styles.metricsGrid}>
-                  <div className={styles.field}>
-                    <label htmlFor="distanceKm" className={styles.label}>
+                <div className={styles.CompletedExerciseFormMetricsGrid}>
+                  <div className={styles.CompletedExerciseFormField}>
+                    <label htmlFor="distanceKm" className={styles.CompletedExerciseFormLabel}>
                       Distance (km)
                     </label>
                     <NumericStepper
                       id="distanceKm"
-                      inputClassName={styles.input}
+                      inputClassName={styles.CompletedExerciseFormInput}
                       value={distanceKm}
                       min={MIN_DISTANCE_KM}
                       max={MAX_DISTANCE_KM}
@@ -789,13 +789,13 @@ export function CompletedExerciseForm({
                     />
                   </div>
 
-                  <div className={styles.field}>
-                    <label htmlFor="paceMinPerKm" className={styles.label}>
+                  <div className={styles.CompletedExerciseFormField}>
+                    <label htmlFor="paceMinPerKm" className={styles.CompletedExerciseFormLabel}>
                       Pace (min/km)
                     </label>
                     <PaceStepper
                       id="paceMinPerKm"
-                      inputClassName={styles.input}
+                      inputClassName={styles.CompletedExerciseFormInput}
                       value={paceMinPerKm}
                       min={MIN_PACE_MIN_PER_KM}
                       max={MAX_PACE_MIN_PER_KM}
@@ -804,13 +804,13 @@ export function CompletedExerciseForm({
                   </div>
                 </div>
                 ) : (
-                <div className={styles.field}>
-                  <label htmlFor="activityDuration" className={styles.label}>
+                <div className={styles.CompletedExerciseFormField}>
+                  <label htmlFor="activityDuration" className={styles.CompletedExerciseFormLabel}>
                     Duration
                   </label>
                   <DurationStepper
                     id="activityDuration"
-                    inputClassName={styles.input}
+                    inputClassName={styles.CompletedExerciseFormInput}
                     value={activityDurationSeconds}
                     min={MIN_ACTIVITY_DURATION_SECONDS}
                     max={MAX_ACTIVITY_DURATION_SECONDS}
@@ -824,16 +824,16 @@ export function CompletedExerciseForm({
           ) : null}
 
           {selectedExercise ? (
-            <section className={styles.section}>
-              <div className={styles.sectionHeader}>
-                <h2 className={styles.sectionTitle}>Notes</h2>
-                <p className={styles.sectionDescription}>
+            <section className={styles.CompletedExerciseFormSection}>
+              <div className={styles.CompletedExerciseFormSectionHeader}>
+                <h2 className={styles.CompletedExerciseFormSectionTitle}>Notes</h2>
+                <p className={styles.CompletedExerciseFormSectionDescription}>
                   Add the workout date and an optional note.
                 </p>
               </div>
 
-              <div className={styles.sectionBody}>
-                <label htmlFor="performedAt" className={styles.label}>
+              <div className={styles.CompletedExerciseFormSectionBody}>
+                <label htmlFor="performedAt" className={styles.CompletedExerciseFormLabel}>
                   Date
                 </label>
                 <DatePicker
@@ -842,12 +842,12 @@ export function CompletedExerciseForm({
                   onChange={setPerformedAt}
                 />
 
-                <label htmlFor="note" className={styles.label}>
+                <label htmlFor="note" className={styles.CompletedExerciseFormLabel}>
                   Note
                 </label>
                 <textarea
                   id="note"
-                  className={`${styles.input} ${styles.textarea}`}
+                  className={`${styles.CompletedExerciseFormInput} ${styles.CompletedExerciseFormTextarea}`}
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
                   rows={3}
@@ -857,14 +857,14 @@ export function CompletedExerciseForm({
             </section>
           ) : null}
 
-          <div className={styles.formFooter}>
+          <div className={styles.CompletedExerciseFormFormFooter}>
             {message && (
               <StatusPanel variant={isError ? 'error' : 'success'} withTopSpacing>
                 {message}
               </StatusPanel>
             )}
 
-            <button type="submit" className={styles.submit} disabled={loading}>
+            <button type="submit" className={styles.CompletedExerciseFormSubmit} disabled={loading}>
               {loading ? submittingLabel : submitLabel}
             </button>
           </div>

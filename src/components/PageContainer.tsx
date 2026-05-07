@@ -7,5 +7,5 @@ type PageContainerProps = {
 }
 
 export default function PageContainer({ children, className }: PageContainerProps) {
-  return <div className={[styles.container, className].filter(Boolean).join(' ')}>{children}</div>
+  return <div className={[styles.PageContainer, className].filter(Boolean).join(' ')}>{children}</div>
 }

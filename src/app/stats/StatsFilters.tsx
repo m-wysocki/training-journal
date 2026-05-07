@@ -32,27 +32,27 @@ export default function StatsFilters({ dateFrom, dateTo }: StatsFiltersProps) {
   }
 
   return (
-    <div className={styles.filtersBar}>
-      <Accordion.Root type="single" collapsible className={styles.filtersAccordion}>
-        <Accordion.Item value="filters" className={styles.filtersAccordionItem}>
-          <Accordion.Header className={styles.filtersAccordionHeader}>
-            <Accordion.Trigger className={styles.filtersTrigger}>
+    <div className={styles.StatsFiltersBar}>
+      <Accordion.Root type="single" collapsible className={styles.StatsFiltersAccordion}>
+        <Accordion.Item value="filters" className={styles.StatsFiltersAccordionItem}>
+          <Accordion.Header className={styles.StatsFiltersAccordionHeader}>
+            <Accordion.Trigger className={styles.StatsFiltersTrigger}>
               Filters
-              <span className={styles.filtersTriggerIcon} aria-hidden="true">
+              <span className={styles.StatsFiltersTriggerIcon} aria-hidden="true">
                 ▾
               </span>
             </Accordion.Trigger>
           </Accordion.Header>
-          <Accordion.Content className={styles.filtersContent}>
-            <div className={styles.dateRangeFields}>
-              <div className={styles.datePickerGroup}>
-                <label htmlFor="dateFrom" className={styles.label}>
+          <Accordion.Content className={styles.StatsFiltersContent}>
+            <div className={styles.StatsDateRangeFields}>
+              <div className={styles.StatsDatePickerGroup}>
+                <label htmlFor="dateFrom" className={styles.StatsLabel}>
                   From
                 </label>
                 <DatePicker id="dateFrom" value={dateFrom} onChange={(value) => updateRange(value, dateTo)} />
               </div>
-              <div className={styles.datePickerGroup}>
-                <label htmlFor="dateTo" className={styles.label}>
+              <div className={styles.StatsDatePickerGroup}>
+                <label htmlFor="dateTo" className={styles.StatsLabel}>
                   To
                 </label>
                 <DatePicker id="dateTo" value={dateTo} onChange={(value) => updateRange(dateFrom, value)} />
@@ -62,22 +62,22 @@ export default function StatsFilters({ dateFrom, dateTo }: StatsFiltersProps) {
         </Accordion.Item>
       </Accordion.Root>
 
-      <div className={styles.compactWeekBar}>
+      <div className={styles.StatsCompactWeekBar}>
         <button
           type="button"
-          className={styles.weekIconButton}
+          className={styles.StatsWeekIconButton}
           onClick={() => shiftDateRangeByWeek(-1)}
           aria-label="Previous week"
           disabled={!hasDateRange}
         >
           ‹
         </button>
-        <p className={styles.weekRange}>
+        <p className={styles.StatsWeekRange}>
           {hasDateRange ? formatDateRange(dateFrom, dateTo) : 'Loading date range...'}
         </p>
         <button
           type="button"
-          className={styles.weekIconButton}
+          className={styles.StatsWeekIconButton}
           onClick={() => shiftDateRangeByWeek(1)}
           aria-label="Next week"
           disabled={!hasDateRange}

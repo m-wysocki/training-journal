@@ -324,8 +324,8 @@ export default function CompletedExercisesClient({
   }
 
   return (
-    <div className={styles.wrapper}>
-      <PageContainer className={styles.container}>
+    <div className={styles.CompletedExercises}>
+      <PageContainer className={styles.CompletedExercisesContainer}>
         <PageHeader
           backHref="/"
           backLabel="← Back to Home"
@@ -334,27 +334,27 @@ export default function CompletedExercisesClient({
           description="Browse your logged exercises grouped by workout date."
         />
 
-        <div className={styles.filtersBar}>
+        <div className={styles.CompletedExercisesFiltersBar}>
           <Accordion.Root
             type="single"
             collapsible
-            className={styles.filtersAccordion}
+            className={styles.CompletedExercisesFiltersAccordion}
             value={filtersValue}
             onValueChange={setFiltersValue}
           >
-            <Accordion.Item value="filters" className={styles.filtersAccordionItem}>
-              <Accordion.Header className={styles.filtersAccordionHeader}>
-                <Accordion.Trigger className={styles.filtersTrigger}>
+            <Accordion.Item value="filters" className={styles.CompletedExercisesFiltersAccordionItem}>
+              <Accordion.Header className={styles.CompletedExercisesFiltersAccordionHeader}>
+                <Accordion.Trigger className={styles.CompletedExercisesFiltersTrigger}>
                   Filters
-                  <span className={styles.filtersTriggerIcon} aria-hidden="true">
+                  <span className={styles.CompletedExercisesFiltersTriggerIcon} aria-hidden="true">
                     ▾
                   </span>
                 </Accordion.Trigger>
               </Accordion.Header>
-              <Accordion.Content className={styles.filtersContent}>
-                <div className={styles.dateRangeFields}>
-                  <div className={styles.datePickerGroup}>
-                    <label htmlFor="dateFrom" className={styles.filterLabel}>
+              <Accordion.Content className={styles.CompletedExercisesFiltersContent}>
+                <div className={styles.CompletedExercisesDateRangeFields}>
+                  <div className={styles.CompletedExercisesDatePickerGroup}>
+                    <label htmlFor="dateFrom" className={styles.CompletedExercisesFilterLabel}>
                       From
                     </label>
                     <DatePicker
@@ -363,8 +363,8 @@ export default function CompletedExercisesClient({
                       onChange={(value) => updateDateRange({ dateFrom: value, dateTo })}
                     />
                   </div>
-                  <div className={styles.datePickerGroup}>
-                    <label htmlFor="dateTo" className={styles.filterLabel}>
+                  <div className={styles.CompletedExercisesDatePickerGroup}>
+                    <label htmlFor="dateTo" className={styles.CompletedExercisesFilterLabel}>
                       To
                     </label>
                     <DatePicker
@@ -375,12 +375,12 @@ export default function CompletedExercisesClient({
                   </div>
                 </div>
 
-                <div className={styles.filterField}>
-                  <p className={styles.filterLabel}>Exercise Category</p>
-                  <div className={styles.badgeGroup} role="group" aria-label="Exercise category filter">
+                <div className={styles.CompletedExercisesFilterField}>
+                  <p className={styles.CompletedExercisesFilterLabel}>Exercise Category</p>
+                  <div className={styles.CompletedExercisesBadgeGroup} role="group" aria-label="Exercise category filter">
                     <button
                       type="button"
-                      className={styles.choiceBadge}
+                      className={styles.CompletedExercisesChoiceBadge}
                       aria-pressed={selectedExerciseCategory === 'all'}
                       data-selected={selectedExerciseCategory === 'all' ? 'true' : undefined}
                       onClick={() => selectExerciseCategory('all')}
@@ -391,7 +391,7 @@ export default function CompletedExercisesClient({
                       <button
                         key={exerciseCategory}
                         type="button"
-                        className={styles.choiceBadge}
+                        className={styles.CompletedExercisesChoiceBadge}
                         aria-pressed={selectedExerciseCategory === exerciseCategory}
                         data-selected={selectedExerciseCategory === exerciseCategory ? 'true' : undefined}
                         onClick={() => selectExerciseCategory(exerciseCategory)}
@@ -405,22 +405,22 @@ export default function CompletedExercisesClient({
             </Accordion.Item>
           </Accordion.Root>
 
-          <div className={styles.compactWeekBar}>
+          <div className={styles.CompletedExercisesCompactWeekBar}>
             <button
               type="button"
-              className={styles.weekIconButton}
+              className={styles.CompletedExercisesWeekIconButton}
               onClick={() => shiftDateRangeByWeek(-1)}
               aria-label="Previous week"
               disabled={!hasDateRange}
             >
               ‹
             </button>
-            <p className={styles.weekRange}>
+            <p className={styles.CompletedExercisesWeekRange}>
               {hasDateRange ? formatDateRange(dateFrom, dateTo) : 'Loading date range...'}
             </p>
             <button
               type="button"
-              className={styles.weekIconButton}
+              className={styles.CompletedExercisesWeekIconButton}
               onClick={() => shiftDateRangeByWeek(1)}
               aria-label="Next week"
               disabled={!hasDateRange}
@@ -444,33 +444,33 @@ export default function CompletedExercisesClient({
           <LoadingSkeleton ariaLabel="Loading completed exercise entries" count={3} variant="card" />
         ) : null}
         {!errorMessage && !isDataLoading && groupedByDate.length === 0 && (
-          <div className={styles.emptyState}>No completed exercises for this date range.</div>
+          <div className={styles.CompletedExercisesEmptyState}>No completed exercises for this date range.</div>
         )}
 
         {!isDataLoading ? (
-        <div className={styles.daysList}>
+        <div className={styles.CompletedExercisesDaysList}>
           {groupedByDate.map((group) => (
-            <section key={group.date} className={styles.dayCard}>
-              <h2 className={styles.dayTitle}>{formatWeekdayDate(group.date)}</h2>
-              <div className={styles.exerciseCategorySections}>
+            <section key={group.date} className={styles.CompletedExercisesDayCard}>
+              <h2 className={styles.CompletedExercisesDayTitle}>{formatWeekdayDate(group.date)}</h2>
+              <div className={styles.CompletedExercisesExerciseCategorySections}>
                 {group.exerciseCategories.map((exerciseCategory) => (
-                  <section key={`${group.date}-${exerciseCategory.name}`} className={styles.exerciseCategorySection}>
-                    <div className={styles.exerciseCategoryHeader}>
-                      <h3 className={styles.exerciseCategoryHeading}>{exerciseCategory.name}</h3>
+                  <section key={`${group.date}-${exerciseCategory.name}`} className={styles.CompletedExercisesExerciseCategorySection}>
+                    <div className={styles.CompletedExercisesExerciseCategoryHeader}>
+                      <h3 className={styles.CompletedExercisesExerciseCategoryHeading}>{exerciseCategory.name}</h3>
                       <DropdownMenu.Root>
                         <DropdownMenu.Trigger asChild>
                           <button
                             type="button"
-                            className={styles.menuTrigger}
+                            className={styles.CompletedExercisesMenuTrigger}
                             aria-label={`Options for ${exerciseCategory.name}`}
                           >
-                            <Ellipsis size={16} strokeWidth={2} className={styles.menuIcon} aria-hidden="true" />
+                            <Ellipsis size={16} strokeWidth={2} className={styles.CompletedExercisesMenuIcon} aria-hidden="true" />
                           </button>
                         </DropdownMenu.Trigger>
                         <DropdownMenu.Portal>
-                          <DropdownMenu.Content className={styles.menuContent} align="end">
+                          <DropdownMenu.Content className={styles.CompletedExercisesMenuContent} align="end">
                             <DropdownMenu.Item
-                              className={styles.menuItem}
+                              className={styles.CompletedExercisesMenuItem}
                               onSelect={() =>
                                 openCopyCategory(group.date, exerciseCategory.name, exerciseCategory.entries)
                               }
@@ -481,28 +481,28 @@ export default function CompletedExercisesClient({
                         </DropdownMenu.Portal>
                       </DropdownMenu.Root>
                     </div>
-                    <ul className={styles.entriesList}>
+                    <ul className={styles.CompletedExercisesEntriesList}>
                       {exerciseCategory.entries.map((entry) => (
-                        <li key={entry.id} className={styles.entryItem}>
-                          <div className={styles.entryRow}>
-                            <div className={styles.entryMain}>
-                              <div className={styles.entryTop}>
-                                <p className={styles.exerciseName}>
+                        <li key={entry.id} className={styles.CompletedExercisesEntryItem}>
+                          <div className={styles.CompletedExercisesEntryRow}>
+                            <div className={styles.CompletedExercisesEntryMain}>
+                              <div className={styles.CompletedExercisesEntryTop}>
+                                <p className={styles.CompletedExercisesExerciseName}>
                                   {entry.exercise?.name || 'Unknown exercise'}
                                 </p>
                               </div>
-                              <p className={styles.entryDetails}>
+                              <p className={styles.CompletedExercisesEntryDetails}>
                                 {formatEntryDetails(entry)}
                               </p>
                               {entryComparisons[entry.id]?.length ? (
-                                <div className={styles.entryComparisons} aria-label="Changes since previous session">
+                                <div className={styles.CompletedExercisesEntryComparisons} aria-label="Changes since previous session">
                                   {entryComparisons[entry.id].map((metric) => {
                                     const ComparisonIcon = metric.direction === 'up' ? ArrowUp : ArrowDown
 
                                     return (
                                       <span
                                         key={metric.key}
-                                        className={styles.comparisonBadge}
+                                        className={styles.CompletedExercisesComparisonBadge}
                                         data-direction={metric.direction}
                                         data-tone={metric.tone}
                                       >
@@ -516,28 +516,28 @@ export default function CompletedExercisesClient({
                                 </div>
                               ) : null}
                               {entry.note?.trim() ? (
-                                <p className={styles.entryNote}>{entry.note.trim()}</p>
+                                <p className={styles.CompletedExercisesEntryNote}>{entry.note.trim()}</p>
                               ) : null}
                             </div>
 
                             <DropdownMenu.Root>
                             <DropdownMenu.Trigger asChild>
-                              <button type="button" className={styles.menuTrigger} aria-label="Opcje">
-                                <Ellipsis size={16} strokeWidth={2} className={styles.menuIcon} aria-hidden="true" />
+                              <button type="button" className={styles.CompletedExercisesMenuTrigger} aria-label="Opcje">
+                                <Ellipsis size={16} strokeWidth={2} className={styles.CompletedExercisesMenuIcon} aria-hidden="true" />
                               </button>
                             </DropdownMenu.Trigger>
                               <DropdownMenu.Portal>
-                                <DropdownMenu.Content className={styles.menuContent} align="end">
+                                <DropdownMenu.Content className={styles.CompletedExercisesMenuContent} align="end">
                                   <DropdownMenu.Item asChild>
                                     <Link
                                       href={`/completed-exercises/${entry.id}/edit`}
-                                      className={styles.menuItem}
+                                      className={styles.CompletedExercisesMenuItem}
                                     >
                                       Edit
                                     </Link>
                                   </DropdownMenu.Item>
                                   <DropdownMenu.Item
-                                    className={styles.menuItemDanger}
+                                    className={styles.CompletedExercisesMenuItemDanger}
                                     onSelect={() => openDelete(entry.id)}
                                   >
                                     Delete
@@ -559,21 +559,21 @@ export default function CompletedExercisesClient({
 
         <Dialog.Root open={deleteOpen} onOpenChange={(open) => !open && closeDelete()}>
           <Dialog.Portal>
-            <Dialog.Overlay className={styles.overlay} />
-            <Dialog.Content className={styles.dialogContentSmall}>
-              <Dialog.Title className={styles.dialogTitle}>Delete entry?</Dialog.Title>
-              <Dialog.Description className={styles.dialogDescription}>
+            <Dialog.Overlay className={styles.CompletedExercisesOverlay} />
+            <Dialog.Content className={styles.CompletedExercisesDialogContentSmall}>
+              <Dialog.Title className={styles.CompletedExercisesDialogTitle}>Delete entry?</Dialog.Title>
+              <Dialog.Description className={styles.CompletedExercisesDialogDescription}>
                 This action cannot be undone.
               </Dialog.Description>
-              <div className={styles.dialogActions}>
+              <div className={styles.CompletedExercisesDialogActions}>
                 <Dialog.Close asChild>
-                  <button type="button" className={styles.ghostButton}>
+                  <button type="button" className={styles.CompletedExercisesGhostButton}>
                     Cancel
                   </button>
                 </Dialog.Close>
                 <button
                   type="button"
-                  className={styles.dangerButton}
+                  className={styles.CompletedExercisesDangerButton}
                   disabled={deleteLoading}
                   onClick={confirmDelete}
                 >
@@ -586,17 +586,17 @@ export default function CompletedExercisesClient({
 
         <Dialog.Root open={copyOpen} onOpenChange={(open) => !open && closeCopyCategory()}>
           <Dialog.Portal>
-            <Dialog.Overlay className={styles.overlay} />
-            <Dialog.Content className={styles.dialogContentSmall}>
-              <Dialog.Title className={styles.dialogTitle}>Copy exercises</Dialog.Title>
-              <Dialog.Description className={styles.dialogDescription}>
+            <Dialog.Overlay className={styles.CompletedExercisesOverlay} />
+            <Dialog.Content className={styles.CompletedExercisesDialogContentSmall}>
+              <Dialog.Title className={styles.CompletedExercisesDialogTitle}>Copy exercises</Dialog.Title>
+              <Dialog.Description className={styles.CompletedExercisesDialogDescription}>
                 {copyTarget
                   ? `Copy ${copyTarget.categoryName} from ${formatWeekdayDate(copyTarget.sourceDate)} to another date.`
                   : 'Choose a date to copy these exercises.'}
               </Dialog.Description>
-              <div className={styles.dialogForm}>
-                <div className={styles.field}>
-                  <label htmlFor="copyDate" className={styles.label}>
+              <div className={styles.CompletedExercisesDialogForm}>
+                <div className={styles.CompletedExercisesField}>
+                  <label htmlFor="copyDate" className={styles.CompletedExercisesLabel}>
                     New date
                   </label>
                   <DatePicker
@@ -605,18 +605,18 @@ export default function CompletedExercisesClient({
                     onChange={setCopyDate}
                   />
                   {isCopyDateSameAsSource ? (
-                    <p className={styles.fieldHint}>Choose a different date than the source workout.</p>
+                    <p className={styles.CompletedExercisesFieldHint}>Choose a different date than the source workout.</p>
                   ) : null}
                 </div>
-                <div className={styles.dialogActions}>
+                <div className={styles.CompletedExercisesDialogActions}>
                   <Dialog.Close asChild>
-                    <button type="button" className={styles.ghostButton}>
+                    <button type="button" className={styles.CompletedExercisesGhostButton}>
                       Cancel
                     </button>
                   </Dialog.Close>
                   <button
                     type="button"
-                    className={styles.primaryButton}
+                    className={styles.CompletedExercisesPrimaryButton}
                     disabled={copyLoading || !copyDate || isCopyDateSameAsSource}
                     onClick={confirmCopyCategory}
                   >

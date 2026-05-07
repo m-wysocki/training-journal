@@ -119,30 +119,30 @@ export default function ExerciseCategoriesManager({
   }
 
   return (
-    <section className={styles.section}>
-      <div className={styles.topBar}>
+    <section className={styles.ExerciseCategoriesManager}>
+      <div className={styles.ExerciseCategoriesManagerTopBar}>
         <div>
-          <h2 className={styles.title}>Exercise Categories</h2>
-          <p className={styles.description}>Manage your exercise categories</p>
+          <h2 className={styles.ExerciseCategoriesManagerTitle}>Exercise Categories</h2>
+          <p className={styles.ExerciseCategoriesManagerDescription}>Manage your exercise categories</p>
         </div>
         <Dialog.Root open={open} onOpenChange={setOpen}>
           <Dialog.Trigger asChild>
-            <button type="button" className={styles.primaryButton}>
+            <button type="button" className={styles.ExerciseCategoriesManagerPrimaryButton}>
               Add Category
             </button>
           </Dialog.Trigger>
           <Dialog.Portal>
-            <Dialog.Overlay className={styles.overlay} />
-            <Dialog.Content className={styles.dialogContent}>
-              <Dialog.Title className={styles.dialogTitle}>
+            <Dialog.Overlay className={styles.ExerciseCategoriesManagerOverlay} />
+            <Dialog.Content className={styles.ExerciseCategoriesManagerDialogContent}>
+              <Dialog.Title className={styles.ExerciseCategoriesManagerDialogTitle}>
                 Add Exercise Category
               </Dialog.Title>
-              <Dialog.Description className={styles.dialogDescription}>
+              <Dialog.Description className={styles.ExerciseCategoriesManagerDialogDescription}>
                 Enter the name of the exercise category you want to add.
               </Dialog.Description>
-              <div className={styles.dialogBody}>
+              <div className={styles.ExerciseCategoriesManagerDialogBody}>
                 <input
-                  className={styles.input}
+                  className={styles.ExerciseCategoriesManagerInput}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g. Arms"
@@ -152,16 +152,16 @@ export default function ExerciseCategoriesManager({
                     }
                   }}
                 />
-                <div className={styles.dialogActions}>
+                <div className={styles.ExerciseCategoriesManagerDialogActions}>
                   <Dialog.Close asChild>
-                    <button type="button" className={styles.ghostButton}>
+                    <button type="button" className={styles.ExerciseCategoriesManagerGhostButton}>
                       Cancel
                     </button>
                   </Dialog.Close>
                   <button
                     type="button"
                     onClick={addCategory}
-                    className={styles.primaryButton}
+                    className={styles.ExerciseCategoriesManagerPrimaryButton}
                     disabled={isAdding}
                   >
                     {isAdding ? 'Adding...' : 'Add'}
@@ -182,33 +182,33 @@ export default function ExerciseCategoriesManager({
       {isLoading ? (
         <LoadingSkeleton ariaLabel="Loading exercise categories" count={4} />
       ) : categories.length === 0 ? (
-        <div className={styles.emptyState}>
-          <p className={styles.emptyText}>No exercise categories yet</p>
+        <div className={styles.ExerciseCategoriesManagerEmptyState}>
+          <p className={styles.ExerciseCategoriesManagerEmptyText}>No exercise categories yet</p>
         </div>
       ) : (
-        <ul className={styles.list}>
+        <ul className={styles.ExerciseCategoriesManagerList}>
           {categories.map((category) => (
-            <li key={category.id} className={styles.listItem}>
-              <Link href={`/exercise-categories/${category.id}`} className={styles.categoryLink}>
+            <li key={category.id} className={styles.ExerciseCategoriesManagerListItem}>
+              <Link href={`/exercise-categories/${category.id}`} className={styles.ExerciseCategoriesManagerCategoryLink}>
                 {category.name}
               </Link>
 
               <DropdownMenu.Root>
                 <DropdownMenu.Trigger asChild>
-                  <button type="button" className={styles.menuTrigger} aria-label="Options">
-                    <Ellipsis size={16} strokeWidth={2} className={styles.menuIcon} aria-hidden="true" />
+                  <button type="button" className={styles.ExerciseCategoriesManagerMenuTrigger} aria-label="Options">
+                    <Ellipsis size={16} strokeWidth={2} className={styles.ExerciseCategoriesManagerMenuIcon} aria-hidden="true" />
                   </button>
                 </DropdownMenu.Trigger>
                 <DropdownMenu.Portal>
-                  <DropdownMenu.Content className={styles.menuContent}>
+                  <DropdownMenu.Content className={styles.ExerciseCategoriesManagerMenuContent}>
                     <DropdownMenu.Item
-                      className={styles.menuItem}
+                      className={styles.ExerciseCategoriesManagerMenuItem}
                       onSelect={() => openEditCategory(category)}
                     >
                       Edit
                     </DropdownMenu.Item>
                     <DropdownMenu.Item
-                      className={styles.menuItemDanger}
+                      className={styles.ExerciseCategoriesManagerMenuItemDanger}
                       disabled={deletingCategoryId === category.id}
                       onSelect={() => deleteCategory(category.id)}
                     >
@@ -224,17 +224,17 @@ export default function ExerciseCategoriesManager({
 
       <Dialog.Root open={editOpen} onOpenChange={setEditOpen}>
         <Dialog.Portal>
-          <Dialog.Overlay className={styles.overlay} />
-          <Dialog.Content className={styles.dialogContent}>
-            <Dialog.Title className={styles.dialogTitle}>
+          <Dialog.Overlay className={styles.ExerciseCategoriesManagerOverlay} />
+          <Dialog.Content className={styles.ExerciseCategoriesManagerDialogContent}>
+            <Dialog.Title className={styles.ExerciseCategoriesManagerDialogTitle}>
               Edit Exercise Category
             </Dialog.Title>
-            <Dialog.Description className={styles.dialogDescription}>
+            <Dialog.Description className={styles.ExerciseCategoriesManagerDialogDescription}>
               Update the exercise category name.
             </Dialog.Description>
-            <div className={styles.dialogBody}>
+            <div className={styles.ExerciseCategoriesManagerDialogBody}>
               <input
-                className={styles.input}
+                className={styles.ExerciseCategoriesManagerInput}
                 value={editName}
                 onChange={(e) => setEditName(e.target.value)}
                 placeholder="e.g. Arms"
@@ -244,16 +244,16 @@ export default function ExerciseCategoriesManager({
                   }
                 }}
               />
-              <div className={styles.dialogActions}>
+              <div className={styles.ExerciseCategoriesManagerDialogActions}>
                 <Dialog.Close asChild>
-                  <button type="button" className={styles.ghostButton}>
+                  <button type="button" className={styles.ExerciseCategoriesManagerGhostButton}>
                     Cancel
                   </button>
                 </Dialog.Close>
                 <button
                   type="button"
                   onClick={updateCategory}
-                  className={styles.primaryButton}
+                  className={styles.ExerciseCategoriesManagerPrimaryButton}
                   disabled={updatingCategoryId === editingCategory?.id}
                 >
                   {updatingCategoryId === editingCategory?.id ? 'Saving...' : 'Save'}

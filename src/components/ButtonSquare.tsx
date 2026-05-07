@@ -25,7 +25,7 @@ export default function ButtonSquare({
   className,
   ...props
 }: ButtonSquareProps) {
-  const buttonClassName = [styles.buttonSquare, className].filter(Boolean).join(' ')
+  const buttonClassName = [styles.ButtonSquare, className].filter(Boolean).join(' ')
 
   if ('href' in props) {
     const { href, prefetch, ...linkProps } = props

@@ -88,8 +88,8 @@ async function EditCompletedExerciseData({ params }: EditCompletedExercisePagePr
 
 function EditCompletedExerciseFallback() {
   return (
-    <div className={styles.wrapper}>
-      <PageContainer className={styles.container}>
+    <div className={styles.CompletedExerciseForm}>
+      <PageContainer className={styles.CompletedExerciseFormContainer}>
         <PageHeader
           backHref="/completed-exercises"
           backLabel="← Back to Completed Exercises"
@@ -99,28 +99,28 @@ function EditCompletedExerciseFallback() {
           titleRowMobileAlign="start"
         />
 
-        <form className={styles.form} aria-busy="true">
-          <section className={styles.section}>
-            <div className={styles.sectionHeader}>
-              <h2 className={styles.sectionTitle}>Exercise</h2>
-              <p className={styles.sectionDescription}>
+        <form className={styles.CompletedExerciseFormForm} aria-busy="true">
+          <section className={styles.CompletedExerciseFormSection}>
+            <div className={styles.CompletedExerciseFormSectionHeader}>
+              <h2 className={styles.CompletedExerciseFormSectionTitle}>Exercise</h2>
+              <p className={styles.CompletedExerciseFormSectionDescription}>
                 Start by choosing an exercise category and a specific exercise.
               </p>
             </div>
 
-            <div className={styles.sectionBody}>
-              <div className={styles.badgeField}>
-                <p className={styles.label}>Exercise Category</p>
-                <div className={styles.formDataSkeleton} aria-label="Loading exercise categories">
+            <div className={styles.CompletedExerciseFormSectionBody}>
+              <div className={styles.CompletedExerciseFormBadgeField}>
+                <p className={styles.CompletedExerciseFormLabel}>Exercise Category</p>
+                <div className={styles.CompletedExerciseFormFormDataSkeleton} aria-label="Loading exercise categories">
                   <span />
                   <span />
                   <span />
                 </div>
               </div>
 
-              <div className={styles.badgeField}>
-                <p className={styles.label}>Exercise</p>
-                <div className={styles.formDataSkeleton} aria-label="Loading exercises">
+              <div className={styles.CompletedExerciseFormBadgeField}>
+                <p className={styles.CompletedExerciseFormLabel}>Exercise</p>
+                <div className={styles.CompletedExerciseFormFormDataSkeleton} aria-label="Loading exercises">
                   <span />
                   <span />
                 </div>
@@ -128,8 +128,8 @@ function EditCompletedExerciseFallback() {
             </div>
           </section>
 
-          <div className={styles.formFooter}>
-            <button type="button" className={styles.submit} disabled>
+          <div className={styles.CompletedExerciseFormFormFooter}>
+            <button type="button" className={styles.CompletedExerciseFormSubmit} disabled>
               Save Changes
             </button>
           </div>

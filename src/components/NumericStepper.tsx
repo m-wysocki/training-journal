@@ -84,21 +84,21 @@ export function NumericStepper({
   }
 
   return (
-    <div className={styles.wrapper}>
-      <div className={styles.stepper}>
+    <div className={styles.NumericStepper}>
+      <div className={styles.NumericStepperStepper}>
         <button
           type="button"
-          className={styles.stepButton}
+          className={styles.NumericStepperStepButton}
           onClick={() => updateByStep(-1)}
           disabled={disabled || value <= min}
           aria-label="Decrease value"
         >
           -
         </button>
-        <div className={styles.inputShell}>
+        <div className={styles.NumericStepperInputShell}>
           <input
             id={id}
-            className={[styles.valueInput, unit ? styles.valueInputWithUnit : null, inputClassName]
+            className={[styles.NumericStepperValueInput, unit ? styles.NumericStepperValueInputWithUnit : null, inputClassName]
               .filter(Boolean)
               .join(' ')}
             type="number"
@@ -119,14 +119,14 @@ export function NumericStepper({
             aria-label={displayValue ? `${displayValue}, editable value` : undefined}
           />
           {unit && (
-            <span className={styles.unitAdornment} aria-hidden="true">
+            <span className={styles.NumericStepperUnitAdornment} aria-hidden="true">
               {unit}
             </span>
           )}
         </div>
         <button
           type="button"
-          className={styles.stepButton}
+          className={styles.NumericStepperStepButton}
           onClick={() => updateByStep(1)}
           disabled={disabled || value >= max}
           aria-label="Increase value"

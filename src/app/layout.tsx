@@ -41,7 +41,7 @@ export default function RootLayout({
   return (
     <html lang="pl">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <div className={styles.pageRoot}>
+        <div className={styles.RootLayoutPageRoot}>
           <AppHeader />
           {children}
         </div>
