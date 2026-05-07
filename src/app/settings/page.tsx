@@ -1,3 +1,4 @@
+import { Tags } from 'lucide-react'
 import BackLink from '@/components/BackLink'
 import NavigationCard from '@/components/NavigationCard'
 import PageContainer from '@/components/PageContainer'
@@ -8,6 +9,7 @@ const settingsRoutes = [
     path: '/settings/exercise-categories',
     name: 'Exercise Categories',
     description: 'Manage your exercise categories',
+    icon: Tags,
   },
 ]
 
@@ -26,6 +28,7 @@ export default function SettingsPage() {
             href={route.path}
             title={route.name}
             description={route.description}
+            icon={route.icon}
           />
         ))}
       </div>

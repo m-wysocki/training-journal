@@ -10,7 +10,6 @@
     background: var(--card-hover);
   }
 
-  &:hover &Title,
   &:hover &ArrowIcon {
     color: #2c5f7c;
   }
@@ -46,7 +45,6 @@
     font-size: 1.125rem;
     font-weight: 500;
     color: #000;
-    transition: color 0.2s ease;
   }
 
   &Description {

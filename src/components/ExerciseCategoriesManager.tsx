@@ -1,6 +1,6 @@
 'use client'
 
-import { Ellipsis } from 'lucide-react'
+import { Ellipsis, Tags } from 'lucide-react'
 import { useState } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
@@ -122,7 +122,12 @@ export default function ExerciseCategoriesManager({
     <section className={styles.ExerciseCategoriesManager}>
       <div className={styles.ExerciseCategoriesManagerTopBar}>
         <div>
-          <h2 className={styles.ExerciseCategoriesManagerTitle}>Exercise Categories</h2>
+          <div className={styles.ExerciseCategoriesManagerTitleRow}>
+            <div className={styles.ExerciseCategoriesManagerTitleIcon} aria-hidden="true">
+              <Tags size={22} strokeWidth={1.9} />
+            </div>
+            <h2 className={styles.ExerciseCategoriesManagerTitle}>Exercise Categories</h2>
+          </div>
           <p className={styles.ExerciseCategoriesManagerDescription}>Manage your exercise categories</p>
         </div>
         <Dialog.Root open={open} onOpenChange={setOpen}>

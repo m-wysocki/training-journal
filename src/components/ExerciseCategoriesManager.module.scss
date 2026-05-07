@@ -16,6 +16,24 @@
     color: #000;
   }
 
+  &TitleRow {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  &TitleIcon {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.75rem;
+    color: var(--primary);
+    background: color-mix(in srgb, var(--primary) 10%, white);
+  }
+
   &Description {
     margin: 0.35rem 0 0;
     font-size: 0.9375rem;
