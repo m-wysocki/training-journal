@@ -22,10 +22,8 @@ export const metadata: Metadata = {
     shortcut: "/favicon/favicon.ico",
     icon: [
       { url: "/favicon/favicon.ico", media: "(prefers-color-scheme: light)" },
-      { url: "/favicon/favicon.svg", type: "image/svg+xml", media: "(prefers-color-scheme: light)" },
       { url: "/favicon/favicon-96x96.png", sizes: "96x96", type: "image/png", media: "(prefers-color-scheme: light)" },
       { url: "/favicon-black/favicon.ico", media: "(prefers-color-scheme: dark)" },
-      { url: "/favicon-black/favicon.svg", type: "image/svg+xml", media: "(prefers-color-scheme: dark)" },
       { url: "/favicon-black/favicon-96x96.png", sizes: "96x96", type: "image/png", media: "(prefers-color-scheme: dark)" },
     ],
     apple: [
