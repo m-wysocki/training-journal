@@ -3,9 +3,9 @@
 import { BarChart3, ChevronDown } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import * as Accordion from '@radix-ui/react-accordion'
-import BackLink from '@/components/BackLink'
 import LoadingSkeleton from '@/components/LoadingSkeleton'
 import PageContainer from '@/components/PageContainer'
+import PageHeader from '@/components/PageHeader'
 import StatusPanel from '@/components/StatusPanel'
 import type { WeeklyEntry } from '@/lib/supabase/trainingData'
 import { formatWeekdayDate } from '@/lib/trainingFormatters'
@@ -101,18 +101,13 @@ export default function StatsClient({ dateFrom, dateTo }: StatsClientProps) {
   return (
     <div className={styles.wrapper}>
       <PageContainer className={styles.container}>
-        <div className={styles.header}>
-          <BackLink href="/" label="← Back to Home" />
-          <div className={styles.titleRow}>
-            <div className={styles.titleIcon} aria-hidden="true">
-              <BarChart3 size={22} strokeWidth={1.9} />
-            </div>
-            <h1 className={styles.title}>Statistics</h1>
-          </div>
-          <p className={styles.description}>
-            Review your training by date range and see how often you trained each exercise category.
-          </p>
-        </div>
+        <PageHeader
+          backHref="/"
+          backLabel="← Back to Home"
+          icon={BarChart3}
+          title="Statistics"
+          description="Review your training by date range and see how often you trained each exercise category."
+        />
 
         <StatsFilters dateFrom={dateFrom} dateTo={dateTo} />
 

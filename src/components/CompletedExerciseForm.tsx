@@ -4,12 +4,12 @@ import type { LucideIcon } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import * as Dialog from '@radix-ui/react-dialog'
-import BackLink from '@/components/BackLink'
 import { DatePicker } from '@/components/DatePicker'
 import { DurationStepper } from '@/components/DurationStepper'
 import { NumericStepper } from '@/components/NumericStepper'
 import { PaceStepper } from '@/components/PaceStepper'
 import PageContainer from '@/components/PageContainer'
+import PageHeader from '@/components/PageHeader'
 import StatusPanel from '@/components/StatusPanel'
 import { loadRecentCompletedExercises } from '@/app/completed-exercises/actions'
 import {
@@ -437,21 +437,15 @@ export function CompletedExerciseForm({
   return (
     <div className={styles.wrapper}>
       <PageContainer className={styles.container}>
-        <div className={styles.header}>
-          <BackLink
-            href={mode === 'edit' ? '/completed-exercises' : '/'}
-            label={mode === 'edit' ? '← Back to Completed Exercises' : '← Back to Home'}
-          />
-          <div className={styles.titleRow}>
-            {HeaderIcon ? (
-              <div className={styles.titleIcon} aria-hidden="true">
-                <HeaderIcon size={22} strokeWidth={1.9} />
-              </div>
-            ) : null}
-            <h1 className={styles.title}>{title}</h1>
-          </div>
-          <p className={styles.description}>{description}</p>
-        </div>
+        <PageHeader
+          backHref={mode === 'edit' ? '/completed-exercises' : '/'}
+          backLabel={mode === 'edit' ? '← Back to Completed Exercises' : '← Back to Home'}
+          icon={HeaderIcon}
+          title={title}
+          description={description}
+          descriptionSize="large"
+          titleRowMobileAlign="start"
+        />
 
         <form onSubmit={handleSubmit} className={styles.form}>
           <section className={styles.section}>

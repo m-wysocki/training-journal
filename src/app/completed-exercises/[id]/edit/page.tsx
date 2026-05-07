@@ -1,7 +1,7 @@
 import { Suspense } from 'react'
 import { notFound } from 'next/navigation'
-import BackLink from '@/components/BackLink'
 import PageContainer from '@/components/PageContainer'
+import PageHeader from '@/components/PageHeader'
 import { requireUser } from '@/lib/supabase/auth'
 import { getExerciseSetup } from '@/lib/supabase/trainingData'
 import type { CompletedExerciseFormValues } from '@/components/CompletedExerciseForm'
@@ -90,15 +90,14 @@ function EditCompletedExerciseFallback() {
   return (
     <div className={styles.wrapper}>
       <PageContainer className={styles.container}>
-        <div className={styles.header}>
-          <BackLink href="/completed-exercises" label="← Back to Completed Exercises" />
-          <div className={styles.titleRow}>
-            <h1 className={styles.title}>Edit Completed Exercise</h1>
-          </div>
-          <p className={styles.description}>
-            Update the exercise, workout details, or notes using the same view as the create form.
-          </p>
-        </div>
+        <PageHeader
+          backHref="/completed-exercises"
+          backLabel="← Back to Completed Exercises"
+          title="Edit Completed Exercise"
+          description="Update the exercise, workout details, or notes using the same view as the create form."
+          descriptionSize="large"
+          titleRowMobileAlign="start"
+        />
 
         <form className={styles.form} aria-busy="true">
           <section className={styles.section}>

@@ -10,52 +10,6 @@
   width: 100%;
 }
 
-.header {
-  margin-bottom: 1.5rem;
-}
-
-.titleRow {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.titleIcon {
-  display: inline-flex;
-  flex: 0 0 auto;
-  align-items: center;
-  justify-content: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 0.75rem;
-  color: var(--primary);
-  background: color-mix(in srgb, var(--primary) 10%, white);
-}
-
-.backLink {
-  display: inline-block;
-  margin-bottom: 1rem;
-  font-size: 0.875rem;
-  color: #6b7280;
-}
-
-.backLink:hover {
-  color: #111827;
-}
-
-.title {
-  margin: 0;
-  font-size: 1.75rem;
-  font-weight: 300;
-  color: #000;
-}
-
-.description {
-  margin: 0.5rem 0 0;
-  color: #6b7280;
-  font-size: 0.9rem;
-}
-
 .filtersBar {
   display: grid;
   gap: 0.5rem;
@@ -617,10 +571,6 @@
 @media (max-width: 640px) {
   .wrapper {
     padding-block: 1rem;
-  }
-
-  .header {
-    margin-bottom: 1rem;
   }
 
   .dateRangeFields {

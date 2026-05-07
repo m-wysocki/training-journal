@@ -7,10 +7,10 @@ import { useRouter } from 'next/navigation'
 import * as Accordion from '@radix-ui/react-accordion'
 import * as Dialog from '@radix-ui/react-dialog'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
-import BackLink from '@/components/BackLink'
 import { DatePicker } from '@/components/DatePicker'
 import LoadingSkeleton from '@/components/LoadingSkeleton'
 import PageContainer from '@/components/PageContainer'
+import PageHeader from '@/components/PageHeader'
 import StatusPanel from '@/components/StatusPanel'
 import { formatLocalDateOnly } from '@/lib/dateOnly'
 import type { CompletedExerciseRow, EntryComparisons, ExerciseCategory } from '@/lib/completedExercises'
@@ -326,16 +326,13 @@ export default function CompletedExercisesClient({
   return (
     <div className={styles.wrapper}>
       <PageContainer className={styles.container}>
-        <div className={styles.header}>
-          <BackLink href="/" label="← Back to Home" />
-          <div className={styles.titleRow}>
-            <div className={styles.titleIcon} aria-hidden="true">
-              <ClipboardList size={22} strokeWidth={1.9} />
-            </div>
-            <h1 className={styles.title}>Completed Exercises</h1>
-          </div>
-          <p className={styles.description}>Browse your logged exercises grouped by workout date.</p>
-        </div>
+        <PageHeader
+          backHref="/"
+          backLabel="← Back to Home"
+          icon={ClipboardList}
+          title="Completed Exercises"
+          description="Browse your logged exercises grouped by workout date."
+        />
 
         <div className={styles.filtersBar}>
           <Accordion.Root
