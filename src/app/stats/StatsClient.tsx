@@ -1,23 +1,16 @@
 'use client'
 
-import { BarChart3, ChevronDown } from 'lucide-react'
+import { BarChart3 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
-import * as Accordion from '@radix-ui/react-accordion'
 import LoadingSkeleton from '@/components/LoadingSkeleton'
 import PageContainer from '@/components/PageContainer'
 import PageHeader from '@/components/PageHeader'
 import StatusPanel from '@/components/StatusPanel'
 import type { WeeklyEntry } from '@/lib/supabase/trainingData'
-import { formatWeekdayDate } from '@/lib/trainingFormatters'
 import { loadStatsEntries } from './actions'
+import StatsCategoryBreakdown, { type ExerciseCategoryStat } from './StatsCategoryBreakdown'
 import StatsFilters from './StatsFilters'
 import styles from './page.module.scss'
-
-type ExerciseCategoryStat = {
-  name: string
-  trainingDays: number
-  trainingDates: string[]
-}
 
 type StatsClientProps = {
   dateFrom: string
@@ -137,45 +130,7 @@ export default function StatsClient({ dateFrom, dateTo }: StatsClientProps) {
                 </p>
               </div>
 
-              {exerciseCategoryStats.length === 0 ? (
-                <p className={styles.emptyText}>No workouts logged for this date range.</p>
-              ) : (
-                <Accordion.Root type="single" collapsible className={styles.breakdownList} asChild>
-                  <ul>
-                    {exerciseCategoryStats.map((stat) => (
-                      <Accordion.Item key={stat.name} value={stat.name} className={styles.breakdownItem} asChild>
-                        <li>
-                          <Accordion.Header className={styles.breakdownItemHeader}>
-                            <Accordion.Trigger className={styles.breakdownTrigger}>
-                              <span className={styles.exerciseCategoryName}>{stat.name}</span>
-                              <span className={styles.exerciseCategoryMeta}>
-                                <span className={styles.exerciseCategoryValue}>
-                                  {stat.trainingDays} {stat.trainingDays === 1 ? 'day' : 'days'}
-                                </span>
-                                <ChevronDown
-                                  size={16}
-                                  strokeWidth={2}
-                                  className={styles.breakdownTriggerIcon}
-                                  aria-hidden="true"
-                                />
-                              </span>
-                            </Accordion.Trigger>
-                          </Accordion.Header>
-                          <Accordion.Content className={styles.breakdownContent}>
-                            <ul className={styles.trainingDatesList}>
-                              {stat.trainingDates.map((trainingDate) => (
-                                <li key={trainingDate} className={styles.trainingDateItem}>
-                                  {formatWeekdayDate(trainingDate)}
-                                </li>
-                              ))}
-                            </ul>
-                          </Accordion.Content>
-                        </li>
-                      </Accordion.Item>
-                    ))}
-                  </ul>
-                </Accordion.Root>
-              )}
+              <StatsCategoryBreakdown stats={exerciseCategoryStats} />
             </section>
           </div>
         )}
