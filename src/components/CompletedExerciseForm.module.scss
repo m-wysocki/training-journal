@@ -91,6 +91,18 @@
     color: var(--text-muted);
   }
 
+  &RecentHistoryNote {
+    margin: 0.5rem 0 0;
+    padding: 0.5rem 0.625rem;
+    font-size: 0.8125rem;
+    line-height: 1.45;
+    color: var(--text-muted);
+    background: var(--surface-low);
+    border-radius: 0.5rem;
+    border: 1px solid var(--surface-border);
+    white-space: pre-wrap;
+  }
+
   &RecentHistorySkeleton {
     display: grid;
     gap: 0.5rem;

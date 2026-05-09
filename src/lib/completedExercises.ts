@@ -51,6 +51,7 @@ export type RecentCompletedExercise = {
   load_kg: number | null
   distance_km: number | null
   pace_min_per_km: number | null
+  note: string | null
 }
 
 export type EntryComparisonMetric = {

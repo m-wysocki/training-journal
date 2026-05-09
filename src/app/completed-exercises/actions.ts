@@ -69,7 +69,8 @@ export async function loadRecentCompletedExercises(
         duration_per_set_seconds,
         load_kg,
         distance_km,
-        pace_min_per_km
+        pace_min_per_km,
+        note
       `,
     )
     .eq('user_id', user.id)

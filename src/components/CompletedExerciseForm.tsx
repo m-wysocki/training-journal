@@ -200,6 +200,7 @@ export function CompletedExerciseForm({
 
   useEffect(() => {
     let isActive = true
+    const currentExerciseType = selectedExercise?.exercise_type ?? 'strength'
 
     if (!selectedExerciseId) {
       return () => {
@@ -224,12 +225,80 @@ export function CompletedExerciseForm({
           exerciseId: selectedExerciseId,
           entries,
         })
+
+        if (mode !== 'create') return
+
+        const latestEntry = entries[0]
+
+        if (!latestEntry) {
+          setSets(3)
+          setRepsPerSet([12, 12, 12])
+          setDurationPerSetSeconds([40, 40, 40])
+          setStrengthDetailMode('reps')
+          setLoadKg(DEFAULT_LOAD_KG)
+          setHasLoad(true)
+          setDistanceKm(DEFAULT_DISTANCE_KM)
+          setPaceMinPerKm(null)
+          setActivityDurationSeconds(DEFAULT_ACTIVITY_DURATION_SECONDS)
+          return
+        }
+
+        if (currentExerciseType === 'strength') {
+          const sourceSets =
+            latestEntry.sets ??
+            latestEntry.reps_per_set?.length ??
+            latestEntry.duration_per_set_seconds?.length ??
+            3
+          const nextSets = Math.min(MAX_SETS, Math.max(MIN_SETS, sourceSets))
+
+          const nextRepsPerSet = Array.from({ length: nextSets }, (_, index) => {
+            const sourceValue = latestEntry.reps_per_set?.[index]
+            return sourceValue ? Math.min(MAX_REPS, Math.max(MIN_REPS, sourceValue)) : DEFAULT_REPS
+          })
+          const nextDurationPerSetSeconds = Array.from({ length: nextSets }, (_, index) => {
+            const sourceValue = latestEntry.duration_per_set_seconds?.[index]
+            return sourceValue
+              ? Math.min(MAX_DURATION_SECONDS, Math.max(MIN_DURATION_SECONDS, sourceValue))
+              : DEFAULT_DURATION_SECONDS
+          })
+
+          setSets(nextSets)
+          setRepsPerSet(nextRepsPerSet)
+          setDurationPerSetSeconds(nextDurationPerSetSeconds)
+          setStrengthDetailMode(latestEntry.duration_per_set_seconds?.length ? 'time' : 'reps')
+          setHasLoad(latestEntry.load_kg !== null)
+          setLoadKg(latestEntry.load_kg ?? DEFAULT_LOAD_KG)
+          return
+        }
+
+        if (currentExerciseType === 'cardio') {
+          const nextDistanceKm =
+            latestEntry.distance_km === null
+              ? DEFAULT_DISTANCE_KM
+              : Math.min(MAX_DISTANCE_KM, Math.max(MIN_DISTANCE_KM, latestEntry.distance_km))
+          const nextPaceMinPerKm =
+            latestEntry.pace_min_per_km === null
+              ? null
+              : Math.min(MAX_PACE_MIN_PER_KM, Math.max(MIN_PACE_MIN_PER_KM, latestEntry.pace_min_per_km))
+
+          setDistanceKm(nextDistanceKm)
+          setPaceMinPerKm(nextPaceMinPerKm)
+          return
+        }
+
+        const sourceDuration = latestEntry.duration_per_set_seconds?.[0]
+        const nextDurationSeconds =
+          sourceDuration && sourceDuration >= MIN_ACTIVITY_DURATION_SECONDS && sourceDuration <= MAX_ACTIVITY_DURATION_SECONDS
+            ? sourceDuration - (sourceDuration % ACTIVITY_DURATION_STEP_SECONDS)
+            : DEFAULT_ACTIVITY_DURATION_SECONDS
+
+        setActivityDurationSeconds(Math.max(MIN_ACTIVITY_DURATION_SECONDS, nextDurationSeconds))
       })
 
     return () => {
       isActive = false
     }
-  }, [selectedExerciseId])
+  }, [mode, selectedExercise?.exercise_type, selectedExerciseId])
 
   const handleSetsChange = (value: string) => {
     const parsed = Number(value)
@@ -650,6 +719,9 @@ export function CompletedExerciseForm({
                           <p className={styles.CompletedExerciseFormRecentHistoryDetails}>
                             {formatRecentExerciseSummary(selectedExerciseType, exercise)}
                           </p>
+                          {exercise.note?.trim() ? (
+                            <p className={styles.CompletedExerciseFormRecentHistoryNote}>{exercise.note.trim()}</p>
+                          ) : null}
                         </div>
                       ))}
                     </div>
