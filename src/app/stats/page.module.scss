@@ -59,8 +59,16 @@
   }
 
   &FiltersTriggerIcon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    line-height: 0;
     color: var(--text-soft);
-    font-size: 0.75rem;
+  }
+
+  &FiltersTriggerIcon :global(svg) {
+    display: block;
   }
 
   &FiltersContent {

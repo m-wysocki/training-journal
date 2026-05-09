@@ -1,4 +1,4 @@
-.ButtonSquare {
+.IconButton {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -9,10 +9,15 @@
   color: var(--foreground);
   background: var(--surface);
   cursor: pointer;
+}
 
-  &:hover,
-  &[aria-expanded='true'] {
-    border-color: var(--primary);
-    background: var(--surface-low);
-  }
+.IconButton:hover,
+.IconButton[aria-expanded='true'] {
+  border-color: var(--primary);
+  background: var(--surface-low);
+}
+
+.IconButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }

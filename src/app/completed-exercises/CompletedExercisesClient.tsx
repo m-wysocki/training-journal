@@ -1,6 +1,6 @@
 'use client'
 
-import { ArrowDown, ArrowUp, ChevronLeft, ChevronRight, ClipboardList } from 'lucide-react'
+import { ArrowDown, ArrowUp, ChevronDown, ChevronLeft, ChevronRight, ClipboardList } from 'lucide-react'
 import { useMemo, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import * as Accordion from '@radix-ui/react-accordion'
@@ -11,6 +11,7 @@ import OverflowMenu from '@/components/OverflowMenu'
 import PageContainer from '@/components/PageContainer'
 import PageHeader from '@/components/PageHeader'
 import StatusPanel from '@/components/StatusPanel'
+import IconButton from '@/components/IconButton'
 import { formatLocalDateOnly } from '@/lib/dateOnly'
 import type { CompletedExerciseRow, EntryComparisons, ExerciseCategory } from '@/lib/completedExercises'
 import {
@@ -346,7 +347,7 @@ export default function CompletedExercisesClient({
                 <Accordion.Trigger className={styles.CompletedExercisesFiltersTrigger}>
                   Filters
                   <span className={styles.CompletedExercisesFiltersTriggerIcon} aria-hidden="true">
-                    ▾
+                    <ChevronDown size={14} strokeWidth={2} aria-hidden="true" />
                   </span>
                 </Accordion.Trigger>
               </Accordion.Header>
@@ -407,27 +408,27 @@ export default function CompletedExercisesClient({
           </Accordion.Root>
 
           <div className={styles.CompletedExercisesCompactWeekBar}>
-            <button
-              type="button"
+            <IconButton
               className={styles.CompletedExercisesWeekIconButton}
+              icon={ChevronLeft}
+              iconSize={14}
+              iconStrokeWidth={2.2}
               onClick={() => shiftDateRangeByWeek(-1)}
               aria-label="Previous week"
               disabled={!hasDateRange}
-            >
-              <ChevronLeft size={14} strokeWidth={2.2} aria-hidden="true" />
-            </button>
+            />
             <p className={styles.CompletedExercisesWeekRange}>
               {hasDateRange ? formatDateRange(dateFrom, dateTo) : 'Loading date range...'}
             </p>
-            <button
-              type="button"
+            <IconButton
               className={styles.CompletedExercisesWeekIconButton}
+              icon={ChevronRight}
+              iconSize={14}
+              iconStrokeWidth={2.2}
               onClick={() => shiftDateRangeByWeek(1)}
               aria-label="Next week"
               disabled={!hasDateRange}
-            >
-              <ChevronRight size={14} strokeWidth={2.2} aria-hidden="true" />
-            </button>
+            />
           </div>
         </div>
 

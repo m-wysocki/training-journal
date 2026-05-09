@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { LogOut, Settings, User as UserIcon } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import ButtonSquare from '@/components/ButtonSquare'
+import IconButton from '@/components/IconButton'
 import { signOut } from '@/components/authActions'
 import styles from './AuthButton.module.scss'
 
@@ -58,15 +58,16 @@ export default function AuthButton({ user, onUserChange }: AuthButtonProps) {
   if (user) {
     return (
       <div className={styles.AuthButton} ref={menuRef}>
-        <ButtonSquare
+        <IconButton
           type="button"
           aria-label="Open account menu"
           aria-expanded={menuOpen}
           aria-haspopup="menu"
           onClick={() => setMenuOpen((isOpen) => !isOpen)}
-        >
-          <UserIcon size={18} strokeWidth={1.8} aria-hidden="true" />
-        </ButtonSquare>
+          icon={UserIcon}
+          iconSize={18}
+          iconStrokeWidth={1.8}
+        />
 
         {menuOpen ? (
           <div className={styles.AuthButtonMenuPanel} role="menu">
@@ -100,11 +101,6 @@ export default function AuthButton({ user, onUserChange }: AuthButtonProps) {
   }
 
   return (
-    <ButtonSquare
-      href="/login"
-      aria-label="Sign in"
-    >
-      <UserIcon size={18} strokeWidth={1.8} aria-hidden="true" />
-    </ButtonSquare>
+    <IconButton href="/login" aria-label="Sign in" icon={UserIcon} iconSize={18} iconStrokeWidth={1.8} />
   )
 }

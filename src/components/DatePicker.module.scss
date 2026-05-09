@@ -38,9 +38,16 @@
   }
 
   &TriggerIcon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     flex: 0 0 auto;
     color: var(--text-soft);
-    font-size: 0.875rem;
+    line-height: 0;
+  }
+
+  &TriggerIcon :global(svg) {
+    display: block;
   }
 
   &Content {

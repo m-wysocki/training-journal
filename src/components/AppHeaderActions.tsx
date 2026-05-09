@@ -3,7 +3,7 @@
 import { Plus } from 'lucide-react'
 import { useState } from 'react'
 import AuthButton, { type AuthButtonUser } from '@/components/AuthButton'
-import ButtonSquare from '@/components/ButtonSquare'
+import IconButton from '@/components/IconButton'
 
 type AppHeaderActionsProps = {
   initialUser: AuthButtonUser | null
@@ -14,9 +14,7 @@ export default function AppHeaderActions({ initialUser }: AppHeaderActionsProps)
 
   return (
     <>
-      <ButtonSquare href="/completed-exercises/new" aria-label="Log exercise">
-        <Plus size={20} strokeWidth={2} aria-hidden="true" />
-      </ButtonSquare>
+      <IconButton href="/completed-exercises/new" aria-label="Log exercise" icon={Plus} iconSize={20} iconStrokeWidth={2} />
       <AuthButton user={user} onUserChange={setUser} />
     </>
   )

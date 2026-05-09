@@ -2,7 +2,9 @@
 
 import { useMemo, useState } from 'react'
 import * as Popover from '@radix-ui/react-popover'
+import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react'
 import { formatLocalDateOnly, parseDateOnly } from '@/lib/dateOnly'
+import IconButton from './IconButton'
 import styles from './DatePicker.module.scss'
 
 type DatePickerProps = {
@@ -74,30 +76,30 @@ export function DatePicker({ id, value, onChange, className, closeOnSelect = tru
         <button id={id} type="button" className={[styles.DatePickerTrigger, className].filter(Boolean).join(' ')}>
           <span>{formatDateLabel(value)}</span>
           <span className={styles.DatePickerTriggerIcon} aria-hidden="true">
-            ▾
+            <ChevronDown size={14} strokeWidth={2} aria-hidden="true" />
           </span>
         </button>
       </Popover.Trigger>
       <Popover.Portal>
         <Popover.Content className={styles.DatePickerContent} sideOffset={8} align="start">
           <div className={styles.DatePickerHeader}>
-            <button
-              type="button"
+            <IconButton
               className={styles.DatePickerNavButton}
+              icon={ChevronLeft}
+              iconSize={16}
+              iconStrokeWidth={2}
               onClick={() => setVisibleMonth((current) => addMonths(current, -1))}
               aria-label="Previous month"
-            >
-              ‹
-            </button>
+            />
             <div className={styles.DatePickerMonthLabel}>{MONTH_LABEL_FORMATTER.format(visibleMonth)}</div>
-            <button
-              type="button"
+            <IconButton
               className={styles.DatePickerNavButton}
+              icon={ChevronRight}
+              iconSize={16}
+              iconStrokeWidth={2}
               onClick={() => setVisibleMonth((current) => addMonths(current, 1))}
               aria-label="Next month"
-            >
-              ›
-            </button>
+            />
           </div>
 
           <div className={styles.DatePickerWeekDays} aria-hidden="true">

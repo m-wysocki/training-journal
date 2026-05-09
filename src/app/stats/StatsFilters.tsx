@@ -4,7 +4,9 @@ import { useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import * as Accordion from '@radix-ui/react-accordion'
 import { DatePicker } from '@/components/DatePicker'
+import IconButton from '@/components/IconButton'
 import { formatDateRange, shiftWeekRange } from '@/lib/trainingDateRange'
+import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react'
 import styles from './page.module.scss'
 
 type StatsFiltersProps = {
@@ -39,7 +41,7 @@ export default function StatsFilters({ dateFrom, dateTo }: StatsFiltersProps) {
             <Accordion.Trigger className={styles.StatsFiltersTrigger}>
               Filters
               <span className={styles.StatsFiltersTriggerIcon} aria-hidden="true">
-                ▾
+                <ChevronDown size={14} strokeWidth={2} aria-hidden="true" />
               </span>
             </Accordion.Trigger>
           </Accordion.Header>
@@ -63,27 +65,27 @@ export default function StatsFilters({ dateFrom, dateTo }: StatsFiltersProps) {
       </Accordion.Root>
 
       <div className={styles.StatsCompactWeekBar}>
-        <button
-          type="button"
+        <IconButton
           className={styles.StatsWeekIconButton}
+          icon={ChevronLeft}
+          iconSize={14}
+          iconStrokeWidth={2.2}
           onClick={() => shiftDateRangeByWeek(-1)}
           aria-label="Previous week"
           disabled={!hasDateRange}
-        >
-          ‹
-        </button>
+        />
         <p className={styles.StatsWeekRange}>
           {hasDateRange ? formatDateRange(dateFrom, dateTo) : 'Loading date range...'}
         </p>
-        <button
-          type="button"
+        <IconButton
           className={styles.StatsWeekIconButton}
+          icon={ChevronRight}
+          iconSize={14}
+          iconStrokeWidth={2.2}
           onClick={() => shiftDateRangeByWeek(1)}
           aria-label="Next week"
           disabled={!hasDateRange}
-        >
-          ›
-        </button>
+        />
       </div>
     </div>
   )

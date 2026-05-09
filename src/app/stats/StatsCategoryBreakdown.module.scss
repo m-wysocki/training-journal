@@ -88,9 +88,17 @@
   }
 
   &BreakdownTriggerIcon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     flex: 0 0 auto;
     color: var(--text-soft);
+    line-height: 0;
     transition: transform 160ms ease;
+  }
+
+  &BreakdownTriggerIcon :global(svg) {
+    display: block;
   }
 
   &BreakdownTrigger[data-state='open'] &BreakdownTriggerIcon {

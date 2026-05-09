@@ -1,10 +1,18 @@
 .BackLink {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
   margin-bottom: 1rem;
   font-family: Quicksand, var(--font-geist-sans), Arial, Helvetica, sans-serif;
   font-size: 0.875rem;
   color: var(--tertiary);
+  line-height: 1.2;
   transition: color 0.2s ease;
+
+  :global(svg) {
+    display: block;
+    flex: 0 0 auto;
+  }
 
   &:hover {
     color: var(--primary);
