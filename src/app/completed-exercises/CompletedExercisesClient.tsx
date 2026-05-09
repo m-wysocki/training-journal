@@ -1,14 +1,13 @@
 'use client'
 
-import { ArrowDown, ArrowUp, ClipboardList, Ellipsis } from 'lucide-react'
-import Link from 'next/link'
+import { ArrowDown, ArrowUp, ClipboardList } from 'lucide-react'
 import { useMemo, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import * as Accordion from '@radix-ui/react-accordion'
 import * as Dialog from '@radix-ui/react-dialog'
-import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import { DatePicker } from '@/components/DatePicker'
 import LoadingSkeleton from '@/components/LoadingSkeleton'
+import OverflowMenu from '@/components/OverflowMenu'
 import PageContainer from '@/components/PageContainer'
 import PageHeader from '@/components/PageHeader'
 import StatusPanel from '@/components/StatusPanel'
@@ -457,29 +456,16 @@ export default function CompletedExercisesClient({
                   <section key={`${group.date}-${exerciseCategory.name}`} className={styles.CompletedExercisesExerciseCategorySection}>
                     <div className={styles.CompletedExercisesExerciseCategoryHeader}>
                       <h3 className={styles.CompletedExercisesExerciseCategoryHeading}>{exerciseCategory.name}</h3>
-                      <DropdownMenu.Root>
-                        <DropdownMenu.Trigger asChild>
-                          <button
-                            type="button"
-                            className={styles.CompletedExercisesMenuTrigger}
-                            aria-label={`Options for ${exerciseCategory.name}`}
-                          >
-                            <Ellipsis size={16} strokeWidth={2} className={styles.CompletedExercisesMenuIcon} aria-hidden="true" />
-                          </button>
-                        </DropdownMenu.Trigger>
-                        <DropdownMenu.Portal>
-                          <DropdownMenu.Content className={styles.CompletedExercisesMenuContent} align="end">
-                            <DropdownMenu.Item
-                              className={styles.CompletedExercisesMenuItem}
-                              onSelect={() =>
-                                openCopyCategory(group.date, exerciseCategory.name, exerciseCategory.entries)
-                              }
-                            >
-                              Copy to another date
-                            </DropdownMenu.Item>
-                          </DropdownMenu.Content>
-                        </DropdownMenu.Portal>
-                      </DropdownMenu.Root>
+                      <OverflowMenu
+                        ariaLabel={`Options for ${exerciseCategory.name}`}
+                        items={[
+                          {
+                            key: 'copy',
+                            label: 'Copy to another date',
+                            onSelect: () => openCopyCategory(group.date, exerciseCategory.name, exerciseCategory.entries),
+                          },
+                        ]}
+                      />
                     </div>
                     <ul className={styles.CompletedExercisesEntriesList}>
                       {exerciseCategory.entries.map((entry) => (
@@ -520,31 +506,22 @@ export default function CompletedExercisesClient({
                               ) : null}
                             </div>
 
-                            <DropdownMenu.Root>
-                            <DropdownMenu.Trigger asChild>
-                              <button type="button" className={styles.CompletedExercisesMenuTrigger} aria-label="Opcje">
-                                <Ellipsis size={16} strokeWidth={2} className={styles.CompletedExercisesMenuIcon} aria-hidden="true" />
-                              </button>
-                            </DropdownMenu.Trigger>
-                              <DropdownMenu.Portal>
-                                <DropdownMenu.Content className={styles.CompletedExercisesMenuContent} align="end">
-                                  <DropdownMenu.Item asChild>
-                                    <Link
-                                      href={`/completed-exercises/${entry.id}/edit`}
-                                      className={styles.CompletedExercisesMenuItem}
-                                    >
-                                      Edit
-                                    </Link>
-                                  </DropdownMenu.Item>
-                                  <DropdownMenu.Item
-                                    className={styles.CompletedExercisesMenuItemDanger}
-                                    onSelect={() => openDelete(entry.id)}
-                                  >
-                                    Delete
-                                  </DropdownMenu.Item>
-                                </DropdownMenu.Content>
-                              </DropdownMenu.Portal>
-                            </DropdownMenu.Root>
+                            <OverflowMenu
+                              ariaLabel={`Options for ${entry.exercise?.name || 'exercise entry'}`}
+                              items={[
+                                {
+                                  key: 'edit',
+                                  label: 'Edit',
+                                  href: `/completed-exercises/${entry.id}/edit`,
+                                },
+                                {
+                                  key: 'delete',
+                                  label: 'Delete',
+                                  danger: true,
+                                  onSelect: () => openDelete(entry.id),
+                                },
+                              ]}
+                            />
                           </div>
                         </li>
                       ))}

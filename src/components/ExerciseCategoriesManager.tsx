@@ -1,9 +1,8 @@
 'use client'
 
-import { Ellipsis, Tags } from 'lucide-react'
+import { Tags } from 'lucide-react'
 import { useState } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
-import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import Link from 'next/link'
 import {
   addExerciseCategory,
@@ -11,6 +10,7 @@ import {
   updateExerciseCategory,
 } from '@/lib/actions/exerciseSetupActions'
 import LoadingSkeleton from '@/components/LoadingSkeleton'
+import OverflowMenu from '@/components/OverflowMenu'
 import StatusPanel from '@/components/StatusPanel'
 import styles from './ExerciseCategoriesManager.module.scss'
 
@@ -198,30 +198,23 @@ export default function ExerciseCategoriesManager({
                 {category.name}
               </Link>
 
-              <DropdownMenu.Root>
-                <DropdownMenu.Trigger asChild>
-                  <button type="button" className={styles.ExerciseCategoriesManagerMenuTrigger} aria-label="Options">
-                    <Ellipsis size={16} strokeWidth={2} className={styles.ExerciseCategoriesManagerMenuIcon} aria-hidden="true" />
-                  </button>
-                </DropdownMenu.Trigger>
-                <DropdownMenu.Portal>
-                  <DropdownMenu.Content className={styles.ExerciseCategoriesManagerMenuContent}>
-                    <DropdownMenu.Item
-                      className={styles.ExerciseCategoriesManagerMenuItem}
-                      onSelect={() => openEditCategory(category)}
-                    >
-                      Edit
-                    </DropdownMenu.Item>
-                    <DropdownMenu.Item
-                      className={styles.ExerciseCategoriesManagerMenuItemDanger}
-                      disabled={deletingCategoryId === category.id}
-                      onSelect={() => deleteCategory(category.id)}
-                    >
-                      {deletingCategoryId === category.id ? 'Deleting...' : 'Delete'}
-                    </DropdownMenu.Item>
-                  </DropdownMenu.Content>
-                </DropdownMenu.Portal>
-              </DropdownMenu.Root>
+              <OverflowMenu
+                ariaLabel={`Options for ${category.name}`}
+                items={[
+                  {
+                    key: 'edit',
+                    label: 'Edit',
+                    onSelect: () => openEditCategory(category),
+                  },
+                  {
+                    key: 'delete',
+                    label: deletingCategoryId === category.id ? 'Deleting...' : 'Delete',
+                    danger: true,
+                    disabled: deletingCategoryId === category.id,
+                    onSelect: () => deleteCategory(category.id),
+                  },
+                ]}
+              />
             </li>
           ))}
         </ul>

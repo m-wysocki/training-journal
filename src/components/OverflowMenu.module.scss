@@ -1,0 +1,65 @@
+.OverflowMenu {
+  &Trigger {
+    flex-shrink: 0;
+    padding: 0.375rem;
+    border: 0;
+    border-radius: 0.5rem;
+    background: transparent;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  &Trigger:hover {
+    background: var(--surface-border);
+  }
+
+  &Icon {
+    color: var(--tertiary);
+  }
+
+  &Content {
+    min-width: 10.5rem;
+    border: 1px solid var(--surface-border);
+    border-radius: 0.75rem;
+    background: var(--surface);
+    padding: 0.25rem;
+    box-shadow: var(--soft-shadow);
+    z-index: 50;
+  }
+
+  &Item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    min-height: 2rem;
+    box-sizing: border-box;
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    font: inherit;
+    font-size: 0.875rem;
+    text-align: left;
+    color: var(--foreground);
+    cursor: pointer;
+    outline: none;
+  }
+
+  &Item:hover,
+  &Item:focus-visible {
+    background: var(--surface-mid);
+  }
+
+  &ItemDanger {
+    color: var(--state-error-text);
+  }
+
+  &ItemDanger:hover,
+  &ItemDanger:focus-visible {
+    background: var(--state-error-bg);
+  }
+
+  &Item[data-disabled] {
+    opacity: 0.65;
+    pointer-events: none;
+  }
+}
+

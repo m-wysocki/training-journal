@@ -1,10 +1,9 @@
 'use client'
 
-import { Ellipsis } from 'lucide-react'
 import { useState } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
-import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import BackLink from '@/components/BackLink'
+import OverflowMenu from '@/components/OverflowMenu'
 import PageContainer from '@/components/PageContainer'
 import StatusPanel from '@/components/StatusPanel'
 import {
@@ -182,33 +181,23 @@ export default function ExerciseCategoryClient({
                 <span className={styles.ExerciseCategoryExerciseName}>
                   {exercise.name}
                 </span>
-                <DropdownMenu.Root>
-                  <DropdownMenu.Trigger asChild>
-                    <button
-                      className={styles.ExerciseCategoryMenuTrigger}
-                      aria-label="Options"
-                    >
-                      <Ellipsis size={16} strokeWidth={2} className={styles.ExerciseCategoryMenuIcon} aria-hidden="true" />
-                    </button>
-                  </DropdownMenu.Trigger>
-                  <DropdownMenu.Portal>
-                    <DropdownMenu.Content className={styles.ExerciseCategoryMenuContent}>
-                      <DropdownMenu.Item
-                        className={styles.ExerciseCategoryMenuItem}
-                        onSelect={() => openEditExercise(exercise)}
-                      >
-                        Edit
-                      </DropdownMenu.Item>
-                      <DropdownMenu.Item
-                        className={styles.ExerciseCategoryMenuItemDanger}
-                        disabled={deletingExerciseId === exercise.id}
-                        onSelect={() => deleteExercise(exercise.id)}
-                      >
-                        {deletingExerciseId === exercise.id ? 'Deleting...' : 'Delete'}
-                      </DropdownMenu.Item>
-                    </DropdownMenu.Content>
-                  </DropdownMenu.Portal>
-                </DropdownMenu.Root>
+                <OverflowMenu
+                  ariaLabel={`Options for ${exercise.name}`}
+                  items={[
+                    {
+                      key: 'edit',
+                      label: 'Edit',
+                      onSelect: () => openEditExercise(exercise),
+                    },
+                    {
+                      key: 'delete',
+                      label: deletingExerciseId === exercise.id ? 'Deleting...' : 'Delete',
+                      danger: true,
+                      disabled: deletingExerciseId === exercise.id,
+                      onSelect: () => deleteExercise(exercise.id),
+                    },
+                  ]}
+                />
               </li>
             ))}
           </ul>
