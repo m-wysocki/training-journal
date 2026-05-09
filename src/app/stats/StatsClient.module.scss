@@ -1,0 +1,68 @@
+.Stats {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-block: 2rem;
+
+  &Container {
+    width: 100%;
+  }
+
+  &Grid {
+    display: grid;
+    gap: 1rem;
+  }
+
+  &SummaryCard {
+    padding: 1rem;
+  }
+
+  &CardLabel {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--text-soft);
+  }
+
+  &PrimaryStat {
+    margin: 0.5rem 0 0;
+    font-size: 2.25rem;
+    font-weight: 400;
+    color: var(--foreground);
+  }
+
+  &CardHint {
+    margin: 0.5rem 0 0;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+  }
+
+  &BreakdownCard {
+    padding: 1rem;
+  }
+
+  &BreakdownHeader {
+    display: grid;
+    gap: 0.25rem;
+    margin-bottom: 1rem;
+  }
+
+  &BreakdownTitle {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--foreground);
+  }
+
+  &BreakdownDescription {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+  }
+
+  @media (max-width: 640px) {
+    & {
+      padding-block: 1rem;
+    }
+  }
+}

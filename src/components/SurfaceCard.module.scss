@@ -1,0 +1,10 @@
+.SurfaceCard {
+  border: 0;
+  border-radius: 1rem;
+  background: var(--surface-low);
+  box-shadow: var(--soft-shadow);
+
+  &ToneMid {
+    background: var(--surface-mid);
+  }
+}

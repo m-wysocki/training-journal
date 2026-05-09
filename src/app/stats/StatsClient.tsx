@@ -1,96 +1,25 @@
 'use client'
 
 import { BarChart3 } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import LoadingSkeleton from '@/components/LoadingSkeleton'
 import PageContainer from '@/components/PageContainer'
 import PageHeader from '@/components/PageHeader'
 import StatusPanel from '@/components/StatusPanel'
-import type { WeeklyEntry } from '@/lib/supabase/trainingData'
-import { loadStatsEntries } from './actions'
-import StatsCategoryBreakdown, { type ExerciseCategoryStat } from './StatsCategoryBreakdown'
+import SurfaceCard from '@/components/SurfaceCard'
+import StatsCategoryBreakdown from './StatsCategoryBreakdown'
+import { getExerciseCategoryStats } from './helpers/stats'
+import { useStatsEntries } from './hooks/useStatsEntries'
 import StatsFilters from './StatsFilters'
-import styles from './page.module.scss'
+import styles from './StatsClient.module.scss'
 
 type StatsClientProps = {
   dateFrom: string
   dateTo: string
 }
 
-const getStatsRangeKey = (dateFrom: string, dateTo: string) => `${dateFrom}:${dateTo}`
-
-const getEarliestTrainingDate = (trainingDates: string[]) => trainingDates[trainingDates.length - 1] || ''
-
-const getExerciseCategoryStats = (entries: WeeklyEntry[]): ExerciseCategoryStat[] => {
-  const groups = new Map<string, Set<string>>()
-
-  entries.forEach((entry) => {
-    const exerciseCategoryName = entry.exercise?.exercise_category?.name || 'Unknown exercise category'
-    const current = groups.get(exerciseCategoryName) || new Set<string>()
-    current.add(entry.performed_at)
-    groups.set(exerciseCategoryName, current)
-  })
-
-  return Array.from(groups.entries())
-    .map(([name, trainingDates]) => ({
-      name,
-      trainingDays: trainingDates.size,
-      trainingDates: Array.from(trainingDates).sort((a, b) => b.localeCompare(a)),
-    }))
-    .sort(
-      (a, b) =>
-        b.trainingDays - a.trainingDays ||
-        getEarliestTrainingDate(a.trainingDates).localeCompare(getEarliestTrainingDate(b.trainingDates)) ||
-        a.name.localeCompare(b.name),
-    )
-}
-
-const loadStatsPayload = async (dateFrom: string, dateTo: string) => {
-  const { data, error } = await loadStatsEntries(dateFrom, dateTo)
-
-  if (error || !data) {
-    throw new Error(error || 'Could not load statistics for the selected date range.')
-  }
-
-  return data
-}
-
 export default function StatsClient({ dateFrom, dateTo }: StatsClientProps) {
-  const [entries, setEntries] = useState<WeeklyEntry[]>([])
-  const [errorMessage, setErrorMessage] = useState('')
-  const [loadedRangeKey, setLoadedRangeKey] = useState('')
-  const currentRangeKey = getStatsRangeKey(dateFrom, dateTo)
-  const isLoading = loadedRangeKey !== currentRangeKey
-
-  useEffect(() => {
-    let isActive = true
-
-    if (!dateFrom || !dateTo) {
-      return () => {
-        isActive = false
-      }
-    }
-
-    loadStatsPayload(dateFrom, dateTo)
-      .then((nextEntries) => {
-        if (!isActive) return
-
-        setEntries(nextEntries)
-        setErrorMessage('')
-        setLoadedRangeKey(currentRangeKey)
-      })
-      .catch((error: Error) => {
-        if (!isActive) return
-
-        setEntries([])
-        setErrorMessage(error.message)
-        setLoadedRangeKey(currentRangeKey)
-      })
-
-    return () => {
-      isActive = false
-    }
-  }, [dateFrom, dateTo, currentRangeKey])
+  const { entries, errorMessage, isLoading } = useStatsEntries(dateFrom, dateTo)
 
   const workoutDaysCount = useMemo(
     () => new Set(entries.map((entry) => entry.performed_at)).size,
@@ -123,13 +52,13 @@ export default function StatsClient({ dateFrom, dateTo }: StatsClientProps) {
 
         {!errorMessage && !isLoading && (
           <div className={styles.StatsGrid}>
-            <section className={styles.StatsSummaryCard}>
+            <SurfaceCard as="section" className={styles.StatsSummaryCard}>
               <p className={styles.StatsCardLabel}>Workout Days</p>
               <p className={styles.StatsPrimaryStat}>{workoutDaysCount}</p>
               <p className={styles.StatsCardHint}>Number of days you trained during the selected date range.</p>
-            </section>
+            </SurfaceCard>
 
-            <section className={styles.StatsBreakdownCard}>
+            <SurfaceCard as="section" className={styles.StatsBreakdownCard}>
               <div className={styles.StatsBreakdownHeader}>
                 <h2 className={styles.StatsBreakdownTitle}>Exercise Category Frequency</h2>
                 <p className={styles.StatsBreakdownDescription}>
@@ -138,7 +67,7 @@ export default function StatsClient({ dateFrom, dateTo }: StatsClientProps) {
               </div>
 
               <StatsCategoryBreakdown stats={exerciseCategoryStats} />
-            </section>
+            </SurfaceCard>
           </div>
         )}
       </PageContainer>

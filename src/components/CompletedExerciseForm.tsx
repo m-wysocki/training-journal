@@ -11,6 +11,7 @@ import { PaceStepper } from '@/components/PaceStepper'
 import PageContainer from '@/components/PageContainer'
 import PageHeader from '@/components/PageHeader'
 import StatusPanel from '@/components/StatusPanel'
+import SurfaceCard from '@/components/SurfaceCard'
 import { loadRecentCompletedExercises } from '@/app/completed-exercises/actions'
 import {
   addExercise,
@@ -517,7 +518,7 @@ export function CompletedExerciseForm({
         />
 
         <form onSubmit={handleSubmit} className={styles.CompletedExerciseFormForm}>
-          <section className={styles.CompletedExerciseFormSection}>
+          <SurfaceCard as="section" className={styles.CompletedExerciseFormSection}>
             <div className={styles.CompletedExerciseFormSectionHeader}>
               <h2 className={styles.CompletedExerciseFormSectionTitle}>Exercise</h2>
               <p className={styles.CompletedExerciseFormSectionDescription}>
@@ -687,10 +688,10 @@ export function CompletedExerciseForm({
                 </div>
               </div>
             </div>
-          </section>
+          </SurfaceCard>
 
           {selectedExercise ? (
-            <section className={styles.CompletedExerciseFormSection}>
+            <SurfaceCard as="section" className={styles.CompletedExerciseFormSection}>
               <div className={styles.CompletedExerciseFormSectionHeader}>
                 <h2 className={styles.CompletedExerciseFormSectionTitle}>Workout Details</h2>
                 <p className={styles.CompletedExerciseFormSectionDescription}>
@@ -892,11 +893,11 @@ export function CompletedExerciseForm({
                 </div>
                 )}
               </div>
-            </section>
+            </SurfaceCard>
           ) : null}
 
           {selectedExercise ? (
-            <section className={styles.CompletedExerciseFormSection}>
+            <SurfaceCard as="section" className={styles.CompletedExerciseFormSection}>
               <div className={styles.CompletedExerciseFormSectionHeader}>
                 <h2 className={styles.CompletedExerciseFormSectionTitle}>Notes</h2>
                 <p className={styles.CompletedExerciseFormSectionDescription}>
@@ -926,7 +927,7 @@ export function CompletedExerciseForm({
                   placeholder="Optional: how the workout felt, notes, observations..."
                 />
               </div>
-            </section>
+            </SurfaceCard>
           ) : null}
 
           <div className={styles.CompletedExerciseFormFormFooter}>

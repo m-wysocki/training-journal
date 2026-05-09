@@ -3,14 +3,10 @@
 import * as Accordion from '@radix-ui/react-accordion'
 import { ChevronDown, ChevronsDownUp, ChevronsUpDown } from 'lucide-react'
 import { useMemo, useState } from 'react'
+import SurfaceCard from '@/components/SurfaceCard'
 import { formatWeekdayDate } from '@/lib/trainingFormatters'
+import type { ExerciseCategoryStat } from './helpers/types'
 import styles from './StatsCategoryBreakdown.module.scss'
-
-export type ExerciseCategoryStat = {
-  name: string
-  trainingDays: number
-  trainingDates: string[]
-}
 
 type StatsCategoryBreakdownProps = {
   stats: ExerciseCategoryStat[]
@@ -49,7 +45,7 @@ export default function StatsCategoryBreakdown({ stats }: StatsCategoryBreakdown
         <ul>
           {stats.map((stat) => (
             <Accordion.Item key={stat.name} value={stat.name} className={styles.StatsCategoryBreakdownBreakdownItem} asChild>
-              <li>
+              <SurfaceCard as="li">
                 <Accordion.Header className={styles.StatsCategoryBreakdownBreakdownItemHeader}>
                   <Accordion.Trigger className={styles.StatsCategoryBreakdownBreakdownTrigger}>
                     <span className={styles.StatsCategoryBreakdownExerciseCategoryName}>{stat.name}</span>
@@ -75,7 +71,7 @@ export default function StatsCategoryBreakdown({ stats }: StatsCategoryBreakdown
                     ))}
                   </ul>
                 </Accordion.Content>
-              </li>
+              </SurfaceCard>
             </Accordion.Item>
           ))}
         </ul>

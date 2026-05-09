@@ -2,14 +2,6 @@
   display: grid;
   gap: 1rem;
   padding: 1.5rem;
-  border: 0;
-  border-radius: 1rem;
-  background: var(--surface-low);
-  box-shadow: var(--soft-shadow);
-
-  &Muted {
-    background: var(--surface-mid);
-  }
 
   &Title {
     margin: 0;
