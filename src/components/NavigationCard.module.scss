@@ -1,17 +1,18 @@
 .NavigationCard {
   display: block;
-  padding: 1rem;
-  border: 1px solid var(--card-border);
-  border-radius: 0.375rem;
-  background: var(--card-bg);
+  padding: 1.25rem;
+  border: 0;
+  border-radius: 1rem;
+  background: var(--surface-low);
+  box-shadow: var(--soft-shadow);
   transition: background-color 0.2s ease;
 
   &:hover {
-    background: var(--card-hover);
+    background: var(--surface-mid);
   }
 
   &:hover &ArrowIcon {
-    color: #2c5f7c;
+    color: var(--primary);
   }
 
   &Inner {
@@ -24,7 +25,7 @@
   &Content {
     display: flex;
     align-items: center;
-    gap: 0.875rem;
+    gap: 1rem;
     min-width: 0;
   }
 
@@ -33,29 +34,49 @@
     flex: 0 0 auto;
     align-items: center;
     justify-content: center;
-    width: 2.5rem;
-    height: 2.5rem;
-    border-radius: 0.75rem;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 0.875rem;
     color: var(--primary);
-    background: color-mix(in srgb, var(--primary) 10%, white);
+    background: var(--icon-sage-bg);
+  }
+
+  &IconToneSage {
+    background: var(--icon-sage-bg);
+    color: var(--primary);
+  }
+
+  &IconToneSand {
+    background: var(--icon-sand-bg);
+    color: var(--secondary);
+  }
+
+  &IconToneMist {
+    background: var(--icon-mist-bg);
+    color: var(--tertiary);
   }
 
   &Title {
     margin: 0;
-    font-size: 1.125rem;
-    font-weight: 500;
-    color: #000;
+    font-family: Quicksand, var(--font-geist-sans), Arial, Helvetica, sans-serif;
+    font-size: 1.25rem;
+    font-weight: 400;
+    line-height: 1.4;
+    letter-spacing: 0;
+    color: var(--foreground);
   }
 
   &Description {
-    margin: 0.25rem 0 0;
-    font-size: 0.875rem;
-    color: #4b5563;
+    margin: 0.3rem 0 0;
+    font-family: Quicksand, var(--font-geist-sans), Arial, Helvetica, sans-serif;
+    font-size: 0.95rem;
+    line-height: 1.45;
+    color: var(--text-muted);
   }
 
   &ArrowIcon {
     flex: 0 0 auto;
-    color: var(--primary);
+    color: var(--tertiary);
     transition: color 0.2s ease;
   }
 }

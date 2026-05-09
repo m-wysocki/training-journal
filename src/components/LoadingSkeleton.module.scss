@@ -6,7 +6,7 @@
     display: block;
     min-width: 0;
     border-radius: 0.5rem;
-    background: linear-gradient(90deg, #eef2f5 0%, #f8fafc 50%, #eef2f5 100%);
+    background: linear-gradient(90deg, var(--skeleton-start) 0%, var(--skeleton-mid) 50%, var(--skeleton-start) 100%);
     background-size: 200% 100%;
     animation: LoadingSkeletonPulse 1.2s ease-in-out infinite;
   }

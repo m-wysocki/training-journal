@@ -9,6 +9,12 @@ type NavigationCardProps = {
   description: string
   icon?: LucideIcon
   prefetch?: boolean | null
+  className?: string
+  titleClassName?: string
+  descriptionClassName?: string
+  iconClassName?: string
+  arrowClassName?: string
+  iconTone?: 'sage' | 'sand' | 'mist'
 }
 
 export default function NavigationCard({
@@ -17,22 +23,48 @@ export default function NavigationCard({
   description,
   icon: Icon,
   prefetch,
+  className,
+  titleClassName,
+  descriptionClassName,
+  iconClassName,
+  arrowClassName,
+  iconTone = 'sage',
 }: NavigationCardProps) {
+  const iconToneClassName = {
+    sage: styles.NavigationCardIconToneSage,
+    sand: styles.NavigationCardIconToneSand,
+    mist: styles.NavigationCardIconToneMist,
+  }[iconTone]
+
   return (
-    <Link href={href} prefetch={prefetch} className={styles.NavigationCard}>
+    <Link
+      href={href}
+      prefetch={prefetch}
+      className={[styles.NavigationCard, className].filter(Boolean).join(' ')}
+    >
       <div className={styles.NavigationCardInner}>
         <div className={styles.NavigationCardContent}>
           {Icon ? (
-            <div className={styles.NavigationCardIcon} aria-hidden="true">
+            <div
+              className={[styles.NavigationCardIcon, iconToneClassName, iconClassName].filter(Boolean).join(' ')}
+              aria-hidden="true"
+            >
               <Icon size={20} strokeWidth={1.9} />
             </div>
           ) : null}
           <div>
-            <h2 className={styles.NavigationCardTitle}>{title}</h2>
-            <p className={styles.NavigationCardDescription}>{description}</p>
+            <h2 className={[styles.NavigationCardTitle, titleClassName].filter(Boolean).join(' ')}>{title}</h2>
+            <p className={[styles.NavigationCardDescription, descriptionClassName].filter(Boolean).join(' ')}>
+              {description}
+            </p>
           </div>
         </div>
-        <ChevronRight size={20} strokeWidth={2} className={styles.NavigationCardArrowIcon} aria-hidden="true" />
+        <ChevronRight
+          size={20}
+          strokeWidth={2}
+          className={[styles.NavigationCardArrowIcon, arrowClassName].filter(Boolean).join(' ')}
+          aria-hidden="true"
+        />
       </div>
     </Link>
   )

@@ -14,14 +14,14 @@
     margin: 0;
     font-size: 2.25rem;
     font-weight: 300;
-    color: #000;
+    color: var(--foreground);
   }
 
   &Description {
     margin: 0.5rem 0 0;
     max-width: 42rem;
     font-size: 1rem;
-    color: #6b7280;
+    color: var(--text-muted);
   }
 }
 

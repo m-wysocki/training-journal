@@ -11,6 +11,10 @@ type AccessPanelProps = {
   description: string
   action?: AccessPanelAction
   variant?: 'default' | 'muted'
+  className?: string
+  titleClassName?: string
+  descriptionClassName?: string
+  actionClassName?: string
 }
 
 export default function AccessPanel({
@@ -18,18 +22,25 @@ export default function AccessPanel({
   description,
   action,
   variant = 'default',
+  className,
+  titleClassName,
+  descriptionClassName,
+  actionClassName,
 }: AccessPanelProps) {
   const panelClassName = [
     styles.AccessPanel,
     variant === 'muted' ? styles.AccessPanelMuted : '',
+    className ?? '',
   ].filter(Boolean).join(' ')
 
   return (
     <section className={panelClassName}>
-      <h2 className={styles.AccessPanelTitle}>{title}</h2>
-      <p className={styles.AccessPanelDescription}>{description}</p>
+      <h2 className={[styles.AccessPanelTitle, titleClassName].filter(Boolean).join(' ')}>{title}</h2>
+      <p className={[styles.AccessPanelDescription, descriptionClassName].filter(Boolean).join(' ')}>
+        {description}
+      </p>
       {action ? (
-        <Link href={action.href} className={styles.AccessPanelAction}>
+        <Link href={action.href} className={[styles.AccessPanelAction, actionClassName].filter(Boolean).join(' ')}>
           {action.label}
         </Link>
       ) : null}

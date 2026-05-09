@@ -9,18 +9,18 @@
     z-index: 20;
     width: min(16rem, calc(100vw - 2rem));
     padding: 0.375rem;
-    border: 1px solid #d1d5db;
-    border-radius: 0.5rem;
-    background: #fff;
-    box-shadow: 0 12px 30px rgb(0 0 0 / 12%);
+    border: 1px solid var(--surface-border);
+    border-radius: 0.75rem;
+    background: var(--surface);
+    box-shadow: var(--soft-shadow);
   }
 
   &MenuEmail {
     overflow: hidden;
     padding: 0.625rem 0.75rem;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid var(--surface-border);
     font-size: 0.8125rem;
-    color: #4b5563;
+    color: var(--text-muted);
     text-overflow: ellipsis;
     white-space: nowrap;
   }
@@ -35,24 +35,24 @@
     border-radius: 0.375rem;
     font-size: 0.875rem;
     font-weight: 400;
-    color: #111827;
+    color: var(--foreground);
     background: transparent;
     cursor: pointer;
     text-decoration: none;
   }
 
   &MenuItemPrimary {
-    font-weight: 700;
+    font-weight: 500;
   }
 
   &MenuIcon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: #6b7280;
+    color: var(--text-soft);
   }
 
   &MenuItem:hover {
-    background: #f3f4f6;
+    background: var(--surface-mid);
   }
 }

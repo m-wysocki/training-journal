@@ -1,6 +1,6 @@
 .RootLayout {
   &PageRoot {
     min-height: 100vh;
-    background: #fff;
+    background: var(--background);
   }
 }

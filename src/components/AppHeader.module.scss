@@ -1,5 +1,7 @@
 .AppHeader {
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--surface-border);
+  background: color-mix(in srgb, var(--surface) 60%, var(--on-primary));
+  backdrop-filter: blur(12px);
 
   &Inner {
     display: flex;

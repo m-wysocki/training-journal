@@ -16,25 +16,25 @@
     display: inline-block;
     margin-bottom: 1rem;
     font-size: 0.875rem;
-    color: var(--primary);
+    color: var(--tertiary);
     transition: color 0.2s ease;
   }
 
   &BackLink:hover {
-    color: var(--primary-hover);
+    color: var(--primary);
   }
 
   &Title {
     margin: 0;
     font-size: 1.875rem;
     font-weight: 300;
-    color: #000;
+    color: var(--foreground);
   }
 
   &Description {
     margin-top: 0.5rem;
     font-size: 0.875rem;
-    color: #4b5563;
+    color: var(--text-muted);
   }
 
   &Form {
@@ -50,22 +50,22 @@
   }
 
   &ModeTab {
-    border: 1px solid #d1d5db;
-    border-radius: 0.375rem;
+    border: 1px solid var(--outline);
+    border-radius: 0.5rem;
     padding: 0.625rem 0.75rem;
     font-size: 0.875rem;
-    color: #374151;
-    background: #fff;
+    color: var(--text-muted);
+    background: var(--surface);
     cursor: pointer;
   }
 
   &ModeTab:hover {
-    border-color: #9ca3af;
+    border-color: var(--primary);
   }
 
   &ModeTabActive {
     border-color: var(--primary);
-    color: #fff;
+    color: var(--on-primary);
     background: var(--primary);
   }
 
@@ -74,21 +74,21 @@
     margin-bottom: 0.5rem;
     font-size: 0.875rem;
     font-weight: 500;
-    color: #000;
+    color: var(--foreground);
   }
 
   &Input {
     width: 100%;
     border: 0;
-    border-bottom: 1px solid #d1d5db;
+    border-bottom: 1px solid var(--outline);
     padding: 0.5rem 0;
-    color: #000;
+    color: var(--foreground);
     background: transparent;
     transition: border-color 0.2s ease;
   }
 
   &Input::placeholder {
-    color: #9ca3af;
+    color: var(--text-soft);
   }
 
   &Input:focus {
@@ -104,15 +104,15 @@
   }
 
   &MessageError {
-    background: #fef2f2;
-    color: #dc2626;
-    border-color: #fecaca;
+    background: var(--state-error-bg);
+    color: var(--state-error-text);
+    border-color: var(--state-error-bg);
   }
 
   &MessageSuccess {
-    background: #e8f4f8;
-    color: #2c5f7c;
-    border-color: #b8e0f0;
+    background: var(--state-success-bg);
+    color: var(--state-success-text);
+    border-color: var(--state-success-border);
   }
 
   &Submit {
@@ -120,10 +120,10 @@
     padding: 0.625rem 1.25rem;
     font-size: 0.875rem;
     font-weight: 500;
-    color: #fff;
+    color: var(--on-primary);
     background: var(--primary);
-    border: 1px solid var(--primary-hover);
-    border-radius: 0.375rem;
+    border: 1px solid var(--primary);
+    border-radius: 0.5rem;
     transition: background-color 0.2s ease, opacity 0.2s ease;
     cursor: pointer;
   }

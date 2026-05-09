@@ -18,30 +18,31 @@
     display: grid;
     gap: 1rem;
     padding: 1.25rem;
-    border: 1px solid var(--card-border);
-    border-radius: 0.875rem;
-    background: var(--card-bg);
+    border: 0;
+    border-radius: 1rem;
+    background: var(--surface-low);
+    box-shadow: var(--soft-shadow);
   }
 
   &SectionHeader {
     display: grid;
     gap: 0.25rem;
     padding-bottom: 0.875rem;
-    border-bottom: 1px solid #edf0f3;
+    border-bottom: 1px solid var(--surface-border);
   }
 
   &SectionTitle {
     margin: 0;
     font-size: 1rem;
     font-weight: 500;
-    color: #111827;
+    color: var(--foreground);
   }
 
   &SectionDescription {
     margin: 0;
     font-size: 0.875rem;
     line-height: 1.45;
-    color: #6b7280;
+    color: var(--text-muted);
   }
 
   &RecentHistory {
@@ -49,7 +50,7 @@
     gap: 0.625rem;
     margin-top: 0.875rem;
     padding-top: 0.875rem;
-    border-top: 1px solid #edf0f3;
+    border-top: 1px solid var(--surface-border);
   }
 
   &RecentHistoryTitle {
@@ -58,7 +59,7 @@
     font-weight: 600;
     letter-spacing: 0.02em;
     text-transform: uppercase;
-    color: #374151;
+    color: var(--text-muted);
   }
 
   &RecentHistoryList {
@@ -70,16 +71,16 @@
     display: grid;
     gap: 0.2rem;
     padding: 0.75rem 0.875rem;
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--surface-border);
     border-radius: 0.75rem;
-    background: #fff;
+    background: var(--surface);
   }
 
   &RecentHistoryDate {
     margin: 0;
     font-size: 0.8125rem;
     font-weight: 600;
-    color: #111827;
+    color: var(--foreground);
   }
 
   &RecentHistoryDetails,
@@ -87,7 +88,7 @@
     margin: 0;
     font-size: 0.875rem;
     line-height: 1.45;
-    color: #6b7280;
+    color: var(--text-muted);
   }
 
   &RecentHistorySkeleton {
@@ -99,7 +100,7 @@
   &FormDataSkeleton span {
     height: 2.25rem;
     border-radius: 0.5rem;
-    background: linear-gradient(90deg, #eef2f5 0%, #f8fafc 50%, #eef2f5 100%);
+    background: linear-gradient(90deg, var(--skeleton-start) 0%, var(--skeleton-mid) 50%, var(--skeleton-start) 100%);
     background-size: 200% 100%;
     animation: RecentHistorySkeletonPulse 1.2s ease-in-out infinite;
   }
@@ -117,7 +118,7 @@
 
   &Label {
     font-size: 0.875rem;
-    color: #374151;
+    color: var(--text-muted);
   }
 
   &LabelWithSpacing {
@@ -129,12 +130,12 @@
     width: 100%;
     min-width: 0;
     box-sizing: border-box;
-    border: 1px solid #d1d5db;
-    border-radius: 0.375rem;
+    border: 1px solid var(--outline);
+    border-radius: 0.5rem;
     padding: 0.625rem 0.75rem;
     font-size: 0.875rem;
-    color: #000;
-    background: #fff;
+    color: var(--foreground);
+    background: var(--surface);
   }
 
   &Select {
@@ -185,10 +186,10 @@
     min-height: 2.25rem;
     max-width: 100%;
     padding: 0.5rem 0.75rem;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--outline);
     border-radius: 999px;
-    color: #111827;
-    background: #fff;
+    color: var(--foreground);
+    background: var(--surface);
     font: inherit;
     font-size: 0.875rem;
     line-height: 1.2;
@@ -197,8 +198,8 @@
   }
 
   &ChoiceBadge:hover {
-    border-color: #9ca3af;
-    background: #f9fafb;
+    border-color: var(--primary);
+    background: var(--surface-low);
   }
 
   &ChoiceBadge:focus-visible {
@@ -208,17 +209,17 @@
 
   &ChoiceBadge[data-selected='true'] {
     border-color: var(--primary);
-    color: #fff;
+    color: var(--on-primary);
     background: var(--primary);
   }
 
   &AddBadge {
     min-height: 2.25rem;
     padding: 0.5rem 0.75rem;
-    border: 1px dashed #9ca3af;
+    border: 1px dashed var(--outline);
     border-radius: 999px;
-    color: #374151;
-    background: #f9fafb;
+    color: var(--text-muted);
+    background: var(--surface-low);
     font: inherit;
     font-size: 0.875rem;
     line-height: 1.2;
@@ -228,7 +229,7 @@
   &AddBadge:hover {
     border-color: var(--primary);
     color: var(--primary);
-    background: #fff;
+    background: var(--on-primary);
   }
 
   &AddBadge:focus-visible {
@@ -237,9 +238,9 @@
   }
 
   &AddBadge:disabled {
-    border-color: #d1d5db;
-    color: #9ca3af;
-    background: #f9fafb;
+    border-color: var(--outline);
+    color: var(--text-soft);
+    background: var(--surface-low);
     cursor: not-allowed;
   }
 
@@ -247,11 +248,11 @@
     width: 100%;
     margin: 0;
     padding: 0.75rem 0.875rem;
-    border: 1px dashed #d1d5db;
+    border: 1px dashed var(--outline);
     border-radius: 0.75rem;
     font-size: 0.875rem;
-    color: #6b7280;
-    background: #fff;
+    color: var(--text-muted);
+    background: var(--surface);
   }
 
   &Input:focus,
@@ -268,8 +269,8 @@
   }
 
   &Select:disabled {
-    background: #f9fafb;
-    color: #9ca3af;
+    background: var(--surface-low);
+    color: var(--text-soft);
   }
 
   &Field {
@@ -289,7 +290,7 @@
     align-items: center;
     gap: 0.45rem;
     font-size: 0.8125rem;
-    color: #4b5563;
+    color: var(--text-muted);
   }
 
   &CheckboxRow input {
@@ -298,30 +299,30 @@
 
   &EmptyValue {
     padding: 0.875rem 1rem;
-    border: 1px dashed #d1d5db;
+    border: 1px dashed var(--outline);
     border-radius: 0.75rem;
     font-size: 0.875rem;
-    color: #6b7280;
-    background: #fff;
+    color: var(--text-muted);
+    background: var(--surface);
   }
 
   &SecondaryButton,
   &PrimaryButton,
   &GhostButton {
-    border-radius: 0.375rem;
+    border-radius: 0.5rem;
     padding: 0.625rem 0.875rem;
     font-size: 0.875rem;
     cursor: pointer;
   }
 
   &SecondaryButton {
-    border: 1px solid #d1d5db;
-    background: #fff;
-    color: #111827;
+    border: 1px solid var(--outline);
+    background: var(--surface);
+    color: var(--foreground);
   }
 
   &SecondaryButton:hover {
-    border-color: #9ca3af;
+    border-color: var(--primary);
   }
 
   &SecondaryButton:disabled,
@@ -352,7 +353,7 @@
     margin: 0.5rem 0 0;
     font-size: 0.875rem;
     font-weight: 600;
-    color: #111827;
+    color: var(--foreground);
   }
 
   &SegmentedControl {
@@ -367,10 +368,10 @@
   &SegmentButton {
     min-height: 2.25rem;
     padding: 0.5rem 0.75rem;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--outline);
     border-radius: 999px;
-    color: #111827;
-    background: #fff;
+    color: var(--foreground);
+    background: var(--surface);
     font: inherit;
     font-size: 0.875rem;
     line-height: 1.2;
@@ -378,8 +379,8 @@
   }
 
   &SegmentButton:hover {
-    border-color: #9ca3af;
-    background: #f9fafb;
+    border-color: var(--primary);
+    background: var(--surface-low);
   }
 
   &SegmentButton:focus-visible {
@@ -389,23 +390,23 @@
 
   &SegmentButton[data-selected='true'] {
     border-color: var(--primary);
-    color: #fff;
+    color: var(--on-primary);
     background: var(--primary);
   }
 
   &RepLabel {
     font-size: 0.875rem;
-    color: #374151;
+    color: var(--text-muted);
     white-space: nowrap;
   }
 
   &Submit {
     padding: 0.75rem 1rem;
-    border: 1px solid var(--primary-hover);
-    border-radius: 0.375rem;
+    border: 1px solid var(--primary);
+    border-radius: 0.5rem;
     font-size: 0.875rem;
     font-weight: 500;
-    color: #fff;
+    color: var(--on-primary);
     background: var(--primary);
     cursor: pointer;
   }
@@ -422,7 +423,8 @@
   &Overlay {
     position: fixed;
     inset: 0;
-    background: rgba(17, 24, 39, 0.45);
+    background: var(--overlay);
+    backdrop-filter: blur(12px);
   }
 
   @keyframes RecentHistorySkeletonPulse {
@@ -442,23 +444,23 @@
     width: min(calc(100vw - 1.5rem), 28rem);
     transform: translate(-50%, -50%);
     box-sizing: border-box;
-    border: 1px solid var(--card-border);
-    border-radius: 0.75rem;
-    background: #fff;
+    border: 1px solid var(--surface-border);
+    border-radius: 1rem;
+    background: var(--surface);
     padding: 1.25rem;
-    box-shadow: 0 24px 80px rgba(15, 23, 42, 0.18);
+    box-shadow: var(--soft-shadow);
   }
 
   &DialogTitle {
     margin: 0;
     font-size: 1.125rem;
-    color: #111827;
+    color: var(--foreground);
   }
 
   &DialogDescription {
     margin: 0.5rem 0 0;
     font-size: 0.875rem;
-    color: #6b7280;
+    color: var(--text-muted);
   }
 
   &DialogBody {
@@ -474,8 +476,8 @@
   }
 
   &PrimaryButton {
-    border: 1px solid var(--primary-hover);
-    color: #fff;
+    border: 1px solid var(--primary);
+    color: var(--on-primary);
     background: var(--primary);
   }
 
@@ -484,13 +486,13 @@
   }
 
   &GhostButton {
-    border: 1px solid #d1d5db;
-    color: #374151;
-    background: #fff;
+    border: 1px solid var(--outline);
+    color: var(--text-muted);
+    background: var(--surface-low);
   }
 
   &GhostButton:hover {
-    border-color: #9ca3af;
+    border-color: var(--primary);
   }
 
   @media (max-width: 640px) {

@@ -18,25 +18,25 @@
     display: inline-block;
     margin-bottom: 1rem;
     font-size: 0.875rem;
-    color: #6b7280;
+    color: var(--tertiary);
   }
 
   &BackLink:hover {
-    color: #111827;
+    color: var(--primary);
   }
 
   &Title {
     margin: 0;
     font-size: 1.75rem;
     font-weight: 300;
-    color: #000;
+    color: var(--foreground);
   }
 
   &Description {
     margin: 0.5rem 0 0;
     font-size: 0.95rem;
     line-height: 1.5;
-    color: #6b7280;
+    color: var(--text-muted);
   }
 
   &Form {
@@ -48,30 +48,31 @@
     display: grid;
     gap: 1rem;
     padding: 1.25rem;
-    border: 1px solid var(--card-border);
-    border-radius: 0.875rem;
-    background: var(--card-bg);
+    border: 0;
+    border-radius: 1rem;
+    background: var(--surface-low);
+    box-shadow: var(--soft-shadow);
   }
 
   &SectionHeader {
     display: grid;
     gap: 0.25rem;
     padding-bottom: 0.875rem;
-    border-bottom: 1px solid #edf0f3;
+    border-bottom: 1px solid var(--surface-border);
   }
 
   &SectionTitle {
     margin: 0;
     font-size: 1rem;
     font-weight: 500;
-    color: #111827;
+    color: var(--foreground);
   }
 
   &SectionDescription {
     margin: 0;
     font-size: 0.875rem;
     line-height: 1.45;
-    color: #6b7280;
+    color: var(--text-muted);
   }
 
   &SectionBody {
@@ -87,7 +88,7 @@
 
   &Label {
     font-size: 0.875rem;
-    color: #374151;
+    color: var(--text-muted);
   }
 
   &LabelWithSpacing {
@@ -97,12 +98,12 @@
   &Input,
   &Select {
     width: 100%;
-    border: 1px solid #d1d5db;
-    border-radius: 0.375rem;
+    border: 1px solid var(--outline);
+    border-radius: 0.5rem;
     padding: 0.625rem 0.75rem;
     font-size: 0.875rem;
-    color: #000;
-    background: #fff;
+    color: var(--foreground);
+    background: var(--surface);
   }
 
   &Select {
@@ -137,8 +138,8 @@
   }
 
   &Select:disabled {
-    background: #f9fafb;
-    color: #9ca3af;
+    background: var(--surface-low);
+    color: var(--text-soft);
   }
 
   &Field {
@@ -149,20 +150,20 @@
   &SecondaryButton,
   &PrimaryButton,
   &GhostButton {
-    border-radius: 0.375rem;
+    border-radius: 0.5rem;
     padding: 0.625rem 0.875rem;
     font-size: 0.875rem;
     cursor: pointer;
   }
 
   &SecondaryButton {
-    border: 1px solid #d1d5db;
-    background: #fff;
-    color: #111827;
+    border: 1px solid var(--outline);
+    background: var(--surface);
+    color: var(--foreground);
   }
 
   &SecondaryButton:hover {
-    border-color: #9ca3af;
+    border-color: var(--primary);
   }
 
   &SecondaryButton:disabled,
@@ -187,22 +188,22 @@
     margin: 0.5rem 0 0;
     font-size: 0.875rem;
     font-weight: 600;
-    color: #111827;
+    color: var(--foreground);
   }
 
   &RepLabel {
     font-size: 0.875rem;
-    color: #374151;
+    color: var(--text-muted);
     white-space: nowrap;
   }
 
   &Submit {
     padding: 0.75rem 1rem;
-    border: 1px solid var(--primary-hover);
-    border-radius: 0.375rem;
+    border: 1px solid var(--primary);
+    border-radius: 0.5rem;
     font-size: 0.875rem;
     font-weight: 500;
-    color: #fff;
+    color: var(--on-primary);
     background: var(--primary);
     cursor: pointer;
   }
@@ -219,7 +220,7 @@
   &Overlay {
     position: fixed;
     inset: 0;
-    background: rgba(17, 24, 39, 0.45);
+    background: var(--overlay);
   }
 
   &DialogContent {
@@ -229,23 +230,23 @@
     width: min(calc(100vw - 1.5rem), 28rem);
     transform: translate(-50%, -50%);
     box-sizing: border-box;
-    border: 1px solid var(--card-border);
-    border-radius: 0.75rem;
-    background: #fff;
+    border: 1px solid var(--surface-border);
+    border-radius: 1rem;
+    background: var(--surface);
     padding: 1.25rem;
-    box-shadow: 0 24px 80px rgba(15, 23, 42, 0.18);
+    box-shadow: var(--soft-shadow);
   }
 
   &DialogTitle {
     margin: 0;
     font-size: 1.125rem;
-    color: #111827;
+    color: var(--foreground);
   }
 
   &DialogDescription {
     margin: 0.5rem 0 0;
     font-size: 0.875rem;
-    color: #6b7280;
+    color: var(--text-muted);
   }
 
   &DialogBody {
@@ -261,8 +262,8 @@
   }
 
   &PrimaryButton {
-    border: 1px solid var(--primary-hover);
-    color: #fff;
+    border: 1px solid var(--primary);
+    color: var(--on-primary);
     background: var(--primary);
   }
 
@@ -271,33 +272,33 @@
   }
 
   &GhostButton {
-    border: 1px solid #d1d5db;
-    color: #374151;
-    background: #fff;
+    border: 1px solid var(--outline);
+    color: var(--text-muted);
+    background: var(--surface-low);
   }
 
   &GhostButton:hover {
-    border-color: #9ca3af;
+    border-color: var(--primary);
   }
 
   &MessageSuccess,
   &MessageError {
     margin-top: 0.25rem;
     padding: 0.75rem;
-    border-radius: 0.375rem;
+    border-radius: 0.5rem;
     font-size: 0.875rem;
   }
 
   &MessageSuccess {
-    color: #166534;
-    background: #f0fdf4;
-    border: 1px solid #bbf7d0;
+    color: var(--state-success-text);
+    background: var(--state-success-bg);
+    border: 1px solid var(--state-success-border);
   }
 
   &MessageError {
-    color: #991b1b;
-    background: #fef2f2;
-    border: 1px solid #fecaca;
+    color: var(--state-error-text);
+    background: var(--state-error-bg);
+    border: 1px solid var(--state-error-bg);
   }
 
   @media (max-width: 640px) {

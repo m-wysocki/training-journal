@@ -14,21 +14,22 @@
     justify-content: center;
     width: 2.5rem;
     height: 2.5rem;
-    border-radius: 0.75rem;
+    border-radius: 0.875rem;
     color: var(--primary);
-    background: color-mix(in srgb, var(--primary) 10%, white);
+    background: var(--icon-sage-bg);
   }
 
   &Title {
     margin: 0;
+    font-family: var(--font-quicksand), Arial, Helvetica, sans-serif;
     font-size: 1.75rem;
     font-weight: 300;
-    color: #000;
+    color: var(--foreground);
   }
 
   &Description {
     margin: 0.5rem 0 0;
-    color: #6b7280;
+    color: var(--text-muted);
     font-size: 0.9rem;
     line-height: 1.5;
 

@@ -13,6 +13,12 @@ const routeIcons = {
   '/stats': BarChart3,
 } as const
 
+const routeIconTones = {
+  '/completed-exercises/new': 'sage',
+  '/completed-exercises': 'sand',
+  '/stats': 'mist',
+} as const
+
 function HomeRoutes() {
   return (
     <div className={styles.HomeList}>
@@ -26,6 +32,7 @@ function HomeRoutes() {
             title={route.name}
             description={route.description}
             icon={RouteIcon}
+            iconTone={routeIconTones[route.path as keyof typeof routeIconTones]}
           />
         )
       })}

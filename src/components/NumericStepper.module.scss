@@ -21,7 +21,7 @@
     border: none;
     border-radius: 0.75rem;
     background: transparent;
-    color: #111827;
+    color: var(--foreground);
     font-size: 1.1rem;
     font-weight: 400;
     cursor: pointer;
@@ -40,7 +40,7 @@
 
   &StepButton:hover:not(:disabled),
   &PaceStepButton:hover:not(:disabled) {
-    background: #f3f4f6;
+    background: var(--surface-mid);
   }
 
   &InputShell {
@@ -54,10 +54,10 @@
     min-height: 2.75rem;
     box-sizing: border-box;
     padding: 0.625rem 0.875rem;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--outline);
     border-radius: 0.75rem;
-    background: #fff;
-    color: #111827;
+    background: var(--surface);
+    color: var(--foreground);
     font: inherit;
     font-size: 0.95rem;
     font-weight: 400;
@@ -78,8 +78,8 @@
   }
 
   &ValueInput:disabled {
-    background: #f9fafb;
-    color: #9ca3af;
+    background: var(--surface-low);
+    color: var(--text-soft);
   }
 
   &ValueInput::-webkit-outer-spin-button,
@@ -100,7 +100,7 @@
     transform: translateY(-50%);
     max-width: 3rem;
     overflow: hidden;
-    color: #6b7280;
+    color: var(--text-soft);
     font-size: 0.8125rem;
     line-height: 1;
     pointer-events: none;
@@ -121,8 +121,8 @@
     transform: translateY(-50%);
     border: none;
     border-radius: 999px;
-    background: #f3f4f6;
-    color: #6b7280;
+    background: var(--surface-mid);
+    color: var(--text-soft);
     cursor: pointer;
   }
 
@@ -132,8 +132,8 @@
   }
 
   &ClearAdornment:hover:not(:disabled) {
-    background: #e5e7eb;
-    color: #111827;
+    background: var(--surface-border);
+    color: var(--foreground);
   }
 
   @media (max-width: 640px) {

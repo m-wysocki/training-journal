@@ -4,15 +4,15 @@
   justify-content: center;
   width: 2.25rem;
   height: 2.25rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--outline);
   border-radius: 0.5rem;
-  color: #111827;
-  background: #fff;
+  color: var(--foreground);
+  background: var(--surface);
   cursor: pointer;
 
   &:hover,
   &[aria-expanded='true'] {
-    border-color: #9ca3af;
-    background: #f9fafb;
+    border-color: var(--primary);
+    background: var(--surface-low);
   }
 }

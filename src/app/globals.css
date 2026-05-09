@@ -1,26 +1,41 @@
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-  --primary: #6bb6d6;
-  --primary-hover: #5aa5c5;
-  --card-bg: #e8f4f8;
-  --card-border: #b8e0f0;
-  --card-hover: #d4e9f0;
+  /* Canonical tokens */
+  --background: #f9f9f7;
+  --foreground: #1a1c1b;
+  --primary: #4a654e;
+  --primary-hover: #3f5843;
+  --secondary: #635e54;
+  --tertiary: #55615e;
+  --surface: #f9f9f7;
+  --surface-low: #f4f4f2;
+  --surface-mid: #eeeeec;
+  --surface-border: #e2e3e1;
+  --outline: #c2c8c0;
+  --text-muted: #424842;
+  --text-soft: #737972;
+  --state-error-bg: #ffdad6;
+  --state-error-text: #93000a;
+  --state-success-bg: #cceace;
+  --state-success-text: #233d29;
+  --state-success-border: #8ba88e;
+  --on-primary: #ffffff;
+  --icon-sage-bg: #d9e2d9;
+  --icon-sand-bg: #ded8cd;
+  --icon-mist-bg: #d2dedc;
+  --danger-strong: #7f0008;
+  --overlay: rgb(249 249 247 / 0.4);
+  --skeleton-start: #e8e8e6;
+  --skeleton-mid: #f4f4f2;
+  --soft-shadow: 0 10px 30px rgba(139, 168, 142, 0.08);
   --layout-width: 42rem;
-}
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
   margin: 0;
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  font-family: var(--font-quicksand), Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
