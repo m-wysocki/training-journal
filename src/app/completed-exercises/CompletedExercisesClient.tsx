@@ -359,6 +359,7 @@ export default function CompletedExercisesClient({
                     <DatePicker
                       id="dateFrom"
                       value={dateFrom}
+                      closeOnSelect={false}
                       onChange={(value) => updateDateRange({ dateFrom: value, dateTo })}
                     />
                   </div>
@@ -369,6 +370,7 @@ export default function CompletedExercisesClient({
                     <DatePicker
                       id="dateTo"
                       value={dateTo}
+                      closeOnSelect={false}
                       onChange={(value) => updateDateRange({ dateFrom, dateTo: value })}
                     />
                   </div>

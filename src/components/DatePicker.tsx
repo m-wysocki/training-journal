@@ -10,6 +10,7 @@ type DatePickerProps = {
   value: string
   onChange: (value: string) => void
   className?: string
+  closeOnSelect?: boolean
 }
 
 const WEEK_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
@@ -52,7 +53,7 @@ const formatDateLabel = (value: string) => {
   return Number.isNaN(parsed.getTime()) ? 'Select date' : DATE_LABEL_FORMATTER.format(parsed)
 }
 
-export function DatePicker({ id, value, onChange, className }: DatePickerProps) {
+export function DatePicker({ id, value, onChange, className, closeOnSelect = true }: DatePickerProps) {
   const [open, setOpen] = useState(false)
   const [visibleMonth, setVisibleMonth] = useState(() => getInitialMonth(value))
   const selectedDate = value ? parseDateOnly(value) : null
@@ -61,7 +62,9 @@ export function DatePicker({ id, value, onChange, className }: DatePickerProps) 
   const selectDate = (date: Date) => {
     onChange(formatLocalDateOnly(date))
     setVisibleMonth(date)
-    setOpen(false)
+    if (closeOnSelect) {
+      setOpen(false)
+    }
   }
 
   return (
