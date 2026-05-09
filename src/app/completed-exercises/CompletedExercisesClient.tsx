@@ -1,6 +1,6 @@
 'use client'
 
-import { ArrowDown, ArrowUp, ClipboardList } from 'lucide-react'
+import { ArrowDown, ArrowUp, ChevronLeft, ChevronRight, ClipboardList } from 'lucide-react'
 import { useMemo, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import * as Accordion from '@radix-ui/react-accordion'
@@ -412,7 +412,7 @@ export default function CompletedExercisesClient({
               aria-label="Previous week"
               disabled={!hasDateRange}
             >
-              ‹
+              <ChevronLeft size={14} strokeWidth={2.2} aria-hidden="true" />
             </button>
             <p className={styles.CompletedExercisesWeekRange}>
               {hasDateRange ? formatDateRange(dateFrom, dateTo) : 'Loading date range...'}
@@ -424,7 +424,7 @@ export default function CompletedExercisesClient({
               aria-label="Next week"
               disabled={!hasDateRange}
             >
-              ›
+              <ChevronRight size={14} strokeWidth={2.2} aria-hidden="true" />
             </button>
           </div>
         </div>

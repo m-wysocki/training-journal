@@ -59,17 +59,17 @@
   &Title {
     margin: 0;
     font-family: Quicksand, var(--font-geist-sans), Arial, Helvetica, sans-serif;
-    font-size: 1.25rem;
-    font-weight: 400;
+    font-size: 1rem;
+    font-weight: 500;
     line-height: 1.4;
     letter-spacing: 0;
     color: var(--foreground);
   }
 
   &Description {
-    margin: 0.3rem 0 0;
+    margin: 0.15rem 0 0;
     font-family: Quicksand, var(--font-geist-sans), Arial, Helvetica, sans-serif;
-    font-size: 0.95rem;
+    font-size: 0.75rem;
     line-height: 1.45;
     color: var(--text-muted);
   }

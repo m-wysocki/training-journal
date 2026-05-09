@@ -41,14 +41,14 @@
   }
 
   &WeekIconButton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     min-height: 2.25rem;
     border: 1px solid var(--outline);
     border-radius: 0.5rem;
     color: var(--foreground);
     background: var(--surface);
-    font: inherit;
-    font-size: 1.25rem;
-    line-height: 1;
     cursor: pointer;
   }
 

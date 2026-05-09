@@ -9,8 +9,8 @@ export default async function Home() {
   return (
     <PageContainer className={styles.Home}>
       <header className={styles.HomeHero}>
-        <h1 className={styles.HomeTitle}>Training Journal</h1>
-        <p className={styles.HomeSubtitle}>Calmly track workouts and see steady progress.</p>
+        <h1 className={styles.HomeTitle}>Welcome back !</h1>
+        <p className={styles.HomeSubtitle}>Every logged session moves you forward.</p>
       </header>
       <HomeClient accessState={accessState} />
     </PageContainer>
