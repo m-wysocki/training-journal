@@ -7,6 +7,7 @@ import BackLink from '@/components/BackLink'
 import { DatePicker } from '@/components/DatePicker'
 import { DurationStepper } from '@/components/DurationStepper'
 import FormDialog from '@/components/FormDialog'
+import FormSelect from '@/components/FormSelect'
 import { NumericStepper } from '@/components/NumericStepper'
 import { PaceStepper } from '@/components/PaceStepper'
 import PageContainer from '@/components/PageContainer'
@@ -644,16 +645,15 @@ export function CompletedExerciseForm({
                       <label htmlFor="newExerciseType" className={styles.CompletedExerciseFormLabel}>
                         Type
                       </label>
-                      <select
+                      <FormSelect
                         id="newExerciseType"
-                        className={styles.CompletedExerciseFormSelect}
                         value={newExerciseType}
                         onChange={(e) => setNewExerciseType(e.target.value as ExerciseType)}
                       >
                         <option value="strength">Strength</option>
                         <option value="cardio">Cardio</option>
                         <option value="duration">Duration only</option>
-                      </select>
+                      </FormSelect>
                     </div>
                   </FormDialog>
                 </div>

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import BackLink from '@/components/BackLink'
 import FormDialog from '@/components/FormDialog'
+import FormSelect from '@/components/FormSelect'
 import OverflowMenu from '@/components/OverflowMenu'
 import PageContainer from '@/components/PageContainer'
 import PageHeader from '@/components/PageHeader'
@@ -226,15 +227,14 @@ export default function ExerciseCategoryClient({
                 }
               }}
             />
-            <select
-              className={styles.ExerciseCategoryInput}
+            <FormSelect
               value={newExerciseType}
               onChange={(e) => setNewExerciseType(e.target.value as ExerciseType)}
             >
               <option value="strength">Strength</option>
               <option value="cardio">Cardio</option>
               <option value="duration">Duration only</option>
-            </select>
+            </FormSelect>
           </div>
         </FormDialog>
 
@@ -259,15 +259,14 @@ export default function ExerciseCategoryClient({
                 }
               }}
             />
-            <select
-              className={styles.ExerciseCategoryInput}
+            <FormSelect
               value={editExerciseType}
               onChange={(e) => setEditExerciseType(e.target.value as ExerciseType)}
             >
               <option value="strength">Strength</option>
               <option value="cardio">Cardio</option>
               <option value="duration">Duration only</option>
-            </select>
+            </FormSelect>
           </div>
         </FormDialog>
     </PageContainer>

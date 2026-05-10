@@ -1,0 +1,91 @@
+.FormDialog {
+  &Overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--overlay);
+    backdrop-filter: blur(12px);
+  }
+
+  &Content {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    max-width: 28rem;
+    border-radius: 1rem;
+    border: 1px solid var(--surface-border);
+    background: var(--surface);
+    padding: 2rem;
+    box-shadow: var(--soft-shadow);
+  }
+
+  &ContentSmall {
+    width: min(calc(100vw - 1.5rem), 22rem);
+    max-width: 22rem;
+  }
+
+  &Title {
+    margin: 0 0 0.5rem;
+    font-size: 1.25rem;
+    font-weight: 400;
+    color: var(--foreground);
+  }
+
+  &Description {
+    margin: 0 0 1.5rem;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+  }
+
+  &Actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding-top: 0.5rem;
+  }
+
+  &GhostButton {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    background: var(--surface-low);
+    border: 1px solid var(--outline);
+    border-radius: 0.5rem;
+    cursor: pointer;
+  }
+
+  &GhostButton:hover {
+    background: var(--surface-mid);
+  }
+
+  &PrimaryButton {
+    padding: 0.625rem 1.25rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--on-primary);
+    background: var(--primary);
+    border: 1px solid var(--primary);
+    border-radius: 0.5rem;
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+  }
+
+  &PrimaryButton:hover {
+    background: var(--primary-hover);
+  }
+
+  &PrimaryButton:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+  }
+
+  &PrimaryButtonDanger {
+    background: var(--state-error-text);
+    border-color: var(--state-error-text);
+  }
+
+  &PrimaryButtonDanger:hover {
+    background: var(--danger-strong);
+  }
+}
