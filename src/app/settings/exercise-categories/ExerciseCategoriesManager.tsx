@@ -1,23 +1,14 @@
 'use client'
 
 import { Tags } from 'lucide-react'
-import { useState } from 'react'
 import Link from 'next/link'
-import {
-  addExerciseCategory,
-  deleteExerciseCategory,
-  updateExerciseCategory,
-} from '@/lib/actions/exerciseSetupActions'
 import LoadingSkeleton from '@/components/LoadingSkeleton'
 import FormDialog from '@/components/FormDialog'
 import OverflowMenu from '@/components/OverflowMenu'
+import PageHeader from '@/components/PageHeader'
 import StatusPanel from '@/components/StatusPanel'
+import { useExerciseCategoriesManager, type ExerciseCategory } from './hooks/useExerciseCategoriesManager'
 import styles from './ExerciseCategoriesManager.module.scss'
-
-type ExerciseCategory = {
-  id: string
-  name: string
-}
 
 type ExerciseCategoriesManagerProps = {
   initialCategories: ExerciseCategory[]
@@ -30,109 +21,32 @@ export default function ExerciseCategoriesManager({
   initialErrorMessage = '',
   isLoading = false,
 }: ExerciseCategoriesManagerProps) {
-  const [name, setName] = useState('')
-  const [categories, setCategories] = useState<ExerciseCategory[]>(initialCategories)
-  const [open, setOpen] = useState(false)
-  const [editOpen, setEditOpen] = useState(false)
-  const [editingCategory, setEditingCategory] = useState<ExerciseCategory | null>(null)
-  const [editName, setEditName] = useState('')
-  const [message, setMessage] = useState(initialErrorMessage)
-  const [isError, setIsError] = useState(Boolean(initialErrorMessage))
-  const [isAdding, setIsAdding] = useState(false)
-  const [updatingCategoryId, setUpdatingCategoryId] = useState<string | null>(null)
-  const [deletingCategoryId, setDeletingCategoryId] = useState<string | null>(null)
-
-  const addCategory = async () => {
-    const trimmedName = name.trim()
-
-    if (!trimmedName) return
-
-    setMessage('')
-    setIsError(false)
-    setIsAdding(true)
-
-    const result = await addExerciseCategory(trimmedName)
-    setIsAdding(false)
-
-    if (result.error) {
-      setIsError(true)
-      setMessage(result.error)
-      return
-    }
-
-    setName('')
-    setOpen(false)
-    setMessage(`Added exercise category: ${trimmedName}.`)
-    setCategories((current) => result.data ? [...current, result.data] : current)
-  }
-
-  const deleteCategory = async (id: string) => {
-    setMessage('')
-    setIsError(false)
-    setDeletingCategoryId(id)
-
-    const result = await deleteExerciseCategory(id)
-    setDeletingCategoryId(null)
-
-    if (result.error) {
-      setIsError(true)
-      setMessage(result.error)
-      return
-    }
-
-    setCategories((current) => current.filter((category) => category.id !== id))
-  }
-
-  const openEditCategory = (category: ExerciseCategory) => {
-    setEditingCategory(category)
-    setEditName(category.name)
-    setEditOpen(true)
-    setMessage('')
-    setIsError(false)
-  }
-
-  const updateCategory = async () => {
-    const trimmedName = editName.trim()
-
-    if (!editingCategory || !trimmedName) return
-
-    setMessage('')
-    setIsError(false)
-    setUpdatingCategoryId(editingCategory.id)
-
-    const result = await updateExerciseCategory(editingCategory.id, trimmedName)
-    setUpdatingCategoryId(null)
-
-    if (result.error) {
-      setIsError(true)
-      setMessage(result.error)
-      return
-    }
-
-    setEditOpen(false)
-    setEditingCategory(null)
-    setEditName('')
-    setMessage(`Updated exercise category: ${trimmedName}.`)
-    setCategories((current) =>
-      current.map((category) => category.id === editingCategory.id ? { ...category, name: trimmedName } : category),
-    )
-  }
+  const {
+    categories,
+    uiState,
+    updateUiState,
+    addCategory,
+    deleteCategory,
+    openEditCategory,
+    updateCategory,
+  } = useExerciseCategoriesManager({
+    initialCategories,
+    initialErrorMessage,
+  })
 
   return (
     <section className={styles.ExerciseCategoriesManager}>
       <div className={styles.ExerciseCategoriesManagerTopBar}>
-        <div>
-          <div className={styles.ExerciseCategoriesManagerTitleRow}>
-            <div className={styles.ExerciseCategoriesManagerTitleIcon} aria-hidden="true">
-              <Tags size={22} strokeWidth={1.9} />
-            </div>
-            <h2 className={styles.ExerciseCategoriesManagerTitle}>Exercise Categories</h2>
-          </div>
-          <p className={styles.ExerciseCategoriesManagerDescription}>Manage your exercise categories</p>
+        <div className={styles.ExerciseCategoriesManagerHeader}>
+          <PageHeader
+            icon={Tags}
+            title="Exercise Categories"
+            description="Manage your exercise categories"
+          />
         </div>
         <FormDialog
-          open={open}
-          onOpenChange={setOpen}
+          open={uiState.open}
+          onOpenChange={(open) => updateUiState({ open })}
           title="Add Exercise Category"
           description="Enter the name of the exercise category you want to add."
           trigger={(
@@ -140,15 +54,15 @@ export default function ExerciseCategoriesManager({
               Add Category
             </button>
           )}
-          primaryActionLabel={isAdding ? 'Adding...' : 'Add'}
+          primaryActionLabel={uiState.isAdding ? 'Adding...' : 'Add'}
           onPrimaryAction={addCategory}
-          primaryActionDisabled={isAdding}
+          primaryActionDisabled={uiState.isAdding}
         >
           <div className={styles.ExerciseCategoriesManagerDialogBody}>
             <input
               className={styles.ExerciseCategoriesManagerInput}
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              value={uiState.name}
+              onChange={(e) => updateUiState({ name: e.target.value })}
               placeholder="e.g. Arms"
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
@@ -160,9 +74,9 @@ export default function ExerciseCategoriesManager({
         </FormDialog>
       </div>
 
-      {message ? (
-        <StatusPanel variant={isError ? 'error' : 'success'}>
-          {message}
+      {uiState.message ? (
+        <StatusPanel variant={uiState.messageType === 'error' ? 'error' : 'success'}>
+          {uiState.message}
         </StatusPanel>
       ) : null}
 
@@ -190,9 +104,9 @@ export default function ExerciseCategoriesManager({
                   },
                   {
                     key: 'delete',
-                    label: deletingCategoryId === category.id ? 'Deleting...' : 'Delete',
+                    label: uiState.deletingCategoryId === category.id ? 'Deleting...' : 'Delete',
                     danger: true,
-                    disabled: deletingCategoryId === category.id,
+                    disabled: uiState.deletingCategoryId === category.id,
                     onSelect: () => deleteCategory(category.id),
                   },
                 ]}
@@ -203,19 +117,19 @@ export default function ExerciseCategoriesManager({
       )}
 
       <FormDialog
-        open={editOpen}
-        onOpenChange={setEditOpen}
+        open={uiState.editOpen}
+        onOpenChange={(editOpen) => updateUiState({ editOpen })}
         title="Edit Exercise Category"
         description="Update the exercise category name."
-        primaryActionLabel={updatingCategoryId === editingCategory?.id ? 'Saving...' : 'Save'}
+        primaryActionLabel={uiState.updatingCategoryId === uiState.editingCategory?.id ? 'Saving...' : 'Save'}
         onPrimaryAction={updateCategory}
-        primaryActionDisabled={updatingCategoryId === editingCategory?.id}
+        primaryActionDisabled={uiState.updatingCategoryId === uiState.editingCategory?.id}
       >
         <div className={styles.ExerciseCategoriesManagerDialogBody}>
           <input
             className={styles.ExerciseCategoriesManagerInput}
-            value={editName}
-            onChange={(e) => setEditName(e.target.value)}
+            value={uiState.editName}
+            onChange={(e) => updateUiState({ editName: e.target.value })}
             placeholder="e.g. Arms"
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
