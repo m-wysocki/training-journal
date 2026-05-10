@@ -1,6 +1,6 @@
 import BackLink from '@/components/BackLink'
-import ExerciseCategoriesManager from '@/components/ExerciseCategoriesManager'
 import PageContainer from '@/components/PageContainer'
+import ExerciseCategoriesManager from './ExerciseCategoriesManager'
 import styles from './page.module.scss'
 
 export default function ExerciseCategoriesLoading() {

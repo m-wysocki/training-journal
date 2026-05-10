@@ -3,10 +3,10 @@
 import { ArrowDown, ArrowUp, ClipboardList } from 'lucide-react'
 import { useMemo, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import * as Dialog from '@radix-ui/react-dialog'
 import BackLink from '@/components/BackLink'
 import DateRangeFiltersBar from '@/components/DateRangeFiltersBar'
 import { DatePicker } from '@/components/DatePicker'
+import FormDialog from '@/components/FormDialog'
 import LoadingSkeleton from '@/components/LoadingSkeleton'
 import OverflowMenu from '@/components/OverflowMenu'
 import PageContainer from '@/components/PageContainer'
@@ -473,76 +473,52 @@ export default function CompletedExercisesClient({
         </div>
         ) : null}
 
-        <Dialog.Root open={deleteOpen} onOpenChange={(open) => !open && closeDelete()}>
-          <Dialog.Portal>
-            <Dialog.Overlay className={styles.CompletedExercisesOverlay} />
-            <Dialog.Content className={styles.CompletedExercisesDialogContentSmall}>
-              <Dialog.Title className={styles.CompletedExercisesDialogTitle}>Delete entry?</Dialog.Title>
-              <Dialog.Description className={styles.CompletedExercisesDialogDescription}>
-                This action cannot be undone.
-              </Dialog.Description>
-              <div className={styles.CompletedExercisesDialogActions}>
-                <Dialog.Close asChild>
-                  <button type="button" className={styles.CompletedExercisesGhostButton}>
-                    Cancel
-                  </button>
-                </Dialog.Close>
-                <button
-                  type="button"
-                  className={styles.CompletedExercisesDangerButton}
-                  disabled={deleteLoading}
-                  onClick={confirmDelete}
-                >
-                  {deleteLoading ? 'Deleting…' : 'Delete'}
-                </button>
-              </div>
-            </Dialog.Content>
-          </Dialog.Portal>
-        </Dialog.Root>
+        <FormDialog
+          open={deleteOpen}
+          onOpenChange={(open) => {
+            if (!open) closeDelete()
+          }}
+          size="small"
+          title="Delete entry?"
+          description="This action cannot be undone."
+          primaryActionLabel={deleteLoading ? 'Deleting…' : 'Delete'}
+          onPrimaryAction={confirmDelete}
+          primaryActionDisabled={deleteLoading}
+          primaryActionTone="danger"
+        >
+          <></>
+        </FormDialog>
 
-        <Dialog.Root open={copyOpen} onOpenChange={(open) => !open && closeCopyCategory()}>
-          <Dialog.Portal>
-            <Dialog.Overlay className={styles.CompletedExercisesOverlay} />
-            <Dialog.Content className={styles.CompletedExercisesDialogContentSmall}>
-              <Dialog.Title className={styles.CompletedExercisesDialogTitle}>Copy exercises</Dialog.Title>
-              <Dialog.Description className={styles.CompletedExercisesDialogDescription}>
-                {copyTarget
-                  ? `Copy ${copyTarget.categoryName} from ${formatWeekdayDate(copyTarget.sourceDate)} to another date.`
-                  : 'Choose a date to copy these exercises.'}
-              </Dialog.Description>
-              <div className={styles.CompletedExercisesDialogForm}>
-                <div className={styles.CompletedExercisesField}>
-                  <label htmlFor="copyDate" className={styles.CompletedExercisesLabel}>
-                    New date
-                  </label>
-                  <DatePicker
-                    id="copyDate"
-                    value={copyDate}
-                    onChange={setCopyDate}
-                  />
-                  {isCopyDateSameAsSource ? (
-                    <p className={styles.CompletedExercisesFieldHint}>Choose a different date than the source workout.</p>
-                  ) : null}
-                </div>
-                <div className={styles.CompletedExercisesDialogActions}>
-                  <Dialog.Close asChild>
-                    <button type="button" className={styles.CompletedExercisesGhostButton}>
-                      Cancel
-                    </button>
-                  </Dialog.Close>
-                  <button
-                    type="button"
-                    className={styles.CompletedExercisesPrimaryButton}
-                    disabled={copyLoading || !copyDate || isCopyDateSameAsSource}
-                    onClick={confirmCopyCategory}
-                  >
-                    {copyLoading ? 'Copying...' : 'Copy'}
-                  </button>
-                </div>
-              </div>
-            </Dialog.Content>
-          </Dialog.Portal>
-        </Dialog.Root>
+        <FormDialog
+          open={copyOpen}
+          onOpenChange={(open) => {
+            if (!open) closeCopyCategory()
+          }}
+          size="small"
+          title="Copy exercises"
+          description={copyTarget
+            ? `Copy ${copyTarget.categoryName} from ${formatWeekdayDate(copyTarget.sourceDate)} to another date.`
+            : 'Choose a date to copy these exercises.'}
+          primaryActionLabel={copyLoading ? 'Copying...' : 'Copy'}
+          onPrimaryAction={confirmCopyCategory}
+          primaryActionDisabled={copyLoading || !copyDate || isCopyDateSameAsSource}
+        >
+          <div className={styles.CompletedExercisesDialogForm}>
+            <div className={styles.CompletedExercisesField}>
+              <label htmlFor="copyDate" className={styles.CompletedExercisesLabel}>
+                New date
+              </label>
+              <DatePicker
+                id="copyDate"
+                value={copyDate}
+                onChange={setCopyDate}
+              />
+              {isCopyDateSameAsSource ? (
+                <p className={styles.CompletedExercisesFieldHint}>Choose a different date than the source workout.</p>
+              ) : null}
+            </div>
+          </div>
+        </FormDialog>
       </PageContainer>
     </div>
   )

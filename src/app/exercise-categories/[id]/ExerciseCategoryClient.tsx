@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import * as Dialog from '@radix-ui/react-dialog'
 import BackLink from '@/components/BackLink'
+import FormDialog from '@/components/FormDialog'
 import OverflowMenu from '@/components/OverflowMenu'
 import PageContainer from '@/components/PageContainer'
 import PageHeader from '@/components/PageHeader'
@@ -204,113 +204,72 @@ export default function ExerciseCategoryClient({
           </ul>
         )}
 
-        <Dialog.Root open={open} onOpenChange={setOpen}>
-          <Dialog.Trigger asChild>
-            <button className={styles.ExerciseCategoryPrimaryButton}>
-              Add Exercise
-            </button>
-          </Dialog.Trigger>
+        <FormDialog
+          open={open}
+          onOpenChange={setOpen}
+          title="Add Exercise"
+          description="Enter the name of the exercise you want to add."
+          trigger={<button className={styles.ExerciseCategoryPrimaryButton}>Add Exercise</button>}
+          primaryActionLabel={isAdding ? 'Adding...' : 'Add'}
+          onPrimaryAction={addExercise}
+          primaryActionDisabled={isAdding}
+        >
+          <div className={styles.ExerciseCategoryDialogBody}>
+            <input
+              className={styles.ExerciseCategoryInput}
+              placeholder="e.g. Biceps Curls"
+              value={newExercise}
+              onChange={(e) => setNewExercise(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  addExercise()
+                }
+              }}
+            />
+            <select
+              className={styles.ExerciseCategoryInput}
+              value={newExerciseType}
+              onChange={(e) => setNewExerciseType(e.target.value as ExerciseType)}
+            >
+              <option value="strength">Strength</option>
+              <option value="cardio">Cardio</option>
+              <option value="duration">Duration only</option>
+            </select>
+          </div>
+        </FormDialog>
 
-          <Dialog.Portal>
-            <Dialog.Overlay className={styles.ExerciseCategoryOverlay} />
-            <Dialog.Content className={styles.ExerciseCategoryDialogContent}>
-              <Dialog.Title className={styles.ExerciseCategoryDialogTitle}>
-                Add Exercise
-              </Dialog.Title>
-              <Dialog.Description className={styles.ExerciseCategoryDialogDescription}>
-                Enter the name of the exercise you want to add.
-              </Dialog.Description>
-              <div className={styles.ExerciseCategoryDialogBody}>
-                <input
-                  className={styles.ExerciseCategoryInput}
-                  placeholder="e.g. Biceps Curls"
-                  value={newExercise}
-                  onChange={(e) => setNewExercise(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      addExercise()
-                    }
-                  }}
-                />
-                <select
-                  className={styles.ExerciseCategoryInput}
-                  value={newExerciseType}
-                  onChange={(e) => setNewExerciseType(e.target.value as ExerciseType)}
-                >
-                  <option value="strength">Strength</option>
-                  <option value="cardio">Cardio</option>
-                  <option value="duration">Duration only</option>
-                </select>
-                <div className={styles.ExerciseCategoryDialogActions}>
-                  <Dialog.Close asChild>
-                    <button className={styles.ExerciseCategoryGhostButton}>
-                      Cancel
-                    </button>
-                  </Dialog.Close>
-                  <button
-                    type="button"
-                    onClick={addExercise}
-                    className={styles.ExerciseCategoryPrimaryButton}
-                    disabled={isAdding}
-                  >
-                    {isAdding ? 'Adding...' : 'Add'}
-                  </button>
-                </div>
-              </div>
-            </Dialog.Content>
-          </Dialog.Portal>
-        </Dialog.Root>
-
-        <Dialog.Root open={editOpen} onOpenChange={setEditOpen}>
-          <Dialog.Portal>
-            <Dialog.Overlay className={styles.ExerciseCategoryOverlay} />
-            <Dialog.Content className={styles.ExerciseCategoryDialogContent}>
-              <Dialog.Title className={styles.ExerciseCategoryDialogTitle}>
-                Edit Exercise
-              </Dialog.Title>
-              <Dialog.Description className={styles.ExerciseCategoryDialogDescription}>
-                Update the exercise name and type.
-              </Dialog.Description>
-              <div className={styles.ExerciseCategoryDialogBody}>
-                <input
-                  className={styles.ExerciseCategoryInput}
-                  placeholder="e.g. Biceps Curls"
-                  value={editExerciseName}
-                  onChange={(e) => setEditExerciseName(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      updateExercise()
-                    }
-                  }}
-                />
-                <select
-                  className={styles.ExerciseCategoryInput}
-                  value={editExerciseType}
-                  onChange={(e) => setEditExerciseType(e.target.value as ExerciseType)}
-                >
-                  <option value="strength">Strength</option>
-                  <option value="cardio">Cardio</option>
-                  <option value="duration">Duration only</option>
-                </select>
-                <div className={styles.ExerciseCategoryDialogActions}>
-                  <Dialog.Close asChild>
-                    <button type="button" className={styles.ExerciseCategoryGhostButton}>
-                      Cancel
-                    </button>
-                  </Dialog.Close>
-                  <button
-                    type="button"
-                    onClick={updateExercise}
-                    className={styles.ExerciseCategoryPrimaryButton}
-                    disabled={updatingExerciseId === editingExercise?.id}
-                  >
-                    {updatingExerciseId === editingExercise?.id ? 'Saving...' : 'Save'}
-                  </button>
-                </div>
-              </div>
-            </Dialog.Content>
-          </Dialog.Portal>
-        </Dialog.Root>
+        <FormDialog
+          open={editOpen}
+          onOpenChange={setEditOpen}
+          title="Edit Exercise"
+          description="Update the exercise name and type."
+          primaryActionLabel={updatingExerciseId === editingExercise?.id ? 'Saving...' : 'Save'}
+          onPrimaryAction={updateExercise}
+          primaryActionDisabled={updatingExerciseId === editingExercise?.id}
+        >
+          <div className={styles.ExerciseCategoryDialogBody}>
+            <input
+              className={styles.ExerciseCategoryInput}
+              placeholder="e.g. Biceps Curls"
+              value={editExerciseName}
+              onChange={(e) => setEditExerciseName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  updateExercise()
+                }
+              }}
+            />
+            <select
+              className={styles.ExerciseCategoryInput}
+              value={editExerciseType}
+              onChange={(e) => setEditExerciseType(e.target.value as ExerciseType)}
+            >
+              <option value="strength">Strength</option>
+              <option value="cardio">Cardio</option>
+              <option value="duration">Duration only</option>
+            </select>
+          </div>
+        </FormDialog>
     </PageContainer>
   )
 }

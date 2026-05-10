@@ -314,32 +314,6 @@
     background: var(--surface);
   }
 
-  &SecondaryButton,
-  &PrimaryButton,
-  &GhostButton {
-    border-radius: 0.5rem;
-    padding: 0.625rem 0.875rem;
-    font-size: 0.875rem;
-    cursor: pointer;
-  }
-
-  &SecondaryButton {
-    border: 1px solid var(--outline);
-    background: var(--surface);
-    color: var(--foreground);
-  }
-
-  &SecondaryButton:hover {
-    border-color: var(--primary);
-  }
-
-  &SecondaryButton:disabled,
-  &PrimaryButton:disabled,
-  &GhostButton:disabled {
-    opacity: 0.65;
-    cursor: not-allowed;
-  }
-
   &RepsGrid {
     display: grid;
     grid-template-columns: 1fr;
@@ -428,13 +402,6 @@
     cursor: not-allowed;
   }
 
-  &Overlay {
-    position: fixed;
-    inset: 0;
-    background: var(--overlay);
-    backdrop-filter: blur(12px);
-  }
-
   @keyframes RecentHistorySkeletonPulse {
     0% {
       background-position: 200% 0;
@@ -445,62 +412,9 @@
     }
   }
 
-  &DialogContent {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    width: min(calc(100vw - 1.5rem), 28rem);
-    transform: translate(-50%, -50%);
-    box-sizing: border-box;
-    border: 1px solid var(--surface-border);
-    border-radius: 1rem;
-    background: var(--surface);
-    padding: 1.25rem;
-    box-shadow: var(--soft-shadow);
-  }
-
-  &DialogTitle {
-    margin: 0;
-    font-size: 1.125rem;
-    color: var(--foreground);
-  }
-
-  &DialogDescription {
-    margin: 0.5rem 0 0;
-    font-size: 0.875rem;
-    color: var(--text-muted);
-  }
-
   &DialogBody {
     display: grid;
     gap: 1rem;
-    margin-top: 1rem;
-  }
-
-  &DialogActions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 0.75rem;
-  }
-
-  &PrimaryButton {
-    border: 1px solid var(--primary);
-    color: var(--on-primary);
-    background: var(--primary);
-  }
-
-  &PrimaryButton:hover {
-    background: var(--primary-hover);
-  }
-
-  &GhostButton {
-    border: 1px solid var(--outline);
-    color: var(--text-muted);
-    background: var(--surface-low);
-  }
-
-  &GhostButton:hover {
-    border-color: var(--primary);
   }
 
   @media (max-width: 640px) {

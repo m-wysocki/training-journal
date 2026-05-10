@@ -200,58 +200,6 @@
     white-space: pre-wrap;
   }
 
-  &Overlay {
-    position: fixed;
-    inset: 0;
-    background: var(--overlay);
-    backdrop-filter: blur(12px);
-  }
-
-  &DialogContent {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: min(calc(100vw - 1.5rem), 28rem);
-    max-width: 28rem;
-    max-height: min(90vh, 40rem);
-    overflow-y: auto;
-    box-sizing: border-box;
-    border-radius: 1rem;
-    border: 1px solid var(--surface-border);
-    background: var(--surface);
-    padding: 2rem;
-    box-shadow: var(--soft-shadow);
-  }
-
-  &DialogContentSmall {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: min(calc(100vw - 1.5rem), 22rem);
-    max-width: 22rem;
-    box-sizing: border-box;
-    border-radius: 1rem;
-    border: 1px solid var(--surface-border);
-    background: var(--surface);
-    padding: 2rem;
-    box-shadow: var(--soft-shadow);
-  }
-
-  &DialogTitle {
-    margin: 0 0 1rem;
-    font-size: 1.25rem;
-    font-weight: 400;
-    color: var(--foreground);
-  }
-
-  &DialogDescription {
-    margin: 0 0 1.5rem;
-    font-size: 0.875rem;
-    color: var(--text-muted);
-  }
-
   &DialogForm {
     display: grid;
     gap: 0.75rem;
@@ -341,68 +289,6 @@
     border: 1px solid var(--state-error-bg);
   }
 
-  &DialogActions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 0.75rem;
-    padding-top: 0.5rem;
-    margin-top: 0.25rem;
-  }
-
-  &PrimaryButton {
-    padding: 0.625rem 1.25rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: var(--on-primary);
-    background: var(--primary);
-    border: 1px solid var(--primary);
-    border-radius: 0.5rem;
-    cursor: pointer;
-  }
-
-  &PrimaryButton:hover {
-    background: var(--primary-hover);
-  }
-
-  &PrimaryButton:disabled {
-    opacity: 0.65;
-    cursor: not-allowed;
-  }
-
-  &GhostButton {
-    padding: 0.5rem 1rem;
-    font-size: 0.875rem;
-    color: var(--text-muted);
-    background: var(--surface-low);
-    border: 1px solid var(--outline);
-    border-radius: 0.5rem;
-    cursor: pointer;
-  }
-
-  &GhostButton:hover {
-    background: var(--surface-mid);
-  }
-
-  &DangerButton {
-    padding: 0.625rem 1.25rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: var(--on-primary);
-    background: var(--state-error-text);
-    border: 1px solid var(--state-error-text);
-    border-radius: 0.5rem;
-    cursor: pointer;
-  }
-
-  &DangerButton:hover {
-    background: var(--danger-strong);
-  }
-
-  &DangerButton:disabled {
-    opacity: 0.65;
-    cursor: not-allowed;
-  }
-
   @media (max-width: 640px) {
     & {
       padding-block: 1rem;
@@ -418,14 +304,5 @@
       flex-direction: column;
     }
 
-    &DialogActions {
-      flex-direction: column-reverse;
-    }
-
-    &PrimaryButton,
-    &DangerButton,
-    &GhostButton {
-      width: 100%;
-    }
   }
 }

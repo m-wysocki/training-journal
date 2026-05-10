@@ -78,40 +78,6 @@
     cursor: not-allowed;
   }
 
-  &Overlay {
-    position: fixed;
-    inset: 0;
-    background: var(--overlay);
-    backdrop-filter: blur(12px);
-  }
-
-  &DialogContent {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 100%;
-    max-width: 28rem;
-    border-radius: 1rem;
-    border: 1px solid var(--surface-border);
-    background: var(--surface);
-    padding: 2rem;
-    box-shadow: var(--soft-shadow);
-  }
-
-  &DialogTitle {
-    margin: 0 0 0.5rem;
-    font-size: 1.25rem;
-    font-weight: 400;
-    color: var(--foreground);
-  }
-
-  &DialogDescription {
-    margin: 0 0 1.5rem;
-    font-size: 0.875rem;
-    color: var(--text-muted);
-  }
-
   &DialogBody {
     display: grid;
     gap: 1.25rem;
@@ -134,27 +100,6 @@
   &Input:focus {
     outline: none;
     border-color: var(--primary);
-  }
-
-  &DialogActions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 0.75rem;
-    padding-top: 0.5rem;
-  }
-
-  &GhostButton {
-    padding: 0.5rem 1rem;
-    font-size: 0.875rem;
-    color: var(--text-muted);
-    background: var(--surface-low);
-    border: 1px solid var(--outline);
-    border-radius: 0.5rem;
-    cursor: pointer;
-  }
-
-  &GhostButton:hover {
-    background: var(--surface-mid);
   }
 
   @media (max-width: 640px) {

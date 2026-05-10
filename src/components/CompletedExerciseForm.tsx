@@ -3,10 +3,10 @@
 import type { LucideIcon } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import * as Dialog from '@radix-ui/react-dialog'
 import BackLink from '@/components/BackLink'
 import { DatePicker } from '@/components/DatePicker'
 import { DurationStepper } from '@/components/DurationStepper'
+import FormDialog from '@/components/FormDialog'
 import { NumericStepper } from '@/components/NumericStepper'
 import { PaceStepper } from '@/components/PaceStepper'
 import PageContainer from '@/components/PageContainer'
@@ -557,51 +557,35 @@ export function CompletedExerciseForm({
                       {category.name}
                     </button>
                   ))}
-                  <Dialog.Root open={isExerciseCategoryDialogOpen} onOpenChange={setIsExerciseCategoryDialogOpen}>
-                    <Dialog.Trigger asChild>
+                  <FormDialog
+                    open={isExerciseCategoryDialogOpen}
+                    onOpenChange={setIsExerciseCategoryDialogOpen}
+                    title="Add Exercise Category"
+                    description="Enter the name of the new exercise category."
+                    trigger={(
                       <button type="button" className={styles.CompletedExerciseFormAddBadge}>
                         Add
                       </button>
-                    </Dialog.Trigger>
-                    <Dialog.Portal>
-                      <Dialog.Overlay className={styles.CompletedExerciseFormOverlay} />
-                      <Dialog.Content className={styles.CompletedExerciseFormDialogContent}>
-                        <Dialog.Title className={styles.CompletedExerciseFormDialogTitle}>Add Exercise Category</Dialog.Title>
-                        <Dialog.Description className={styles.CompletedExerciseFormDialogDescription}>
-                          Enter the name of the new exercise category.
-                        </Dialog.Description>
-                        <div className={styles.CompletedExerciseFormDialogBody}>
-                          <input
-                            className={styles.CompletedExerciseFormInput}
-                            value={newExerciseCategoryName}
-                            onChange={(e) => setNewExerciseCategoryName(e.target.value)}
-                            placeholder="e.g. Back"
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter') {
-                                e.preventDefault()
-                                handleAddExerciseCategory()
-                              }
-                            }}
-                          />
-                          <div className={styles.CompletedExerciseFormDialogActions}>
-                            <Dialog.Close asChild>
-                              <button type="button" className={styles.CompletedExerciseFormGhostButton}>
-                                Cancel
-                              </button>
-                            </Dialog.Close>
-                            <button
-                              type="button"
-                              onClick={handleAddExerciseCategory}
-                              className={styles.CompletedExerciseFormPrimaryButton}
-                              disabled={isAddingExerciseCategory}
-                            >
-                              {isAddingExerciseCategory ? 'Adding...' : 'Add'}
-                            </button>
-                          </div>
-                        </div>
-                      </Dialog.Content>
-                    </Dialog.Portal>
-                  </Dialog.Root>
+                    )}
+                    primaryActionLabel={isAddingExerciseCategory ? 'Adding...' : 'Add'}
+                    onPrimaryAction={handleAddExerciseCategory}
+                    primaryActionDisabled={isAddingExerciseCategory}
+                  >
+                    <div className={styles.CompletedExerciseFormDialogBody}>
+                      <input
+                        className={styles.CompletedExerciseFormInput}
+                        value={newExerciseCategoryName}
+                        onChange={(e) => setNewExerciseCategoryName(e.target.value)}
+                        placeholder="e.g. Back"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault()
+                            handleAddExerciseCategory()
+                          }
+                        }}
+                      />
+                    </div>
+                  </FormDialog>
                 </div>
               </div>
 
@@ -626,8 +610,12 @@ export function CompletedExerciseForm({
                       </button>
                     ))
                   )}
-                  <Dialog.Root open={isExerciseDialogOpen} onOpenChange={setIsExerciseDialogOpen}>
-                    <Dialog.Trigger asChild>
+                  <FormDialog
+                    open={isExerciseDialogOpen}
+                    onOpenChange={setIsExerciseDialogOpen}
+                    title="Add Exercise"
+                    description="Add a new exercise to the selected exercise category."
+                    trigger={(
                       <button
                         type="button"
                         className={styles.CompletedExerciseFormAddBadge}
@@ -635,59 +623,39 @@ export function CompletedExerciseForm({
                       >
                         Add
                       </button>
-                    </Dialog.Trigger>
-                    <Dialog.Portal>
-                      <Dialog.Overlay className={styles.CompletedExerciseFormOverlay} />
-                      <Dialog.Content className={styles.CompletedExerciseFormDialogContent}>
-                        <Dialog.Title className={styles.CompletedExerciseFormDialogTitle}>Add Exercise</Dialog.Title>
-                        <Dialog.Description className={styles.CompletedExerciseFormDialogDescription}>
-                          Add a new exercise to the selected exercise category.
-                        </Dialog.Description>
-                        <div className={styles.CompletedExerciseFormDialogBody}>
-                          <input
-                            className={styles.CompletedExerciseFormInput}
-                            value={newExerciseName}
-                            onChange={(e) => setNewExerciseName(e.target.value)}
-                            placeholder="e.g. Barbell Row"
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter') {
-                                e.preventDefault()
-                                handleAddExercise()
-                              }
-                            }}
-                          />
-                          <label htmlFor="newExerciseType" className={styles.CompletedExerciseFormLabel}>
-                            Type
-                          </label>
-                          <select
-                            id="newExerciseType"
-                            className={styles.CompletedExerciseFormSelect}
-                            value={newExerciseType}
-                            onChange={(e) => setNewExerciseType(e.target.value as ExerciseType)}
-                          >
-                            <option value="strength">Strength</option>
-                            <option value="cardio">Cardio</option>
-                            <option value="duration">Duration only</option>
-                          </select>
-                          <div className={styles.CompletedExerciseFormDialogActions}>
-                            <Dialog.Close asChild>
-                              <button type="button" className={styles.CompletedExerciseFormGhostButton}>
-                                Cancel
-                              </button>
-                            </Dialog.Close>
-                            <button
-                              type="button"
-                              onClick={handleAddExercise}
-                              className={styles.CompletedExerciseFormPrimaryButton}
-                              disabled={isAddingExercise}
-                            >
-                              {isAddingExercise ? 'Adding...' : 'Add'}
-                            </button>
-                          </div>
-                        </div>
-                      </Dialog.Content>
-                    </Dialog.Portal>
-                  </Dialog.Root>
+                    )}
+                    primaryActionLabel={isAddingExercise ? 'Adding...' : 'Add'}
+                    onPrimaryAction={handleAddExercise}
+                    primaryActionDisabled={isAddingExercise}
+                  >
+                    <div className={styles.CompletedExerciseFormDialogBody}>
+                      <input
+                        className={styles.CompletedExerciseFormInput}
+                        value={newExerciseName}
+                        onChange={(e) => setNewExerciseName(e.target.value)}
+                        placeholder="e.g. Barbell Row"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault()
+                            handleAddExercise()
+                          }
+                        }}
+                      />
+                      <label htmlFor="newExerciseType" className={styles.CompletedExerciseFormLabel}>
+                        Type
+                      </label>
+                      <select
+                        id="newExerciseType"
+                        className={styles.CompletedExerciseFormSelect}
+                        value={newExerciseType}
+                        onChange={(e) => setNewExerciseType(e.target.value as ExerciseType)}
+                      >
+                        <option value="strength">Strength</option>
+                        <option value="cardio">Cardio</option>
+                        <option value="duration">Duration only</option>
+                      </select>
+                    </div>
+                  </FormDialog>
                 </div>
               </div>
             </div>
