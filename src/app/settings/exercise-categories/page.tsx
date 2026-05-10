@@ -25,7 +25,7 @@ function ExerciseCategoriesFallback() {
 export default function SettingsExerciseCategoriesPage() {
   return (
     <PageContainer className={styles.SettingsExerciseCategories}>
-      <BackLink href="/settings" label="← Back to Settings" />
+      <BackLink href="/settings" label="Back to Settings" />
       <Suspense fallback={<ExerciseCategoriesFallback />}>
         <ExerciseCategoriesData />
       </Suspense>

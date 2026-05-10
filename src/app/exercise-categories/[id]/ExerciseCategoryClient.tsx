@@ -157,7 +157,7 @@ export default function ExerciseCategoryClient({
   return (
     <PageContainer className={styles.ExerciseCategoryContainer}>
         <div className={styles.ExerciseCategoryHeader}>
-          <BackLink href="/exercise-categories" label="← Back to Exercise Categories" />
+          <BackLink href="/exercise-categories" label="Back to Exercise Categories" />
           <h1 className={styles.ExerciseCategoryTitle}>{category.name}</h1>
         </div>
 

@@ -323,7 +323,7 @@ export default function CompletedExercisesClient({
       <PageContainer className={styles.CompletedExercisesContainer}>
         <PageHeader
           backHref="/"
-          backLabel="← Back to Home"
+          backLabel="Back to Home"
           icon={ClipboardList}
           title="Completed Exercises"
           description="Browse your logged exercises grouped by workout date."

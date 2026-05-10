@@ -16,7 +16,7 @@ const settingsRoutes = [
 export default function SettingsPage() {
   return (
     <PageContainer className={styles.Settings}>
-      <BackLink href="/" label="← Back to Home" />
+      <BackLink href="/" label="Back to Home" />
       <div className={styles.SettingsHeader}>
         <h1 className={styles.SettingsTitle}>Settings</h1>
         <p className={styles.SettingsDescription}>Manage account-related options and exercise setup.</p>

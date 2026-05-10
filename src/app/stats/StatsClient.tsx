@@ -32,7 +32,7 @@ export default function StatsClient({ dateFrom, dateTo }: StatsClientProps) {
       <PageContainer className={styles.StatsContainer}>
         <PageHeader
           backHref="/"
-          backLabel="← Back to Home"
+          backLabel="Back to Home"
           icon={BarChart3}
           title="Statistics"
           description="Review your training by date range and see how often you trained each exercise category."

@@ -92,7 +92,7 @@ export default function LoginPage() {
     <div className={styles.Login}>
       <PageContainer className={styles.LoginContainer}>
         <div className={styles.LoginHeader}>
-          <BackLink href="/" label="← Back to Home" />
+          <BackLink href="/" label="Back to Home" />
           <h1 className={styles.LoginTitle}>Sign In</h1>
           <p className={styles.LoginDescription}>
             Sign in with your email and password or request a new account.

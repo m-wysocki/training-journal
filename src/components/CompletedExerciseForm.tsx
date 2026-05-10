@@ -509,7 +509,7 @@ export function CompletedExerciseForm({
       <PageContainer className={styles.CompletedExerciseFormContainer}>
         <PageHeader
           backHref={mode === 'edit' ? '/completed-exercises' : '/'}
-          backLabel={mode === 'edit' ? '← Back to Completed Exercises' : '← Back to Home'}
+          backLabel={mode === 'edit' ? 'Back to Completed Exercises' : 'Back to Home'}
           icon={HeaderIcon}
           title={title}
           description={description}

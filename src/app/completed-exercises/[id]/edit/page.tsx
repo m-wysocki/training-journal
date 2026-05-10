@@ -92,7 +92,7 @@ function EditCompletedExerciseFallback() {
       <PageContainer className={styles.CompletedExerciseFormContainer}>
         <PageHeader
           backHref="/completed-exercises"
-          backLabel="← Back to Completed Exercises"
+          backLabel="Back to Completed Exercises"
           title="Edit Completed Exercise"
           description="Update the exercise, workout details, or notes using the same view as the create form."
           descriptionSize="large"
