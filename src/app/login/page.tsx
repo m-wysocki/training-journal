@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import BackLink from '@/components/BackLink'
 import PageContainer from '@/components/PageContainer'
+import PageHeader from '@/components/PageHeader'
 import { signInWithPassword, signUpWithPassword } from './actions'
 import styles from './page.module.scss'
 
@@ -91,13 +92,11 @@ export default function LoginPage() {
   return (
     <div className={styles.Login}>
       <PageContainer className={styles.LoginContainer}>
-        <div className={styles.LoginHeader}>
-          <BackLink href="/" label="Back to Home" />
-          <h1 className={styles.LoginTitle}>Sign In</h1>
-          <p className={styles.LoginDescription}>
-            Sign in with your email and password or request a new account.
-          </p>
-        </div>
+        <BackLink href="/" label="Back to Home" />
+        <PageHeader
+          title="Sign In"
+          description="Sign in with your email and password or request a new account."
+        />
 
         <div className={styles.LoginModeTabs}>
           <button

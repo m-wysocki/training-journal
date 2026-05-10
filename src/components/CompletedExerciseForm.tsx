@@ -4,6 +4,7 @@ import type { LucideIcon } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import * as Dialog from '@radix-ui/react-dialog'
+import BackLink from '@/components/BackLink'
 import { DatePicker } from '@/components/DatePicker'
 import { DurationStepper } from '@/components/DurationStepper'
 import { NumericStepper } from '@/components/NumericStepper'
@@ -507,9 +508,11 @@ export function CompletedExerciseForm({
   return (
     <div className={styles.CompletedExerciseForm}>
       <PageContainer className={styles.CompletedExerciseFormContainer}>
+        <BackLink
+          href={mode === 'edit' ? '/completed-exercises' : '/'}
+          label={mode === 'edit' ? 'Back to Completed Exercises' : 'Back to Home'}
+        />
         <PageHeader
-          backHref={mode === 'edit' ? '/completed-exercises' : '/'}
-          backLabel={mode === 'edit' ? 'Back to Completed Exercises' : 'Back to Home'}
           icon={HeaderIcon}
           title={title}
           description={description}

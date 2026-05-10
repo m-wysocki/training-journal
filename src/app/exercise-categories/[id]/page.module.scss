@@ -15,28 +15,6 @@
     padding-block: 2rem;
   }
 
-  &Header {
-    margin-bottom: 2rem;
-  }
-
-  &BackLink {
-    display: inline-block;
-    margin-bottom: 1rem;
-    font-size: 0.875rem;
-    color: var(--primary);
-  }
-
-  &BackLink:hover {
-    color: var(--primary-hover);
-  }
-
-  &Title {
-    margin: 0.5rem 0 0;
-    font-size: 1.875rem;
-    font-weight: 400;
-    color: var(--foreground);
-  }
-
   &EmptyState {
     padding: 4rem 0;
     text-align: center;
@@ -182,10 +160,6 @@
   @media (max-width: 640px) {
     &Container {
       padding-block: 1rem;
-    }
-
-    &Header {
-      margin-bottom: 1.25rem;
     }
   }
 }

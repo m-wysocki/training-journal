@@ -4,6 +4,7 @@ import { ArrowDown, ArrowUp, ClipboardList } from 'lucide-react'
 import { useMemo, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import * as Dialog from '@radix-ui/react-dialog'
+import BackLink from '@/components/BackLink'
 import DateRangeFiltersBar from '@/components/DateRangeFiltersBar'
 import { DatePicker } from '@/components/DatePicker'
 import LoadingSkeleton from '@/components/LoadingSkeleton'
@@ -321,9 +322,8 @@ export default function CompletedExercisesClient({
   return (
     <div className={styles.CompletedExercises}>
       <PageContainer className={styles.CompletedExercisesContainer}>
+        <BackLink href="/" label="Back to Home" />
         <PageHeader
-          backHref="/"
-          backLabel="Back to Home"
           icon={ClipboardList}
           title="Completed Exercises"
           description="Browse your logged exercises grouped by workout date."

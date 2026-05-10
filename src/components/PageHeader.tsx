@@ -1,20 +1,15 @@
 import type { LucideIcon } from 'lucide-react'
-import BackLink from './BackLink'
 import styles from './PageHeader.module.scss'
 
 type PageHeaderProps = {
-  backHref: string
-  backLabel: string
   title: string
-  description: string
+  description?: string
   icon?: LucideIcon
   descriptionSize?: 'default' | 'large'
   titleRowMobileAlign?: 'center' | 'start'
 }
 
 export default function PageHeader({
-  backHref,
-  backLabel,
   title,
   description,
   icon: Icon,
@@ -32,7 +27,6 @@ export default function PageHeader({
 
   return (
     <div className={styles.PageHeader}>
-      <BackLink href={backHref} label={backLabel} />
       <div className={titleRowClassName}>
         {Icon ? (
           <div className={styles.PageHeaderTitleIcon} aria-hidden="true">
@@ -41,7 +35,7 @@ export default function PageHeader({
         ) : null}
         <h1 className={styles.PageHeaderTitle}>{title}</h1>
       </div>
-      <p className={descriptionClassName}>{description}</p>
+      {description ? <p className={descriptionClassName}>{description}</p> : null}
     </div>
   )
 }

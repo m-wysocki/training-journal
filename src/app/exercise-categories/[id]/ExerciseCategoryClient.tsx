@@ -5,6 +5,7 @@ import * as Dialog from '@radix-ui/react-dialog'
 import BackLink from '@/components/BackLink'
 import OverflowMenu from '@/components/OverflowMenu'
 import PageContainer from '@/components/PageContainer'
+import PageHeader from '@/components/PageHeader'
 import StatusPanel from '@/components/StatusPanel'
 import {
   addExercise as addExerciseAction,
@@ -156,10 +157,10 @@ export default function ExerciseCategoryClient({
 
   return (
     <PageContainer className={styles.ExerciseCategoryContainer}>
-        <div className={styles.ExerciseCategoryHeader}>
-          <BackLink href="/exercise-categories" label="Back to Exercise Categories" />
-          <h1 className={styles.ExerciseCategoryTitle}>{category.name}</h1>
-        </div>
+        <BackLink href="/exercise-categories" label="Back to Exercise Categories" />
+        <PageHeader
+          title={category.name}
+        />
 
         {message && (
           <StatusPanel variant={isError ? 'error' : 'success'} withBottomSpacing>

@@ -2,6 +2,7 @@
 
 import { BarChart3 } from 'lucide-react'
 import { useMemo } from 'react'
+import BackLink from '@/components/BackLink'
 import LoadingSkeleton from '@/components/LoadingSkeleton'
 import PageContainer from '@/components/PageContainer'
 import PageHeader from '@/components/PageHeader'
@@ -30,9 +31,8 @@ export default function StatsClient({ dateFrom, dateTo }: StatsClientProps) {
   return (
     <div className={styles.Stats}>
       <PageContainer className={styles.StatsContainer}>
+        <BackLink href="/" label="Back to Home" />
         <PageHeader
-          backHref="/"
-          backLabel="Back to Home"
           icon={BarChart3}
           title="Statistics"
           description="Review your training by date range and see how often you trained each exercise category."

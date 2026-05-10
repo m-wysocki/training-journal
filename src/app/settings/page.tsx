@@ -2,6 +2,7 @@ import { Tags } from 'lucide-react'
 import BackLink from '@/components/BackLink'
 import NavigationCard from '@/components/NavigationCard'
 import PageContainer from '@/components/PageContainer'
+import PageHeader from '@/components/PageHeader'
 import styles from './page.module.scss'
 
 const settingsRoutes = [
@@ -17,10 +18,10 @@ export default function SettingsPage() {
   return (
     <PageContainer className={styles.Settings}>
       <BackLink href="/" label="Back to Home" />
-      <div className={styles.SettingsHeader}>
-        <h1 className={styles.SettingsTitle}>Settings</h1>
-        <p className={styles.SettingsDescription}>Manage account-related options and exercise setup.</p>
-      </div>
+      <PageHeader
+        title="Settings"
+        description="Manage account-related options and exercise setup."
+      />
       <div className={styles.SettingsList}>
         {settingsRoutes.map((route) => (
           <NavigationCard

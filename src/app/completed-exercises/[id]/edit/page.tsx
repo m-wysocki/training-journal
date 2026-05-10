@@ -1,5 +1,6 @@
 import { Suspense } from 'react'
 import { notFound } from 'next/navigation'
+import BackLink from '@/components/BackLink'
 import PageContainer from '@/components/PageContainer'
 import PageHeader from '@/components/PageHeader'
 import { requireUser } from '@/lib/supabase/auth'
@@ -90,9 +91,8 @@ function EditCompletedExerciseFallback() {
   return (
     <div className={styles.CompletedExerciseForm}>
       <PageContainer className={styles.CompletedExerciseFormContainer}>
+        <BackLink href="/completed-exercises" label="Back to Completed Exercises" />
         <PageHeader
-          backHref="/completed-exercises"
-          backLabel="Back to Completed Exercises"
           title="Edit Completed Exercise"
           description="Update the exercise, workout details, or notes using the same view as the create form."
           descriptionSize="large"
