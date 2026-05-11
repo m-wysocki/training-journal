@@ -31,6 +31,8 @@ The app is used to track workouts, muscle groups, exercises, sets, reps, and tra
 
 - Use SCSS Modules for component-specific styles.
 - Keep styles close to the component they belong to.
+- Each styled component should have its own `ComponentName.module.scss` file. Do not keep component styles in a
+  different component's stylesheet.
 - Use PascalCase class names based on the component and its elements, for example `Header`, `HeaderLogo`,
   `HeaderButton`.
 - In SCSS Modules, nest related element styles under the base component class when it matches the class naming pattern:

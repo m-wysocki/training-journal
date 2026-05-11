@@ -1,17 +1,18 @@
 'use client'
 
-import { ArrowDown, ArrowUp, ChevronDown, ChevronLeft, ChevronRight, ClipboardList } from 'lucide-react'
+import { ArrowDown, ArrowUp, ClipboardList } from 'lucide-react'
 import { useMemo, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import * as Accordion from '@radix-ui/react-accordion'
-import * as Dialog from '@radix-ui/react-dialog'
+import BackLink from '@/components/BackLink'
+import DateRangeFiltersBar from '@/components/DateRangeFiltersBar'
 import { DatePicker } from '@/components/DatePicker'
+import FormDialog from '@/components/FormDialog'
 import LoadingSkeleton from '@/components/LoadingSkeleton'
 import OverflowMenu from '@/components/OverflowMenu'
 import PageContainer from '@/components/PageContainer'
 import PageHeader from '@/components/PageHeader'
 import StatusPanel from '@/components/StatusPanel'
-import IconButton from '@/components/IconButton'
+import SurfaceCard from '@/components/SurfaceCard'
 import { formatLocalDateOnly } from '@/lib/dateOnly'
 import type { CompletedExerciseRow, EntryComparisons, ExerciseCategory } from '@/lib/completedExercises'
 import {
@@ -19,11 +20,7 @@ import {
   deleteCompletedExercise,
   loadCompletedExercisesForRange,
 } from '@/app/completed-exercises/actions'
-import {
-  formatDateRange,
-  getWeekRangeForDate,
-  shiftWeekRange,
-} from '@/lib/trainingDateRange'
+import { getWeekRangeForDate, shiftWeekRange } from '@/lib/trainingDateRange'
 import { formatDuration, formatDurationHoursMinutes, formatPace, formatWeekdayDate } from '@/lib/trainingFormatters'
 import styles from './page.module.scss'
 
@@ -141,7 +138,6 @@ export default function CompletedExercisesClient({
   const [successMessage, setSuccessMessage] = useState('')
   const [entryComparisons, setEntryComparisons] = useState<EntryComparisons>(initialEntryComparisons)
   const isCopyDateSameAsSource = Boolean(copyTarget && copyDate === copyTarget.sourceDate)
-  const hasDateRange = Boolean(dateFrom && dateTo)
 
   const updateDateRange = (nextDateRange: { dateFrom: string; dateTo: string }) => {
     setDateRange(nextDateRange)
@@ -326,111 +322,51 @@ export default function CompletedExercisesClient({
   return (
     <div className={styles.CompletedExercises}>
       <PageContainer className={styles.CompletedExercisesContainer}>
+        <BackLink href="/" label="Back to Home" />
         <PageHeader
-          backHref="/"
-          backLabel="← Back to Home"
           icon={ClipboardList}
           title="Completed Exercises"
           description="Browse your logged exercises grouped by workout date."
         />
 
-        <div className={styles.CompletedExercisesFiltersBar}>
-          <Accordion.Root
-            type="single"
-            collapsible
-            className={styles.CompletedExercisesFiltersAccordion}
-            value={filtersValue}
-            onValueChange={setFiltersValue}
-          >
-            <Accordion.Item value="filters" className={styles.CompletedExercisesFiltersAccordionItem}>
-              <Accordion.Header className={styles.CompletedExercisesFiltersAccordionHeader}>
-                <Accordion.Trigger className={styles.CompletedExercisesFiltersTrigger}>
-                  Filters
-                  <span className={styles.CompletedExercisesFiltersTriggerIcon} aria-hidden="true">
-                    <ChevronDown size={14} strokeWidth={2} aria-hidden="true" />
-                  </span>
-                </Accordion.Trigger>
-              </Accordion.Header>
-              <Accordion.Content className={styles.CompletedExercisesFiltersContent}>
-                <div className={styles.CompletedExercisesDateRangeFields}>
-                  <div className={styles.CompletedExercisesDatePickerGroup}>
-                    <label htmlFor="dateFrom" className={styles.CompletedExercisesFilterLabel}>
-                      From
-                    </label>
-                    <DatePicker
-                      id="dateFrom"
-                      value={dateFrom}
-                      closeOnSelect={false}
-                      onChange={(value) => updateDateRange({ dateFrom: value, dateTo })}
-                    />
-                  </div>
-                  <div className={styles.CompletedExercisesDatePickerGroup}>
-                    <label htmlFor="dateTo" className={styles.CompletedExercisesFilterLabel}>
-                      To
-                    </label>
-                    <DatePicker
-                      id="dateTo"
-                      value={dateTo}
-                      closeOnSelect={false}
-                      onChange={(value) => updateDateRange({ dateFrom, dateTo: value })}
-                    />
-                  </div>
-                </div>
-
-                <div className={styles.CompletedExercisesFilterField}>
-                  <p className={styles.CompletedExercisesFilterLabel}>Exercise Category</p>
-                  <div className={styles.CompletedExercisesBadgeGroup} role="group" aria-label="Exercise category filter">
-                    <button
-                      type="button"
-                      className={styles.CompletedExercisesChoiceBadge}
-                      aria-pressed={selectedExerciseCategory === 'all'}
-                      data-selected={selectedExerciseCategory === 'all' ? 'true' : undefined}
-                      onClick={() => selectExerciseCategory('all')}
-                    >
-                      All
-                    </button>
-                    {exerciseCategoryOptions.map((exerciseCategory) => (
-                      <button
-                        key={exerciseCategory}
-                        type="button"
-                        className={styles.CompletedExercisesChoiceBadge}
-                        aria-pressed={selectedExerciseCategory === exerciseCategory}
-                        data-selected={selectedExerciseCategory === exerciseCategory ? 'true' : undefined}
-                        onClick={() => selectExerciseCategory(exerciseCategory)}
-                      >
-                        {exerciseCategory}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </Accordion.Content>
-            </Accordion.Item>
-          </Accordion.Root>
-
-          <div className={styles.CompletedExercisesCompactWeekBar}>
-            <IconButton
-              className={styles.CompletedExercisesWeekIconButton}
-              icon={ChevronLeft}
-              iconSize={14}
-              iconStrokeWidth={2.2}
-              onClick={() => shiftDateRangeByWeek(-1)}
-              aria-label="Previous week"
-              disabled={!hasDateRange}
-            />
-            <p className={styles.CompletedExercisesWeekRange}>
-              {hasDateRange ? formatDateRange(dateFrom, dateTo) : 'Loading date range...'}
-            </p>
-            <IconButton
-              className={styles.CompletedExercisesWeekIconButton}
-              icon={ChevronRight}
-              iconSize={14}
-              iconStrokeWidth={2.2}
-              onClick={() => shiftDateRangeByWeek(1)}
-              aria-label="Next week"
-              disabled={!hasDateRange}
-            />
-          </div>
-        </div>
+        <DateRangeFiltersBar
+          dateFrom={dateFrom}
+          dateTo={dateTo}
+          onDateRangeChange={(nextDateFrom, nextDateTo) => updateDateRange({ dateFrom: nextDateFrom, dateTo: nextDateTo })}
+          onShiftWeek={shiftDateRangeByWeek}
+          datePickerCloseOnSelect={false}
+          accordionValue={filtersValue}
+          onAccordionValueChange={setFiltersValue}
+          idPrefix="completed-exercises"
+          extraFilters={(
+            <div className={styles.CompletedExercisesFilterField}>
+              <p className={styles.CompletedExercisesFilterLabel}>Exercise Category</p>
+              <div className={styles.CompletedExercisesBadgeGroup} role="group" aria-label="Exercise category filter">
+                <button
+                  type="button"
+                  className={styles.CompletedExercisesChoiceBadge}
+                  aria-pressed={selectedExerciseCategory === 'all'}
+                  data-selected={selectedExerciseCategory === 'all' ? 'true' : undefined}
+                  onClick={() => selectExerciseCategory('all')}
+                >
+                  All
+                </button>
+                {exerciseCategoryOptions.map((exerciseCategory) => (
+                  <button
+                    key={exerciseCategory}
+                    type="button"
+                    className={styles.CompletedExercisesChoiceBadge}
+                    aria-pressed={selectedExerciseCategory === exerciseCategory}
+                    data-selected={selectedExerciseCategory === exerciseCategory ? 'true' : undefined}
+                    onClick={() => selectExerciseCategory(exerciseCategory)}
+                  >
+                    {exerciseCategory}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        />
 
         {errorMessage && (
           <StatusPanel variant="error" withBottomSpacing>
@@ -452,7 +388,7 @@ export default function CompletedExercisesClient({
         {!isDataLoading ? (
         <div className={styles.CompletedExercisesDaysList}>
           {groupedByDate.map((group) => (
-            <section key={group.date} className={styles.CompletedExercisesDayCard}>
+            <SurfaceCard as="section" key={group.date} className={styles.CompletedExercisesDayCard}>
               <h2 className={styles.CompletedExercisesDayTitle}>{formatWeekdayDate(group.date)}</h2>
               <div className={styles.CompletedExercisesExerciseCategorySections}>
                 {group.exerciseCategories.map((exerciseCategory) => (
@@ -532,81 +468,57 @@ export default function CompletedExercisesClient({
                   </section>
                 ))}
               </div>
-            </section>
+            </SurfaceCard>
           ))}
         </div>
         ) : null}
 
-        <Dialog.Root open={deleteOpen} onOpenChange={(open) => !open && closeDelete()}>
-          <Dialog.Portal>
-            <Dialog.Overlay className={styles.CompletedExercisesOverlay} />
-            <Dialog.Content className={styles.CompletedExercisesDialogContentSmall}>
-              <Dialog.Title className={styles.CompletedExercisesDialogTitle}>Delete entry?</Dialog.Title>
-              <Dialog.Description className={styles.CompletedExercisesDialogDescription}>
-                This action cannot be undone.
-              </Dialog.Description>
-              <div className={styles.CompletedExercisesDialogActions}>
-                <Dialog.Close asChild>
-                  <button type="button" className={styles.CompletedExercisesGhostButton}>
-                    Cancel
-                  </button>
-                </Dialog.Close>
-                <button
-                  type="button"
-                  className={styles.CompletedExercisesDangerButton}
-                  disabled={deleteLoading}
-                  onClick={confirmDelete}
-                >
-                  {deleteLoading ? 'Deleting…' : 'Delete'}
-                </button>
-              </div>
-            </Dialog.Content>
-          </Dialog.Portal>
-        </Dialog.Root>
+        <FormDialog
+          open={deleteOpen}
+          onOpenChange={(open) => {
+            if (!open) closeDelete()
+          }}
+          size="small"
+          title="Delete entry?"
+          description="This action cannot be undone."
+          primaryActionLabel={deleteLoading ? 'Deleting…' : 'Delete'}
+          onPrimaryAction={confirmDelete}
+          primaryActionDisabled={deleteLoading}
+          primaryActionTone="danger"
+        >
+          <></>
+        </FormDialog>
 
-        <Dialog.Root open={copyOpen} onOpenChange={(open) => !open && closeCopyCategory()}>
-          <Dialog.Portal>
-            <Dialog.Overlay className={styles.CompletedExercisesOverlay} />
-            <Dialog.Content className={styles.CompletedExercisesDialogContentSmall}>
-              <Dialog.Title className={styles.CompletedExercisesDialogTitle}>Copy exercises</Dialog.Title>
-              <Dialog.Description className={styles.CompletedExercisesDialogDescription}>
-                {copyTarget
-                  ? `Copy ${copyTarget.categoryName} from ${formatWeekdayDate(copyTarget.sourceDate)} to another date.`
-                  : 'Choose a date to copy these exercises.'}
-              </Dialog.Description>
-              <div className={styles.CompletedExercisesDialogForm}>
-                <div className={styles.CompletedExercisesField}>
-                  <label htmlFor="copyDate" className={styles.CompletedExercisesLabel}>
-                    New date
-                  </label>
-                  <DatePicker
-                    id="copyDate"
-                    value={copyDate}
-                    onChange={setCopyDate}
-                  />
-                  {isCopyDateSameAsSource ? (
-                    <p className={styles.CompletedExercisesFieldHint}>Choose a different date than the source workout.</p>
-                  ) : null}
-                </div>
-                <div className={styles.CompletedExercisesDialogActions}>
-                  <Dialog.Close asChild>
-                    <button type="button" className={styles.CompletedExercisesGhostButton}>
-                      Cancel
-                    </button>
-                  </Dialog.Close>
-                  <button
-                    type="button"
-                    className={styles.CompletedExercisesPrimaryButton}
-                    disabled={copyLoading || !copyDate || isCopyDateSameAsSource}
-                    onClick={confirmCopyCategory}
-                  >
-                    {copyLoading ? 'Copying...' : 'Copy'}
-                  </button>
-                </div>
-              </div>
-            </Dialog.Content>
-          </Dialog.Portal>
-        </Dialog.Root>
+        <FormDialog
+          open={copyOpen}
+          onOpenChange={(open) => {
+            if (!open) closeCopyCategory()
+          }}
+          size="small"
+          title="Copy exercises"
+          description={copyTarget
+            ? `Copy ${copyTarget.categoryName} from ${formatWeekdayDate(copyTarget.sourceDate)} to another date.`
+            : 'Choose a date to copy these exercises.'}
+          primaryActionLabel={copyLoading ? 'Copying...' : 'Copy'}
+          onPrimaryAction={confirmCopyCategory}
+          primaryActionDisabled={copyLoading || !copyDate || isCopyDateSameAsSource}
+        >
+          <div className={styles.CompletedExercisesDialogForm}>
+            <div className={styles.CompletedExercisesField}>
+              <label htmlFor="copyDate" className={styles.CompletedExercisesLabel}>
+                New date
+              </label>
+              <DatePicker
+                id="copyDate"
+                value={copyDate}
+                onChange={setCopyDate}
+              />
+              {isCopyDateSameAsSource ? (
+                <p className={styles.CompletedExercisesFieldHint}>Choose a different date than the source workout.</p>
+              ) : null}
+            </div>
+          </div>
+        </FormDialog>
       </PageContainer>
     </div>
   )

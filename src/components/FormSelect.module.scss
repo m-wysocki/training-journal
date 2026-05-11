@@ -1,0 +1,28 @@
+.FormSelect {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  border: 1px solid var(--outline);
+  border-radius: 0.5rem;
+  padding: 0.625rem 2.75rem 0.625rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--foreground);
+  background-color: var(--surface);
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%236b7280' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 0.75rem;
+}
+
+.FormSelect:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.FormSelect:disabled {
+  background-color: var(--surface-low);
+  color: var(--text-soft);
+}

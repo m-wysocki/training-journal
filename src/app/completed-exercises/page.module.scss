@@ -9,126 +9,9 @@
     width: 100%;
   }
 
-  &FiltersBar {
-    display: grid;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-  }
-
   &FilterField {
     display: grid;
     gap: 0.5rem;
-  }
-
-  &DateRangeFields {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 14rem));
-    gap: 0.75rem;
-  }
-
-  &DatePickerGroup {
-    display: grid;
-    gap: 0.5rem;
-  }
-
-  &CompactWeekBar {
-    display: grid;
-    grid-template-columns: 2.25rem minmax(0, 1fr) 2.25rem;
-    align-items: center;
-    gap: 0.5rem;
-    width: 100%;
-    margin-top: 0.375rem;
-  }
-
-  &WeekIconButton {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 2.25rem;
-    border: 1px solid var(--outline);
-    border-radius: 0.5rem;
-    color: var(--foreground);
-    background: var(--surface);
-    cursor: pointer;
-  }
-
-  &WeekIconButton:hover {
-    border-color: var(--primary);
-  }
-
-  &WeekRange {
-    margin: 0;
-    font-size: 0.875rem;
-    color: var(--text-muted);
-    text-align: center;
-  }
-
-  &FiltersAccordion {
-    justify-self: start;
-    width: 100%;
-  }
-
-  &FiltersAccordionItem {
-    display: grid;
-    justify-items: start;
-  }
-
-  &FiltersAccordionHeader {
-    margin: 0;
-  }
-
-  &FiltersTrigger {
-    min-height: 2.25rem;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 0.375rem;
-    border: 1px solid var(--outline);
-    border-radius: 0.5rem;
-    padding: 0.5rem 0.75rem;
-    color: var(--text-muted);
-    background: var(--surface);
-    font: inherit;
-    font-size: 0.8125rem;
-    cursor: pointer;
-  }
-
-  &FiltersTrigger:hover {
-    border-color: var(--primary);
-    color: var(--foreground);
-  }
-
-  &FiltersTriggerIcon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex: 0 0 auto;
-    line-height: 0;
-    color: var(--text-soft);
-  }
-
-  &FiltersTriggerIcon :global(svg) {
-    display: block;
-  }
-
-  &FiltersContent {
-    width: 100%;
-    box-sizing: border-box;
-    display: grid;
-    gap: 0.875rem;
-    margin-top: 0.5rem;
-    padding: 0.75rem;
-    border: 1px solid var(--surface-border);
-    border-radius: 0.5rem;
-    background: var(--surface-low);
-    overflow: hidden;
-  }
-
-  &FiltersContent[data-state='closed'] {
-    display: none;
-    margin-top: 0;
-    padding: 0;
-    border: 0;
   }
 
   &FilterLabel {
@@ -190,11 +73,7 @@
   }
 
   &DayCard {
-    border: 0;
-    border-radius: 1rem;
-    background: var(--surface-low);
     padding: 1rem;
-    box-shadow: var(--soft-shadow);
     content-visibility: auto;
     contain-intrinsic-size: 320px;
   }
@@ -321,58 +200,6 @@
     white-space: pre-wrap;
   }
 
-  &Overlay {
-    position: fixed;
-    inset: 0;
-    background: var(--overlay);
-    backdrop-filter: blur(12px);
-  }
-
-  &DialogContent {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: min(calc(100vw - 1.5rem), 28rem);
-    max-width: 28rem;
-    max-height: min(90vh, 40rem);
-    overflow-y: auto;
-    box-sizing: border-box;
-    border-radius: 1rem;
-    border: 1px solid var(--surface-border);
-    background: var(--surface);
-    padding: 2rem;
-    box-shadow: var(--soft-shadow);
-  }
-
-  &DialogContentSmall {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: min(calc(100vw - 1.5rem), 22rem);
-    max-width: 22rem;
-    box-sizing: border-box;
-    border-radius: 1rem;
-    border: 1px solid var(--surface-border);
-    background: var(--surface);
-    padding: 2rem;
-    box-shadow: var(--soft-shadow);
-  }
-
-  &DialogTitle {
-    margin: 0 0 1rem;
-    font-size: 1.25rem;
-    font-weight: 400;
-    color: var(--foreground);
-  }
-
-  &DialogDescription {
-    margin: 0 0 1.5rem;
-    font-size: 0.875rem;
-    color: var(--text-muted);
-  }
-
   &DialogForm {
     display: grid;
     gap: 0.75rem;
@@ -462,75 +289,9 @@
     border: 1px solid var(--state-error-bg);
   }
 
-  &DialogActions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 0.75rem;
-    padding-top: 0.5rem;
-    margin-top: 0.25rem;
-  }
-
-  &PrimaryButton {
-    padding: 0.625rem 1.25rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: var(--on-primary);
-    background: var(--primary);
-    border: 1px solid var(--primary);
-    border-radius: 0.5rem;
-    cursor: pointer;
-  }
-
-  &PrimaryButton:hover {
-    background: var(--primary-hover);
-  }
-
-  &PrimaryButton:disabled {
-    opacity: 0.65;
-    cursor: not-allowed;
-  }
-
-  &GhostButton {
-    padding: 0.5rem 1rem;
-    font-size: 0.875rem;
-    color: var(--text-muted);
-    background: var(--surface-low);
-    border: 1px solid var(--outline);
-    border-radius: 0.5rem;
-    cursor: pointer;
-  }
-
-  &GhostButton:hover {
-    background: var(--surface-mid);
-  }
-
-  &DangerButton {
-    padding: 0.625rem 1.25rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: var(--on-primary);
-    background: var(--state-error-text);
-    border: 1px solid var(--state-error-text);
-    border-radius: 0.5rem;
-    cursor: pointer;
-  }
-
-  &DangerButton:hover {
-    background: var(--danger-strong);
-  }
-
-  &DangerButton:disabled {
-    opacity: 0.65;
-    cursor: not-allowed;
-  }
-
   @media (max-width: 640px) {
     & {
       padding-block: 1rem;
-    }
-
-    &DateRangeFields {
-      grid-template-columns: 1fr;
     }
 
     &Input,
@@ -543,14 +304,5 @@
       flex-direction: column;
     }
 
-    &DialogActions {
-      flex-direction: column-reverse;
-    }
-
-    &PrimaryButton,
-    &DangerButton,
-    &GhostButton {
-      width: 100%;
-    }
   }
 }

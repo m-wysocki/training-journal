@@ -1,43 +1,23 @@
-.Stats {
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding-block: 2rem;
+.DateRangeFiltersBar {
+  display: grid;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
 
-  &Container {
-    width: 100%;
-  }
-
-  &SummaryCard,
-  &BreakdownCard {
-    border: 0;
-    border-radius: 1rem;
-    background: var(--surface-low);
-    box-shadow: var(--soft-shadow);
-  }
-
-  &FiltersBar {
-    display: grid;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-  }
-
-  &FiltersAccordion {
+  &Accordion {
     justify-self: start;
     width: 100%;
   }
 
-  &FiltersAccordionItem {
+  &AccordionItem {
     display: grid;
     justify-items: start;
   }
 
-  &FiltersAccordionHeader {
+  &AccordionHeader {
     margin: 0;
   }
 
-  &FiltersTrigger {
+  &Trigger {
     min-height: 2.25rem;
     display: flex;
     align-items: center;
@@ -53,12 +33,12 @@
     cursor: pointer;
   }
 
-  &FiltersTrigger:hover {
+  &Trigger:hover {
     border-color: var(--primary);
     color: var(--foreground);
   }
 
-  &FiltersTriggerIcon {
+  &TriggerIcon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -67,11 +47,11 @@
     color: var(--text-soft);
   }
 
-  &FiltersTriggerIcon :global(svg) {
+  &TriggerIcon :global(svg) {
     display: block;
   }
 
-  &FiltersContent {
+  &Content {
     width: 100%;
     box-sizing: border-box;
     display: grid;
@@ -84,7 +64,7 @@
     overflow: hidden;
   }
 
-  &FiltersContent[data-state='closed'] {
+  &Content[data-state='closed'] {
     display: none;
     margin-top: 0;
     padding: 0;
@@ -100,6 +80,11 @@
   &DatePickerGroup {
     display: grid;
     gap: 0.5rem;
+  }
+
+  &Label {
+    font-size: 0.875rem;
+    color: var(--text-muted);
   }
 
   &CompactWeekBar {
@@ -127,11 +112,6 @@
     border-color: var(--primary);
   }
 
-  &Label {
-    font-size: 0.875rem;
-    color: var(--text-muted);
-  }
-
   &WeekRange {
     margin: 0;
     font-size: 0.875rem;
@@ -139,65 +119,9 @@
     text-align: center;
   }
 
-  &Grid {
-    display: grid;
-    gap: 1rem;
-  }
-
-  &SummaryCard {
-    padding: 1rem;
-  }
-
-  &CardLabel {
-    margin: 0;
-    font-size: 0.875rem;
-    color: var(--text-soft);
-  }
-
-  &PrimaryStat {
-    margin: 0.5rem 0 0;
-    font-size: 2.25rem;
-    font-weight: 400;
-    color: var(--foreground);
-  }
-
-  &CardHint {
-    margin: 0.5rem 0 0;
-    font-size: 0.875rem;
-    color: var(--text-muted);
-  }
-
-  &BreakdownCard {
-    padding: 1rem;
-  }
-
-  &BreakdownHeader {
-    display: grid;
-    gap: 0.25rem;
-    margin-bottom: 1rem;
-  }
-
-  &BreakdownTitle {
-    margin: 0;
-    font-size: 1rem;
-    font-weight: 500;
-    color: var(--foreground);
-  }
-
-  &BreakdownDescription {
-    margin: 0;
-    font-size: 0.875rem;
-    color: var(--text-muted);
-  }
-
   @media (max-width: 640px) {
-    & {
-      padding-block: 1rem;
-    }
-
     &DateRangeFields {
       grid-template-columns: 1fr;
     }
-
   }
 }

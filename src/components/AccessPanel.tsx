@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import SurfaceCard from './SurfaceCard'
 import styles from './AccessPanel.module.scss'
 
 type AccessPanelAction = {
@@ -27,14 +28,12 @@ export default function AccessPanel({
   descriptionClassName,
   actionClassName,
 }: AccessPanelProps) {
-  const panelClassName = [
-    styles.AccessPanel,
-    variant === 'muted' ? styles.AccessPanelMuted : '',
-    className ?? '',
-  ].filter(Boolean).join(' ')
-
   return (
-    <section className={panelClassName}>
+    <SurfaceCard
+      as="section"
+      tone={variant === 'muted' ? 'mid' : 'low'}
+      className={[styles.AccessPanel, className ?? ''].filter(Boolean).join(' ')}
+    >
       <h2 className={[styles.AccessPanelTitle, titleClassName].filter(Boolean).join(' ')}>{title}</h2>
       <p className={[styles.AccessPanelDescription, descriptionClassName].filter(Boolean).join(' ')}>
         {description}
@@ -44,6 +43,6 @@ export default function AccessPanel({
           {action.label}
         </Link>
       ) : null}
-    </section>
+    </SurfaceCard>
   )
 }

@@ -3,20 +3,24 @@
 import type { LucideIcon } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import * as Dialog from '@radix-ui/react-dialog'
+import BackLink from '@/components/BackLink'
 import { DatePicker } from '@/components/DatePicker'
 import { DurationStepper } from '@/components/DurationStepper'
+import FormDialog from '@/components/FormDialog'
+import FormSelect from '@/components/FormSelect'
 import { NumericStepper } from '@/components/NumericStepper'
 import { PaceStepper } from '@/components/PaceStepper'
 import PageContainer from '@/components/PageContainer'
 import PageHeader from '@/components/PageHeader'
 import StatusPanel from '@/components/StatusPanel'
+import SurfaceCard from '@/components/SurfaceCard'
 import { loadRecentCompletedExercises } from '@/app/completed-exercises/actions'
 import {
   addExercise,
   addExerciseCategory,
 } from '@/lib/actions/exerciseSetupActions'
 import type { RecentCompletedExercise } from '@/lib/completedExercises'
+import { EXERCISE_TYPE_OPTIONS } from '@/lib/exerciseTypeOptions'
 import type { ExerciseType } from '@/lib/exerciseTypes'
 import { getCompletedExercisesHrefForDate } from '@/lib/trainingDateRange'
 import { formatDuration, formatLongDate, formatPace } from '@/lib/trainingFormatters'
@@ -506,9 +510,11 @@ export function CompletedExerciseForm({
   return (
     <div className={styles.CompletedExerciseForm}>
       <PageContainer className={styles.CompletedExerciseFormContainer}>
+        <BackLink
+          href={mode === 'edit' ? '/completed-exercises' : '/'}
+          label={mode === 'edit' ? 'Back to Completed Exercises' : 'Back to Home'}
+        />
         <PageHeader
-          backHref={mode === 'edit' ? '/completed-exercises' : '/'}
-          backLabel={mode === 'edit' ? '← Back to Completed Exercises' : '← Back to Home'}
           icon={HeaderIcon}
           title={title}
           description={description}
@@ -517,7 +523,7 @@ export function CompletedExerciseForm({
         />
 
         <form onSubmit={handleSubmit} className={styles.CompletedExerciseFormForm}>
-          <section className={styles.CompletedExerciseFormSection}>
+          <SurfaceCard as="section" className={styles.CompletedExerciseFormSection}>
             <div className={styles.CompletedExerciseFormSectionHeader}>
               <h2 className={styles.CompletedExerciseFormSectionTitle}>Exercise</h2>
               <p className={styles.CompletedExerciseFormSectionDescription}>
@@ -553,51 +559,35 @@ export function CompletedExerciseForm({
                       {category.name}
                     </button>
                   ))}
-                  <Dialog.Root open={isExerciseCategoryDialogOpen} onOpenChange={setIsExerciseCategoryDialogOpen}>
-                    <Dialog.Trigger asChild>
+                  <FormDialog
+                    open={isExerciseCategoryDialogOpen}
+                    onOpenChange={setIsExerciseCategoryDialogOpen}
+                    title="Add Exercise Category"
+                    description="Enter the name of the new exercise category."
+                    trigger={(
                       <button type="button" className={styles.CompletedExerciseFormAddBadge}>
                         Add
                       </button>
-                    </Dialog.Trigger>
-                    <Dialog.Portal>
-                      <Dialog.Overlay className={styles.CompletedExerciseFormOverlay} />
-                      <Dialog.Content className={styles.CompletedExerciseFormDialogContent}>
-                        <Dialog.Title className={styles.CompletedExerciseFormDialogTitle}>Add Exercise Category</Dialog.Title>
-                        <Dialog.Description className={styles.CompletedExerciseFormDialogDescription}>
-                          Enter the name of the new exercise category.
-                        </Dialog.Description>
-                        <div className={styles.CompletedExerciseFormDialogBody}>
-                          <input
-                            className={styles.CompletedExerciseFormInput}
-                            value={newExerciseCategoryName}
-                            onChange={(e) => setNewExerciseCategoryName(e.target.value)}
-                            placeholder="e.g. Back"
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter') {
-                                e.preventDefault()
-                                handleAddExerciseCategory()
-                              }
-                            }}
-                          />
-                          <div className={styles.CompletedExerciseFormDialogActions}>
-                            <Dialog.Close asChild>
-                              <button type="button" className={styles.CompletedExerciseFormGhostButton}>
-                                Cancel
-                              </button>
-                            </Dialog.Close>
-                            <button
-                              type="button"
-                              onClick={handleAddExerciseCategory}
-                              className={styles.CompletedExerciseFormPrimaryButton}
-                              disabled={isAddingExerciseCategory}
-                            >
-                              {isAddingExerciseCategory ? 'Adding...' : 'Add'}
-                            </button>
-                          </div>
-                        </div>
-                      </Dialog.Content>
-                    </Dialog.Portal>
-                  </Dialog.Root>
+                    )}
+                    primaryActionLabel={isAddingExerciseCategory ? 'Adding...' : 'Add'}
+                    onPrimaryAction={handleAddExerciseCategory}
+                    primaryActionDisabled={isAddingExerciseCategory}
+                  >
+                    <div className={styles.CompletedExerciseFormDialogBody}>
+                      <input
+                        className={styles.CompletedExerciseFormInput}
+                        value={newExerciseCategoryName}
+                        onChange={(e) => setNewExerciseCategoryName(e.target.value)}
+                        placeholder="e.g. Back"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault()
+                            handleAddExerciseCategory()
+                          }
+                        }}
+                      />
+                    </div>
+                  </FormDialog>
                 </div>
               </div>
 
@@ -622,8 +612,12 @@ export function CompletedExerciseForm({
                       </button>
                     ))
                   )}
-                  <Dialog.Root open={isExerciseDialogOpen} onOpenChange={setIsExerciseDialogOpen}>
-                    <Dialog.Trigger asChild>
+                  <FormDialog
+                    open={isExerciseDialogOpen}
+                    onOpenChange={setIsExerciseDialogOpen}
+                    title="Add Exercise"
+                    description="Add a new exercise to the selected exercise category."
+                    trigger={(
                       <button
                         type="button"
                         className={styles.CompletedExerciseFormAddBadge}
@@ -631,66 +625,42 @@ export function CompletedExerciseForm({
                       >
                         Add
                       </button>
-                    </Dialog.Trigger>
-                    <Dialog.Portal>
-                      <Dialog.Overlay className={styles.CompletedExerciseFormOverlay} />
-                      <Dialog.Content className={styles.CompletedExerciseFormDialogContent}>
-                        <Dialog.Title className={styles.CompletedExerciseFormDialogTitle}>Add Exercise</Dialog.Title>
-                        <Dialog.Description className={styles.CompletedExerciseFormDialogDescription}>
-                          Add a new exercise to the selected exercise category.
-                        </Dialog.Description>
-                        <div className={styles.CompletedExerciseFormDialogBody}>
-                          <input
-                            className={styles.CompletedExerciseFormInput}
-                            value={newExerciseName}
-                            onChange={(e) => setNewExerciseName(e.target.value)}
-                            placeholder="e.g. Barbell Row"
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter') {
-                                e.preventDefault()
-                                handleAddExercise()
-                              }
-                            }}
-                          />
-                          <label htmlFor="newExerciseType" className={styles.CompletedExerciseFormLabel}>
-                            Type
-                          </label>
-                          <select
-                            id="newExerciseType"
-                            className={styles.CompletedExerciseFormSelect}
-                            value={newExerciseType}
-                            onChange={(e) => setNewExerciseType(e.target.value as ExerciseType)}
-                          >
-                            <option value="strength">Strength</option>
-                            <option value="cardio">Cardio</option>
-                            <option value="duration">Duration only</option>
-                          </select>
-                          <div className={styles.CompletedExerciseFormDialogActions}>
-                            <Dialog.Close asChild>
-                              <button type="button" className={styles.CompletedExerciseFormGhostButton}>
-                                Cancel
-                              </button>
-                            </Dialog.Close>
-                            <button
-                              type="button"
-                              onClick={handleAddExercise}
-                              className={styles.CompletedExerciseFormPrimaryButton}
-                              disabled={isAddingExercise}
-                            >
-                              {isAddingExercise ? 'Adding...' : 'Add'}
-                            </button>
-                          </div>
-                        </div>
-                      </Dialog.Content>
-                    </Dialog.Portal>
-                  </Dialog.Root>
+                    )}
+                    primaryActionLabel={isAddingExercise ? 'Adding...' : 'Add'}
+                    onPrimaryAction={handleAddExercise}
+                    primaryActionDisabled={isAddingExercise}
+                  >
+                    <div className={styles.CompletedExerciseFormDialogBody}>
+                      <input
+                        className={styles.CompletedExerciseFormInput}
+                        value={newExerciseName}
+                        onChange={(e) => setNewExerciseName(e.target.value)}
+                        placeholder="e.g. Barbell Row"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault()
+                            handleAddExercise()
+                          }
+                        }}
+                      />
+                      <label htmlFor="newExerciseType" className={styles.CompletedExerciseFormLabel}>
+                        Type
+                      </label>
+                      <FormSelect
+                        id="newExerciseType"
+                        value={newExerciseType}
+                        onChange={(e) => setNewExerciseType(e.target.value as ExerciseType)}
+                        options={EXERCISE_TYPE_OPTIONS}
+                      />
+                    </div>
+                  </FormDialog>
                 </div>
               </div>
             </div>
-          </section>
+          </SurfaceCard>
 
           {selectedExercise ? (
-            <section className={styles.CompletedExerciseFormSection}>
+            <SurfaceCard as="section" className={styles.CompletedExerciseFormSection}>
               <div className={styles.CompletedExerciseFormSectionHeader}>
                 <h2 className={styles.CompletedExerciseFormSectionTitle}>Workout Details</h2>
                 <p className={styles.CompletedExerciseFormSectionDescription}>
@@ -892,11 +862,11 @@ export function CompletedExerciseForm({
                 </div>
                 )}
               </div>
-            </section>
+            </SurfaceCard>
           ) : null}
 
           {selectedExercise ? (
-            <section className={styles.CompletedExerciseFormSection}>
+            <SurfaceCard as="section" className={styles.CompletedExerciseFormSection}>
               <div className={styles.CompletedExerciseFormSectionHeader}>
                 <h2 className={styles.CompletedExerciseFormSectionTitle}>Notes</h2>
                 <p className={styles.CompletedExerciseFormSectionDescription}>
@@ -926,7 +896,7 @@ export function CompletedExerciseForm({
                   placeholder="Optional: how the workout felt, notes, observations..."
                 />
               </div>
-            </section>
+            </SurfaceCard>
           ) : null}
 
           <div className={styles.CompletedExerciseFormFormFooter}>

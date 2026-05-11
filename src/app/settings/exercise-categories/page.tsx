@@ -1,9 +1,9 @@
 import { Suspense } from 'react'
 import BackLink from '@/components/BackLink'
-import ExerciseCategoriesManager from '@/components/ExerciseCategoriesManager'
 import PageContainer from '@/components/PageContainer'
 import { requireUser } from '@/lib/supabase/auth'
 import { getExerciseCategories } from '@/lib/supabase/trainingData'
+import ExerciseCategoriesManager from './ExerciseCategoriesManager'
 import styles from './page.module.scss'
 
 async function ExerciseCategoriesData() {
@@ -25,7 +25,7 @@ function ExerciseCategoriesFallback() {
 export default function SettingsExerciseCategoriesPage() {
   return (
     <PageContainer className={styles.SettingsExerciseCategories}>
-      <BackLink href="/settings" label="← Back to Settings" />
+      <BackLink href="/settings" label="Back to Settings" />
       <Suspense fallback={<ExerciseCategoriesFallback />}>
         <ExerciseCategoriesData />
       </Suspense>

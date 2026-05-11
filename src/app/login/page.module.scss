@@ -8,35 +8,6 @@
     padding-block: 0;
   }
 
-  &Header {
-    margin-bottom: 2rem;
-  }
-
-  &BackLink {
-    display: inline-block;
-    margin-bottom: 1rem;
-    font-size: 0.875rem;
-    color: var(--tertiary);
-    transition: color 0.2s ease;
-  }
-
-  &BackLink:hover {
-    color: var(--primary);
-  }
-
-  &Title {
-    margin: 0;
-    font-size: 1.875rem;
-    font-weight: 400;
-    color: var(--foreground);
-  }
-
-  &Description {
-    margin-top: 0.5rem;
-    font-size: 0.875rem;
-    color: var(--text-muted);
-  }
-
   &Form {
     display: grid;
     gap: 1.5rem;
