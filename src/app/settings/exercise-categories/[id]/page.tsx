@@ -5,7 +5,8 @@ import LoadingSkeleton from '@/components/LoadingSkeleton'
 import PageContainer from '@/components/PageContainer'
 import { requireUser } from '@/lib/supabase/auth'
 import { getExerciseCategoryDetail } from '@/lib/supabase/trainingData'
-import ExerciseCategoryClient, { type ExerciseCategory } from './ExerciseCategoryClient'
+import ExerciseCategoryClient from './ExerciseCategoryClient'
+import { type ExerciseCategory } from './hooks/useExerciseCategoryManager'
 import styles from './page.module.scss'
 
 type ExerciseCategoryPageProps = {
