@@ -20,6 +20,7 @@ import {
   addExerciseCategory,
 } from '@/lib/actions/exerciseSetupActions'
 import type { RecentCompletedExercise } from '@/lib/completedExercises'
+import { EXERCISE_TYPE_OPTIONS } from '@/lib/exerciseTypeOptions'
 import type { ExerciseType } from '@/lib/exerciseTypes'
 import { getCompletedExercisesHrefForDate } from '@/lib/trainingDateRange'
 import { formatDuration, formatLongDate, formatPace } from '@/lib/trainingFormatters'
@@ -649,11 +650,8 @@ export function CompletedExerciseForm({
                         id="newExerciseType"
                         value={newExerciseType}
                         onChange={(e) => setNewExerciseType(e.target.value as ExerciseType)}
-                      >
-                        <option value="strength">Strength</option>
-                        <option value="cardio">Cardio</option>
-                        <option value="duration">Duration only</option>
-                      </FormSelect>
+                        options={EXERCISE_TYPE_OPTIONS}
+                      />
                     </div>
                   </FormDialog>
                 </div>

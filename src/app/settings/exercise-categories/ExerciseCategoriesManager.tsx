@@ -90,7 +90,7 @@ export default function ExerciseCategoriesManager({
         <ul className={styles.ExerciseCategoriesManagerList}>
           {categories.map((category) => (
             <li key={category.id} className={styles.ExerciseCategoriesManagerListItem}>
-              <Link href={`/exercise-categories/${category.id}`} className={styles.ExerciseCategoriesManagerCategoryLink}>
+              <Link href={`/settings/exercise-categories/${category.id}`} className={styles.ExerciseCategoriesManagerCategoryLink}>
                 {category.name}
               </Link>
 

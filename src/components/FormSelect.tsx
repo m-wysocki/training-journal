@@ -3,14 +3,23 @@
 import type { SelectHTMLAttributes } from 'react'
 import styles from './FormSelect.module.scss'
 
-type FormSelectProps = SelectHTMLAttributes<HTMLSelectElement>
+type FormSelectOption = {
+  value: string
+  label: string
+}
 
-export default function FormSelect({ className, children, ...props }: FormSelectProps) {
+type FormSelectProps = SelectHTMLAttributes<HTMLSelectElement> & {
+  options: FormSelectOption[]
+}
+
+export default function FormSelect({ className, options, ...props }: FormSelectProps) {
   const selectClassName = className ? `${styles.FormSelect} ${className}` : styles.FormSelect
 
   return (
     <select className={selectClassName} {...props}>
-      {children}
+      {options.map((option) => (
+        <option key={option.value} value={option.value}>{option.label}</option>
+      ))}
     </select>
   )
 }

@@ -85,6 +85,8 @@ export function useExerciseCategoriesManager({
   }
 
   const deleteCategory = async (id: string) => {
+    const deletedCategoryName = categories.find((category) => category.id === id)?.name
+
     clearFeedback()
     updateUiState({ deletingCategoryId: id })
 
@@ -97,6 +99,11 @@ export function useExerciseCategoriesManager({
     }
 
     setCategories((current) => current.filter((category) => category.id !== id))
+    setSuccessMessage(
+      deletedCategoryName
+        ? `Deleted exercise category: ${deletedCategoryName}.`
+        : 'Deleted exercise category.',
+    )
   }
 
   const openEditCategory = (category: ExerciseCategory) => {
