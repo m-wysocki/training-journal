@@ -1,0 +1,126 @@
+.CompletedExercisesDaysList {
+  display: grid;
+  gap: 1rem;
+}
+
+.CompletedExercisesDayCard {
+  padding: 1rem;
+  content-visibility: auto;
+  contain-intrinsic-size: 320px;
+}
+
+.CompletedExercisesDayTitle {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.CompletedExercisesExerciseCategorySections {
+  display: grid;
+  gap: 0.875rem;
+}
+
+.CompletedExercisesExerciseCategorySection {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.CompletedExercisesExerciseCategoryHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.CompletedExercisesExerciseCategoryHeading {
+  margin: 0;
+  padding: 0.25rem 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.CompletedExercisesEntriesList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.CompletedExercisesEntryItem {
+  border: 1px solid var(--surface-border);
+  border-radius: 0.75rem;
+  padding: 0.75rem;
+  background: var(--surface);
+}
+
+.CompletedExercisesEntryRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.CompletedExercisesEntryMain {
+  flex: 1;
+  min-width: 0;
+}
+
+.CompletedExercisesEntryTop {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.CompletedExercisesExerciseName {
+  margin: 0;
+  font-weight: 500;
+  color: var(--foreground);
+}
+
+.CompletedExercisesEntryDetails {
+  margin: 0.375rem 0 0;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.CompletedExercisesEntryComparisons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin-top: 0.5rem;
+}
+
+.CompletedExercisesComparisonBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-height: 1.5rem;
+  padding: 0.1875rem 0.5rem;
+  border: 1px solid var(--state-success-border);
+  border-radius: 999px;
+  color: var(--state-success-text);
+  background: var(--state-success-bg);
+  font-size: 0.75rem;
+  line-height: 1;
+}
+
+.CompletedExercisesComparisonBadge[data-tone='negative'] {
+  border-color: var(--state-error-bg);
+  color: var(--state-error-text);
+  background: var(--state-error-bg);
+}
+
+.CompletedExercisesEntryNote {
+  margin: 0.5rem 0 0;
+  padding: 0.5rem 0.625rem;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--text-muted);
+  background: var(--surface-low);
+  border-radius: 0.5rem;
+  border: 1px solid var(--surface-border);
+  white-space: pre-wrap;
+}

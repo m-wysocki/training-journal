@@ -1,6 +1,6 @@
 import { Suspense } from 'react'
 import { getCurrentWeekRange } from '@/lib/trainingDateRange'
-import StatsClient from './StatsClient'
+import StatsClient from './_components/StatsClient'
 
 type StatsPageProps = {
   searchParams?: Promise<{

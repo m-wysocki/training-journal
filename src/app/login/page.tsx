@@ -3,7 +3,7 @@
 import BackLink from '@/components/BackLink'
 import PageContainer from '@/components/PageContainer'
 import PageHeader from '@/components/PageHeader'
-import { usePasswordAuthForm } from './hooks/usePasswordAuthForm'
+import { usePasswordAuthForm } from './_hooks/usePasswordAuthForm'
 import styles from './page.module.scss'
 
 export default function LoginPage() {

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import type { WeeklyEntry } from '@/lib/supabase/trainingData'
-import { getStatsRangeKey, loadStatsPayload } from '../helpers/stats'
+import { getStatsRangeKey, loadStatsPayload } from '../_helpers/stats'
 
 type UseStatsEntriesResult = {
   entries: WeeklyEntry[]

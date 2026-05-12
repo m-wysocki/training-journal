@@ -7,7 +7,7 @@ import ExerciseFormDialog from './ExerciseFormDialog'
 import {
   useExerciseCategoryManager,
   type ExerciseCategory,
-} from './hooks/useExerciseCategoryManager'
+} from './_hooks/useExerciseCategoryManager'
 import styles from './page.module.scss'
 
 type ExerciseCategoryClientProps = {

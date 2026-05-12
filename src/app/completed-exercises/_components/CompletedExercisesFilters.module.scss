@@ -1,0 +1,47 @@
+.CompletedExercisesFilterField {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.CompletedExercisesFilterLabel {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.CompletedExercisesBadgeGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.CompletedExercisesChoiceBadge {
+  min-height: 2.25rem;
+  max-width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--outline);
+  border-radius: 999px;
+  color: var(--foreground);
+  background: var(--surface);
+  font: inherit;
+  font-size: 0.875rem;
+  line-height: 1.2;
+  text-align: left;
+  cursor: pointer;
+}
+
+.CompletedExercisesChoiceBadge:hover {
+  border-color: var(--primary);
+  background: var(--surface-low);
+}
+
+.CompletedExercisesChoiceBadge:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.CompletedExercisesChoiceBadge[data-selected='true'] {
+  border-color: var(--primary);
+  color: var(--on-primary);
+  background: var(--primary);
+}

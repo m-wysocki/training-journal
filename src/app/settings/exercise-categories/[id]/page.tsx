@@ -6,7 +6,7 @@ import PageContainer from '@/components/PageContainer'
 import { requireUser } from '@/lib/supabase/auth'
 import { getExerciseCategoryDetail } from '@/lib/supabase/trainingData'
 import ExerciseCategoryClient from './ExerciseCategoryClient'
-import { type ExerciseCategory } from './hooks/useExerciseCategoryManager'
+import { type ExerciseCategory } from './_hooks/useExerciseCategoryManager'
 import styles from './page.module.scss'
 
 type ExerciseCategoryPageProps = {

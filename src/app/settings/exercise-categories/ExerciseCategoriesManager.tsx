@@ -7,7 +7,7 @@ import FormDialog from '@/components/FormDialog'
 import OverflowMenu from '@/components/OverflowMenu'
 import PageHeader from '@/components/PageHeader'
 import StatusPanel from '@/components/StatusPanel'
-import { useExerciseCategoriesManager, type ExerciseCategory } from './hooks/useExerciseCategoriesManager'
+import { useExerciseCategoriesManager, type ExerciseCategory } from './_hooks/useExerciseCategoriesManager'
 import styles from './ExerciseCategoriesManager.module.scss'
 
 type ExerciseCategoriesManagerProps = {
