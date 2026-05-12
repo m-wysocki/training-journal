@@ -50,6 +50,8 @@ The app is used to track workouts, muscle groups, exercises, sets, reps, and tra
 - Keep components focused on one responsibility.
 - Extract repeated UI into reusable components when the same pattern appears multiple times.
 - Do not extract components too early if they are used only once and the current code is still readable.
+- When creating a new custom React hook, place it in a local `hooks/` folder near the feature (or the project-level
+  `hooks/` directory when shared).
 
 ## Refactoring rules
 
