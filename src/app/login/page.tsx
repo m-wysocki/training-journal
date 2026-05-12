@@ -1,93 +1,13 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import BackLink from '@/components/BackLink'
 import PageContainer from '@/components/PageContainer'
 import PageHeader from '@/components/PageHeader'
-import { signInWithPassword, signUpWithPassword } from './actions'
+import { usePasswordAuthForm } from './_hooks/usePasswordAuthForm'
 import styles from './page.module.scss'
 
-type PasswordMode = 'sign-in' | 'sign-up'
-type MessageType = 'success' | 'error'
-
 export default function LoginPage() {
-  const router = useRouter()
-  const [passwordMode, setPasswordMode] = useState<PasswordMode>('sign-in')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [message, setMessage] = useState('')
-  const [messageType, setMessageType] = useState<MessageType>('success')
-
-  const showMessage = (nextMessage: string, nextType: MessageType) => {
-    setMessage(nextMessage)
-    setMessageType(nextType)
-  }
-
-  const handleFormKeyDown = (e: React.KeyboardEvent<HTMLFormElement>) => {
-    if (
-      e.key !== 'Enter' ||
-      e.shiftKey ||
-      e.metaKey ||
-      e.ctrlKey ||
-      e.altKey ||
-      e.nativeEvent.isComposing
-    ) {
-      return
-    }
-
-    e.preventDefault()
-    e.currentTarget.requestSubmit()
-  }
-
-  const handlePasswordAuth = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setMessage('')
-
-    if (password.length < 6) {
-      showMessage('Password must be at least 6 characters long.', 'error')
-      setLoading(false)
-      return
-    }
-
-    try {
-      if (passwordMode === 'sign-up') {
-        if (password !== confirmPassword) {
-          showMessage('Passwords must match.', 'error')
-          setLoading(false)
-          return
-        }
-
-        const result = await signUpWithPassword(email, password)
-
-        if (result.error) throw new Error(result.error)
-
-        if (result.signedIn) {
-          router.push('/')
-          router.refresh()
-          return
-        }
-
-        showMessage(result.message ?? 'Account created. Check your inbox to confirm your email address.', 'success')
-        return
-      }
-
-      const result = await signInWithPassword(email, password)
-
-      if (result.error) throw new Error(result.error)
-
-      router.push('/')
-      router.refresh()
-    } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'An error occurred while signing in.'
-      showMessage(errorMessage, 'error')
-    } finally {
-      setLoading(false)
-    }
-  }
+  const { fields, ui, setPasswordMode, updateField, handleFormKeyDown, handlePasswordAuth } = usePasswordAuthForm()
 
   return (
     <div className={styles.Login}>
@@ -101,22 +21,15 @@ export default function LoginPage() {
         <div className={styles.LoginModeTabs}>
           <button
             type="button"
-            className={`${styles.LoginModeTab} ${passwordMode === 'sign-in' ? styles.LoginModeTabActive : ''}`}
-            onClick={() => {
-              setPasswordMode('sign-in')
-              setConfirmPassword('')
-              setMessage('')
-            }}
+            className={`${styles.LoginModeTab} ${ui.passwordMode === 'sign-in' ? styles.LoginModeTabActive : ''}`}
+            onClick={() => setPasswordMode('sign-in')}
           >
             Sign In
           </button>
           <button
             type="button"
-            className={`${styles.LoginModeTab} ${passwordMode === 'sign-up' ? styles.LoginModeTabActive : ''}`}
-            onClick={() => {
-              setPasswordMode('sign-up')
-              setMessage('')
-            }}
+            className={`${styles.LoginModeTab} ${ui.passwordMode === 'sign-up' ? styles.LoginModeTabActive : ''}`}
+            onClick={() => setPasswordMode('sign-up')}
           >
             Create Account
           </button>
@@ -134,8 +47,8 @@ export default function LoginPage() {
             <input
               id="email"
               type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={fields.email}
+              onChange={(e) => updateField('email', e.target.value)}
               placeholder="your@email.com"
               required
               className={styles.LoginInput}
@@ -149,8 +62,8 @@ export default function LoginPage() {
             <input
               id="password"
               type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              value={fields.password}
+              onChange={(e) => updateField('password', e.target.value)}
               placeholder="At least 6 characters"
               required
               minLength={6}
@@ -158,7 +71,7 @@ export default function LoginPage() {
             />
           </div>
 
-          {passwordMode === 'sign-up' ? (
+          {ui.passwordMode === 'sign-up' ? (
             <div>
               <label htmlFor="confirmPassword" className={styles.LoginLabel}>
                 Repeat Password
@@ -166,8 +79,8 @@ export default function LoginPage() {
               <input
                 id="confirmPassword"
                 type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                value={fields.confirmPassword}
+                onChange={(e) => updateField('confirmPassword', e.target.value)}
                 placeholder="Repeat your password"
                 required
                 minLength={6}
@@ -176,22 +89,22 @@ export default function LoginPage() {
             </div>
           ) : null}
 
-          {message && (
+          {ui.message && (
             <div
-              className={`${styles.LoginMessage} ${messageType === 'error' ? styles.LoginMessageError : styles.LoginMessageSuccess}`}
+              className={`${styles.LoginMessage} ${ui.message.type === 'error' ? styles.LoginMessageError : styles.LoginMessageSuccess}`}
             >
-              {message}
+              {ui.message.text}
             </div>
           )}
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={ui.loading}
             className={styles.LoginSubmit}
           >
-            {loading
+            {ui.loading
               ? 'Please wait...'
-              : passwordMode === 'sign-up'
+              : ui.passwordMode === 'sign-up'
                   ? 'Create Account'
                   : 'Sign In'}
           </button>

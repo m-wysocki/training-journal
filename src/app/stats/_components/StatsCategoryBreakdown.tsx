@@ -5,7 +5,7 @@ import { ChevronDown, ChevronsDownUp, ChevronsUpDown } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import SurfaceCard from '@/components/SurfaceCard'
 import { formatWeekdayDate } from '@/lib/trainingFormatters'
-import type { ExerciseCategoryStat } from './helpers/types'
+import type { ExerciseCategoryStat } from '../_helpers/types'
 import styles from './StatsCategoryBreakdown.module.scss'
 
 type StatsCategoryBreakdownProps = {

@@ -50,6 +50,11 @@ The app is used to track workouts, muscle groups, exercises, sets, reps, and tra
 - Keep components focused on one responsibility.
 - Extract repeated UI into reusable components when the same pattern appears multiple times.
 - Do not extract components too early if they are used only once and the current code is still readable.
+- For view-level technical folders, use private naming with an underscore prefix: `_components`, `_hooks`, `_helpers`.
+- When creating a new custom React hook, place it in a local `_hooks/` folder near the feature (or the project-level
+  `_hooks/` directory when shared).
+- When extracting logic to helpers, create/use a local `_helpers/` folder for that feature and place all related
+  helper files there.
 
 ## Refactoring rules
 
@@ -105,6 +110,12 @@ Do not perform broad optimization automatically during normal feature work. Appl
 or when explicitly requested.
 
 ## Workflow expectations
+
+### Before Pushing
+
+1. Run a test build (`npm run build` or the project-equivalent build command).
+2. Confirm the build completes successfully.
+3. Confirm there are no build-time errors before `git push`.
 
 For new features:
 

@@ -1,12 +1,9 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { getCurrentUser, getCurrentUserContext } from '@/lib/supabase/auth'
 
 export async function getAuthButtonUser() {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const user = await getCurrentUser()
 
   if (!user) {
     return null
@@ -19,6 +16,6 @@ export async function getAuthButtonUser() {
 }
 
 export async function signOut() {
-  const supabase = await createClient()
+  const { supabase } = await getCurrentUserContext()
   await supabase.auth.signOut()
 }
