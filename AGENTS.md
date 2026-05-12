@@ -106,6 +106,12 @@ or when explicitly requested.
 
 ## Workflow expectations
 
+### Before Pushing
+
+1. Run a test build (`npm run build` or the project-equivalent build command).
+2. Confirm the build completes successfully.
+3. Confirm there are no build-time errors before `git push`.
+
 For new features:
 
 1. Understand the existing structure.
