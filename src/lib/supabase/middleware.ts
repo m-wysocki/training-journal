@@ -8,6 +8,12 @@ const isPublicRoute = (pathname: string) =>
   PUBLIC_ROUTES.some((route) => pathname === route || pathname.startsWith(`${route}/`))
 
 export async function updateSession(request: NextRequest) {
+  if (isPublicRoute(request.nextUrl.pathname)) {
+    return NextResponse.next({
+      request,
+    })
+  }
+
   let supabaseResponse = NextResponse.next({
     request,
   })
@@ -36,7 +42,7 @@ export async function updateSession(request: NextRequest) {
   const { data, error } = await supabase.auth.getClaims()
   const isAuthenticated = Boolean(data?.claims && !error)
 
-  if (!isAuthenticated && !isPublicRoute(request.nextUrl.pathname)) {
+  if (!isAuthenticated) {
     const redirectUrl = request.nextUrl.clone()
     redirectUrl.pathname = '/login'
     redirectUrl.searchParams.set('next', `${request.nextUrl.pathname}${request.nextUrl.search}`)
