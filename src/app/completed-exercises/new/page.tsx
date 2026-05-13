@@ -1,4 +1,4 @@
-import NewCompletedExerciseClient from './NewCompletedExerciseClient'
+import NewCompletedExerciseClient from './_components/NewCompletedExerciseClient'
 
 export default function NewCompletedExercisePage() {
   return (

@@ -1,0 +1,218 @@
+.WorkoutDetailsSection {
+  display: grid;
+  gap: 1rem;
+  padding: 1.25rem;
+}
+
+.WorkoutDetailsSectionHeader {
+  display: grid;
+  gap: 0.25rem;
+  padding-bottom: 0.875rem;
+  border-bottom: 1px solid var(--surface-border);
+}
+
+.WorkoutDetailsSectionTitle {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--foreground);
+}
+
+.WorkoutDetailsSectionDescription {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
+.WorkoutDetailsSectionBody {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.WorkoutDetailsLabel,
+.WorkoutDetailsRepLabel {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.WorkoutDetailsField,
+.WorkoutDetailsRepField,
+.WorkoutDetailsRecentHistory,
+.WorkoutDetailsRecentHistoryList {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.WorkoutDetailsRecentHistory {
+  margin-top: 0.875rem;
+  padding-top: 0.875rem;
+  border-top: 1px solid var(--surface-border);
+}
+
+.WorkoutDetailsRecentHistoryTitle {
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.WorkoutDetailsRecentHistoryItem {
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.75rem 0.875rem;
+  border: 1px solid var(--surface-border);
+  border-radius: 0.75rem;
+  background: var(--surface);
+}
+
+.WorkoutDetailsRecentHistoryDate {
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.WorkoutDetailsRecentHistoryDetails,
+.WorkoutDetailsRecentHistoryEmpty {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
+.WorkoutDetailsRecentHistoryNote {
+  margin: 0.5rem 0 0;
+  padding: 0.5rem 0.625rem;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--text-muted);
+  background: var(--surface-low);
+  border: 1px solid var(--surface-border);
+  border-radius: 0.5rem;
+  white-space: pre-wrap;
+}
+
+.WorkoutDetailsRecentHistorySkeleton {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.WorkoutDetailsRecentHistorySkeleton span {
+  height: 2.25rem;
+  border-radius: 0.5rem;
+  background: linear-gradient(
+    90deg,
+    var(--skeleton-start) 0%,
+    var(--skeleton-mid) 50%,
+    var(--skeleton-start) 100%
+  );
+  background-size: 200% 100%;
+  animation: WorkoutDetailsPulse 1.2s ease-in-out infinite;
+}
+
+.WorkoutDetailsInput {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  border: 1px solid var(--outline);
+  border-radius: 0.5rem;
+  padding: 0.625rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--foreground);
+  background: var(--surface);
+}
+
+.WorkoutDetailsRepsHeading {
+  margin: 0.5rem 0 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.WorkoutDetailsRepsGrid,
+.WorkoutDetailsMetricsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+}
+
+.WorkoutDetailsFieldHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.WorkoutDetailsCheckboxRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+.WorkoutDetailsCheckboxRow input {
+  margin: 0;
+}
+
+.WorkoutDetailsEmptyValue {
+  padding: 0.875rem 1rem;
+  border: 1px dashed var(--outline);
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  background: var(--surface);
+}
+
+.WorkoutDetailsSegmentedControl {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.WorkoutDetailsSegmentButton {
+  min-height: 2.25rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--outline);
+  border-radius: 999px;
+  color: var(--foreground);
+  background: var(--surface);
+  font: inherit;
+  font-size: 0.875rem;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.WorkoutDetailsSegmentButton[data-selected='true'] {
+  border-color: var(--primary);
+  color: var(--on-primary);
+  background: var(--primary);
+}
+
+@keyframes WorkoutDetailsPulse {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .WorkoutDetailsSection {
+    padding: 1rem;
+  }
+
+  .WorkoutDetailsInput {
+    font-size: 1rem;
+  }
+
+  .WorkoutDetailsFieldHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

@@ -1,6 +1,9 @@
 'use client'
 
-import { CompletedExerciseForm, type CompletedExerciseFormValues } from '@/components/CompletedExerciseForm'
+import {
+  CompletedExerciseForm,
+  type CompletedExerciseFormValues,
+} from '@/app/completed-exercises/_components/CompletedExerciseForm'
 import { updateCompletedExercise } from '@/app/completed-exercises/actions'
 
 type ExerciseCategory = {

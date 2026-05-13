@@ -1,6 +1,6 @@
 'use server'
 
-import type { CompletedExerciseFormValues } from '@/components/CompletedExerciseForm'
+import type { CompletedExerciseFormValues } from '@/app/completed-exercises/_components/CompletedExerciseForm'
 import { requireUser } from '@/lib/supabase/auth'
 import { getCompletedExercisesPayload } from '@/lib/supabase/trainingData'
 import {

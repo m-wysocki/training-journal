@@ -1,0 +1,65 @@
+.NotesSection {
+  display: grid;
+  gap: 1rem;
+  padding: 1.25rem;
+}
+
+.NotesSectionHeader {
+  display: grid;
+  gap: 0.25rem;
+  padding-bottom: 0.875rem;
+  border-bottom: 1px solid var(--surface-border);
+}
+
+.NotesSectionTitle {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--foreground);
+}
+
+.NotesSectionDescription {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
+.NotesSectionBody {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.NotesLabel {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.NotesInput {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  border: 1px solid var(--outline);
+  border-radius: 0.5rem;
+  padding: 0.625rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--foreground);
+  background: var(--surface);
+}
+
+.NotesTextarea {
+  min-height: 4.5rem;
+  resize: vertical;
+  font-family: inherit;
+  line-height: 1.4;
+}
+
+@media (max-width: 640px) {
+  .NotesSection {
+    padding: 1rem;
+  }
+
+  .NotesInput {
+    font-size: 1rem;
+  }
+}
