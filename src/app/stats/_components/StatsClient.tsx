@@ -1,32 +1,33 @@
-'use client'
-
 import { BarChart3 } from 'lucide-react'
-import { useMemo } from 'react'
 import BackLink from '@/components/BackLink'
 import LoadingSkeleton from '@/components/LoadingSkeleton'
 import PageContainer from '@/components/PageContainer'
 import PageHeader from '@/components/PageHeader'
 import StatusPanel from '@/components/StatusPanel'
 import SurfaceCard from '@/components/SurfaceCard'
+import type { WeeklyEntry } from '@/lib/supabase/trainingData'
 import StatsCategoryBreakdown from './StatsCategoryBreakdown'
 import { getExerciseCategoryStats } from '../_helpers/stats'
-import { useStatsEntries } from '../_hooks/useStatsEntries'
 import StatsFilters from './StatsFilters'
 import styles from './StatsClient.module.scss'
 
 type StatsClientProps = {
   dateFrom: string
   dateTo: string
+  entries: WeeklyEntry[]
+  errorMessage?: string
+  isLoading?: boolean
 }
 
-export default function StatsClient({ dateFrom, dateTo }: StatsClientProps) {
-  const { entries, errorMessage, isLoading } = useStatsEntries(dateFrom, dateTo)
-
-  const workoutDaysCount = useMemo(
-    () => new Set(entries.map((entry) => entry.performed_at)).size,
-    [entries],
-  )
-  const exerciseCategoryStats = useMemo(() => getExerciseCategoryStats(entries), [entries])
+export default function StatsClient({
+  dateFrom,
+  dateTo,
+  entries,
+  errorMessage = '',
+  isLoading = false,
+}: StatsClientProps) {
+  const workoutDaysCount = new Set(entries.map((entry) => entry.performed_at)).size
+  const exerciseCategoryStats = getExerciseCategoryStats(entries)
 
   return (
     <div className={styles.StatsClient}>

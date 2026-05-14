@@ -1,5 +1,5 @@
 import { Suspense } from 'react'
-import { getCurrentWeekRange } from '@/lib/trainingDateRange'
+import { getCurrentWeekRange, getWeekRangeForDate } from '@/lib/trainingDateRange'
 import { requireUser } from '@/lib/supabase/auth'
 import { getCompletedExercisesPayload } from '@/lib/supabase/trainingData'
 import { getCompletedExercisesPayloadKey } from './_helpers/CompletedExercisesHelper'
@@ -19,7 +19,11 @@ async function CompletedExercisesData({ searchParams }: CompletedExercisesPagePr
   const dateFrom = params?.dateFrom || currentWeekRange.dateFrom
   const dateTo = params?.dateTo || currentWeekRange.dateTo
   const selectedExerciseCategory = params?.category || 'all'
-  const shouldStartWithOpenFilters = Boolean(params?.dateFrom || params?.dateTo || params?.category)
+  const standardWeekForDateFrom = getWeekRangeForDate(dateFrom)
+  const hasCustomDateRange =
+    standardWeekForDateFrom.dateFrom !== dateFrom || standardWeekForDateFrom.dateTo !== dateTo
+  const hasCustomCategory = selectedExerciseCategory !== 'all'
+  const shouldStartWithOpenFilters = hasCustomDateRange || hasCustomCategory
   const { supabase, user } = await requireUser()
   const payload = await getCompletedExercisesPayload(supabase, user.id, dateFrom, dateTo)
 

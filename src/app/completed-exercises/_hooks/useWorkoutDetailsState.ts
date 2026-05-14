@@ -54,8 +54,10 @@ export const useWorkoutDetailsState = ({
   initialPaceMinPerKm,
   initialActivityDurationSeconds,
 }: Params) => {
+  const hasInitialReps = initialRepsPerSet.length > 0
+  const hasInitialDurations = initialDurationPerSetSeconds.length > 0
   const [strengthDetailMode, setStrengthDetailMode] = useState<StrengthDetailMode>(
-    initialDurationPerSetSeconds.length > 0 ? 'time' : 'reps',
+    hasInitialDurations && !hasInitialReps ? 'time' : 'reps',
   )
   const [sets, setSets] = useState(initialSets)
   const [repsPerSet, setRepsPerSet] = useState<number[]>(initialRepsPerSet)

@@ -59,6 +59,7 @@ export function DatePicker({ id, value, onChange, className, closeOnSelect = tru
   const [open, setOpen] = useState(false)
   const [visibleMonth, setVisibleMonth] = useState(() => getInitialMonth(value))
   const selectedDate = value ? parseDateOnly(value) : null
+  const todayDate = formatLocalDateOnly(new Date())
   const monthDays = useMemo(() => getMonthDays(visibleMonth), [visibleMonth])
 
   const selectDate = (date: Date) => {
@@ -120,6 +121,7 @@ export function DatePicker({ id, value, onChange, className, closeOnSelect = tru
                       ? 'true'
                       : undefined
                   }
+                  data-today={formatLocalDateOnly(date) === todayDate ? 'true' : undefined}
                   onClick={() => selectDate(date)}
                 >
                   {date.getDate()}
