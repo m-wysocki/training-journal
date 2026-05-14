@@ -1,36 +1,107 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Training Journal
 
-## Getting Started
+Training Journal is a web app for logging workouts and reviewing progress over time.
+I built it around a simple flow: define exercise setup once, log sessions quickly, and come back to clear history and weekly stats.
 
-First, run the development server:
+## What it does
+
+- Email/password authentication with Supabase Auth.
+- Access flow with `pending` and `approved` user states.
+- Exercise setup management (categories and exercises).
+- Workout logging for three exercise types:
+  - `strength` (sets, reps, load)
+  - `cardio` (distance, pace)
+  - `duration` (time-based sets)
+- Edit and review completed workout entries.
+- Filter training history by date range and category.
+- Weekly statistics grouped by exercise category.
+- Optional admin notification on new signup (Resend API).
+
+## Tech stack
+
+- Next.js 16 (App Router)
+- React 19
+- TypeScript
+- Supabase (`@supabase/supabase-js`, `@supabase/ssr`)
+- SCSS Modules
+- Radix UI
+- lucide-react
+- ESLint
+
+## Architecture notes
+
+- Server Components by default, Client Components only where interaction/state is needed.
+- Supabase access is kept in `src/lib/supabase/*`.
+- Feature-level structure with local `_components`, `_hooks`, and `_helpers`.
+- PostgreSQL + RLS policies to enforce per-user data access.
+
+## Main routes
+
+- `/` - home dashboard
+- `/completed-exercises/new` - log workout
+- `/completed-exercises` - training history
+- `/stats` - weekly stats
+- `/settings/exercise-categories` - exercise setup
+
+## Local setup
+
+### 1) Install dependencies
+
+```bash
+npm install
+```
+
+### 2) Configure environment variables (`.env`)
+
+Required:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+```
+
+Optional:
+
+```env
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+RESEND_API_KEY=
+ADMIN_EMAIL=
+AUTH_NOTIFICATION_FROM_EMAIL=
+```
+
+### 3) Initialize database schema
+
+Run:
+
+```sql
+sql/initial-schema.sql
+```
+
+in Supabase SQL Editor.
+
+### 4) Start the app
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Access after signup
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+New accounts start as `pending`.  
+To grant access, set `approved = true` in `public.user_access`.
 
-## Learn More
+## Scripts
 
-To learn more about Next.js, take a look at the following resources:
+- `npm run dev` - development server
+- `npm run build` - production build
+- `npm run start` - run production build
+- `npm run lint` - lint checks
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## What this project demonstrates
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Auth + authorization flow with DB-level access control (RLS).
+- Practical Server/Client component boundaries in Next.js App Router.
+- Data modeling for multiple workout types in one journal.
+- Maintainable feature organization and clear separation of concerns.
