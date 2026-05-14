@@ -35,12 +35,12 @@ export default function CompletedExercisesFilters({
       onAccordionValueChange={onSetFiltersValue}
       idPrefix="completed-exercises"
       extraFilters={(
-        <div className={styles.CompletedExercisesFilterField}>
-          <p className={styles.CompletedExercisesFilterLabel}>Exercise Category</p>
-          <div className={styles.CompletedExercisesBadgeGroup} role="group" aria-label="Exercise category filter">
+        <div className={styles.CompletedExercisesFiltersFilterField}>
+          <p className={styles.CompletedExercisesFiltersFilterLabel}>Exercise Category</p>
+          <div className={styles.CompletedExercisesFiltersBadgeGroup} role="group" aria-label="Exercise category filter">
             <button
               type="button"
-              className={styles.CompletedExercisesChoiceBadge}
+              className={styles.CompletedExercisesFiltersChoiceBadge}
               aria-pressed={selectedExerciseCategory === 'all'}
               data-selected={selectedExerciseCategory === 'all' ? 'true' : undefined}
               onClick={() => onSelectExerciseCategory('all')}
@@ -51,7 +51,7 @@ export default function CompletedExercisesFilters({
               <button
                 key={exerciseCategory}
                 type="button"
-                className={styles.CompletedExercisesChoiceBadge}
+                className={styles.CompletedExercisesFiltersChoiceBadge}
                 aria-pressed={selectedExerciseCategory === exerciseCategory}
                 data-selected={selectedExerciseCategory === exerciseCategory ? 'true' : undefined}
                 onClick={() => onSelectExerciseCategory(exerciseCategory)}

@@ -1,0 +1,37 @@
+.WorkoutDetailsFormSection {
+  display: grid;
+  gap: 1rem;
+  padding: 1.25rem;
+
+  &Header {
+    display: grid;
+    gap: 0.25rem;
+    padding-bottom: 0.875rem;
+    border-bottom: 1px solid var(--surface-border);
+  }
+
+  &Title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--foreground);
+  }
+
+  &Description {
+    margin: 0;
+    font-size: 0.875rem;
+    line-height: 1.45;
+    color: var(--text-muted);
+  }
+
+  &Body {
+    display: grid;
+    gap: 0.9rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .WorkoutDetailsFormSection {
+    padding: 1rem;
+  }
+}

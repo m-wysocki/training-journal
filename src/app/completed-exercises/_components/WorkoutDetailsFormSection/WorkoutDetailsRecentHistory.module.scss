@@ -1,0 +1,85 @@
+.WorkoutDetailsRecentHistory {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 0.875rem;
+  padding-top: 0.875rem;
+  border-top: 1px solid var(--surface-border);
+
+  &Title {
+    margin: 0;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  &List {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  &Item {
+    display: grid;
+    gap: 0.2rem;
+    padding: 0.75rem 0.875rem;
+    border: 1px solid var(--surface-border);
+    border-radius: 0.75rem;
+    background: var(--surface);
+  }
+
+  &Date {
+    margin: 0;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--foreground);
+  }
+
+  &Details,
+  &Empty {
+    margin: 0;
+    font-size: 0.875rem;
+    line-height: 1.45;
+    color: var(--text-muted);
+  }
+
+  &Note {
+    margin: 0.5rem 0 0;
+    padding: 0.5rem 0.625rem;
+    font-size: 0.8125rem;
+    line-height: 1.45;
+    color: var(--text-muted);
+    background: var(--surface-low);
+    border: 1px solid var(--surface-border);
+    border-radius: 0.5rem;
+    white-space: pre-wrap;
+  }
+
+  &Skeleton {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  &Skeleton span {
+    height: 2.25rem;
+    border-radius: 0.5rem;
+    background: linear-gradient(
+      90deg,
+      var(--skeleton-start) 0%,
+      var(--skeleton-mid) 50%,
+      var(--skeleton-start) 100%
+    );
+    background-size: 200% 100%;
+    animation: WorkoutDetailsRecentHistoryPulse 1.2s ease-in-out infinite;
+  }
+}
+
+@keyframes WorkoutDetailsRecentHistoryPulse {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}

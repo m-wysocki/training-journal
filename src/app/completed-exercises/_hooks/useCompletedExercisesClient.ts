@@ -25,6 +25,7 @@ type UseCompletedExercisesClientParams = {
   initialErrorMessage: string
   initialIsLoading: boolean
   initialSelectedExerciseCategory: string
+  initialFiltersValue: string
 }
 
 type State = {
@@ -202,7 +203,7 @@ export function useCompletedExercisesClient(params: UseCompletedExercisesClientP
     ui: {
       isDataLoading: params.initialIsLoading,
       selectedExerciseCategory: params.initialSelectedExerciseCategory,
-      filtersValue: params.initialSelectedExerciseCategory === 'all' ? '' : 'filters',
+      filtersValue: params.initialFiltersValue || (params.initialSelectedExerciseCategory === 'all' ? '' : 'filters'),
     },
     deleteDialog: {
       open: false,
@@ -219,6 +220,7 @@ export function useCompletedExercisesClient(params: UseCompletedExercisesClientP
 
   const updateDateRange = (nextDateRange: { dateFrom: string; dateTo: string }) => {
     dispatch({ type: 'date_range_changed', payload: nextDateRange })
+    dispatch({ type: 'filters_value_set', payload: { value: 'filters' } })
     dispatch({ type: 'refresh_started' })
 
     const searchParams = getCompletedExercisesSearchParams(nextDateRange, state.ui.selectedExerciseCategory)

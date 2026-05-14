@@ -62,6 +62,8 @@ When refactoring:
 
 - Preserve existing UI and behavior unless explicitly requested.
 - First inspect related files and existing conventions.
+- During and after refactoring, explicitly validate the result against `General rules`, `Component rules`, and
+  `Styling rules`.
 - Identify duplicated UI, duplicated logic, long components, mixed responsibilities, unclear naming, and unnecessary
   complexity.
 - Prefer small refactors that are easy to review.

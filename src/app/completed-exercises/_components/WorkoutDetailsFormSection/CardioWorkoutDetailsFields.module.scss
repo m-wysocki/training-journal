@@ -1,0 +1,35 @@
+.CardioWorkoutDetailsFields {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+
+  &Field {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  &Label {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+  }
+
+  &Input {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    border: 1px solid var(--outline);
+    border-radius: 0.5rem;
+    padding: 0.625rem 0.75rem;
+    font-size: 0.875rem;
+    color: var(--foreground);
+    background: var(--surface);
+  }
+}
+
+@media (max-width: 640px) {
+  .CardioWorkoutDetailsFields {
+    &Input {
+      font-size: 1rem;
+    }
+  }
+}

@@ -22,6 +22,7 @@ type CompletedExercisesClientProps = {
   initialErrorMessage?: string
   initialIsLoading?: boolean
   initialSelectedExerciseCategory?: string
+  initialFiltersValue?: string
 }
 
 export default function CompletedExercisesClient({
@@ -33,6 +34,7 @@ export default function CompletedExercisesClient({
   initialErrorMessage = '',
   initialIsLoading = false,
   initialSelectedExerciseCategory = 'all',
+  initialFiltersValue = '',
 }: CompletedExercisesClientProps) {
   const {
     state,
@@ -59,6 +61,7 @@ export default function CompletedExercisesClient({
     initialErrorMessage,
     initialIsLoading,
     initialSelectedExerciseCategory,
+    initialFiltersValue,
   })
 
   const { dateRange, data, messages, ui, deleteDialog, copyDialog } = state
@@ -70,8 +73,8 @@ export default function CompletedExercisesClient({
   const { open: copyOpen, target: copyTarget, date: copyDate, loading: copyLoading } = copyDialog
 
   return (
-    <div className={styles.CompletedExercises}>
-      <PageContainer className={styles.CompletedExercisesContainer}>
+    <div className={styles.CompletedExercisesClient}>
+      <PageContainer className={styles.CompletedExercisesClientContainer}>
         <BackLink href="/" label="Back to Home" />
         <PageHeader
           icon={ClipboardList}
@@ -105,7 +108,7 @@ export default function CompletedExercisesClient({
           <LoadingSkeleton ariaLabel="Loading completed exercise entries" count={3} variant="card" />
         ) : null}
         {!errorMessage && !isDataLoading && groupedByDate.length === 0 && (
-          <div className={styles.CompletedExercisesEmptyState}>No completed exercises for this date range.</div>
+          <div className={styles.CompletedExercisesClientEmptyState}>No completed exercises for this date range.</div>
         )}
 
         {!isDataLoading ? (

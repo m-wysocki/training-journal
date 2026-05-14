@@ -19,6 +19,7 @@ async function CompletedExercisesData({ searchParams }: CompletedExercisesPagePr
   const dateFrom = params?.dateFrom || currentWeekRange.dateFrom
   const dateTo = params?.dateTo || currentWeekRange.dateTo
   const selectedExerciseCategory = params?.category || 'all'
+  const shouldStartWithOpenFilters = Boolean(params?.dateFrom || params?.dateTo || params?.category)
   const { supabase, user } = await requireUser()
   const payload = await getCompletedExercisesPayload(supabase, user.id, dateFrom, dateTo)
 
@@ -32,6 +33,7 @@ async function CompletedExercisesData({ searchParams }: CompletedExercisesPagePr
       initialEntryComparisons={payload.entryComparisons}
       initialErrorMessage={payload.errorMessage}
       initialSelectedExerciseCategory={selectedExerciseCategory}
+      initialFiltersValue={shouldStartWithOpenFilters ? 'filters' : ''}
     />
   )
 }

@@ -40,6 +40,23 @@ Prefer separating:
 
 - container components (data, state, logic)
 - presentational components (UI, props, layout)
+- For view-level technical folders, use private naming with an underscore prefix: `_components`, `_hooks`, `_helpers`.
+- When creating a new custom React hook, place it in a local `_hooks/` folder near the feature (or the project-level
+  `_hooks/` directory when shared).
+- When extracting logic to helpers, create/use a local `_helpers/` folder for that feature and place all related
+  helper files there.
+
+Use SCSS Modules for component-specific styles.
+- Keep styles close to the component they belong to.
+- Each styled component should have its own `ComponentName.module.scss` file. Do not keep component styles in a
+  different component's stylesheet.
+- Use PascalCase class names based on the component and its elements, for example `Header`, `HeaderLogo`,
+  `HeaderButton`.
+- In SCSS Modules, nest related element styles under the base component class when it matches the class naming pattern:
+  `.Header { &Logo { ... } }`.
+- Avoid large global styles unless truly shared.
+- Do not duplicate the same visual patterns in multiple places. Extract reusable styling or components when appropriate.
+
 
 Do this only when it improves readability.
 

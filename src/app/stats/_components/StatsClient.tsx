@@ -29,8 +29,8 @@ export default function StatsClient({ dateFrom, dateTo }: StatsClientProps) {
   const exerciseCategoryStats = useMemo(() => getExerciseCategoryStats(entries), [entries])
 
   return (
-    <div className={styles.Stats}>
-      <PageContainer className={styles.StatsContainer}>
+    <div className={styles.StatsClient}>
+      <PageContainer className={styles.StatsClientContainer}>
         <BackLink href="/" label="Back to Home" />
         <PageHeader
           icon={BarChart3}
@@ -51,17 +51,17 @@ export default function StatsClient({ dateFrom, dateTo }: StatsClientProps) {
         ) : null}
 
         {!errorMessage && !isLoading && (
-          <div className={styles.StatsGrid}>
-            <SurfaceCard as="section" className={styles.StatsSummaryCard}>
-              <p className={styles.StatsCardLabel}>Workout Days</p>
-              <p className={styles.StatsPrimaryStat}>{workoutDaysCount}</p>
-              <p className={styles.StatsCardHint}>Number of days you trained during the selected date range.</p>
+          <div className={styles.StatsClientGrid}>
+            <SurfaceCard as="section" className={styles.StatsClientSummaryCard}>
+              <p className={styles.StatsClientCardLabel}>Workout Days</p>
+              <p className={styles.StatsClientPrimaryStat}>{workoutDaysCount}</p>
+              <p className={styles.StatsClientCardHint}>Number of days you trained during the selected date range.</p>
             </SurfaceCard>
 
-            <SurfaceCard as="section" className={styles.StatsBreakdownCard}>
-              <div className={styles.StatsBreakdownHeader}>
-                <h2 className={styles.StatsBreakdownTitle}>Exercise Category Frequency</h2>
-                <p className={styles.StatsBreakdownDescription}>
+            <SurfaceCard as="section" className={styles.StatsClientBreakdownCard}>
+              <div className={styles.StatsClientBreakdownHeader}>
+                <h2 className={styles.StatsClientBreakdownTitle}>Exercise Category Frequency</h2>
+                <p className={styles.StatsClientBreakdownDescription}>
                   Counted as distinct training days per exercise category within the selected date range.
                 </p>
               </div>

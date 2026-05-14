@@ -1,20 +1,22 @@
-.CompletedExercisesDialogForm {
-  display: grid;
-  gap: 0.75rem;
-}
+.CompletedExerciseDialogs {
+  &Form {
+    display: grid;
+    gap: 0.75rem;
+  }
 
-.CompletedExercisesField {
-  display: grid;
-  gap: 0.5rem;
-}
+  &Field {
+    display: grid;
+    gap: 0.5rem;
+  }
 
-.CompletedExercisesLabel {
-  font-size: 0.875rem;
-  color: var(--text-muted);
-}
+  &Label {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+  }
 
-.CompletedExercisesFieldHint {
-  margin: 0;
-  font-size: 0.8125rem;
-  color: var(--text-muted);
+  &FieldHint {
+    margin: 0;
+    font-size: 0.8125rem;
+    color: var(--text-muted);
+  }
 }
