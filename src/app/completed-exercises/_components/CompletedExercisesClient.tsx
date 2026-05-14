@@ -22,6 +22,7 @@ type CompletedExercisesClientProps = {
   initialErrorMessage?: string
   initialIsLoading?: boolean
   initialSelectedExerciseCategory?: string
+  initialFiltersValue?: string
 }
 
 export default function CompletedExercisesClient({
@@ -33,6 +34,7 @@ export default function CompletedExercisesClient({
   initialErrorMessage = '',
   initialIsLoading = false,
   initialSelectedExerciseCategory = 'all',
+  initialFiltersValue = '',
 }: CompletedExercisesClientProps) {
   const {
     state,
@@ -59,6 +61,7 @@ export default function CompletedExercisesClient({
     initialErrorMessage,
     initialIsLoading,
     initialSelectedExerciseCategory,
+    initialFiltersValue,
   })
 
   const { dateRange, data, messages, ui, deleteDialog, copyDialog } = state
