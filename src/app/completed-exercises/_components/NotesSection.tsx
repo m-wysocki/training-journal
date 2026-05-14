@@ -17,12 +17,12 @@ export default function NotesSection({ performedAt, note, setPerformedAt, setNot
         <p className={styles.NotesSectionDescription}>Add the workout date and an optional note.</p>
       </div>
       <div className={styles.NotesSectionBody}>
-        <label htmlFor="performedAt" className={styles.NotesLabel}>Date</label>
+        <label htmlFor="performedAt" className={styles.NotesSectionLabel}>Date</label>
         <DatePicker id="performedAt" value={performedAt} onChange={setPerformedAt} />
-        <label htmlFor="note" className={styles.NotesLabel}>Note</label>
+        <label htmlFor="note" className={styles.NotesSectionLabel}>Note</label>
         <textarea
           id="note"
-          className={`${styles.NotesInput} ${styles.NotesTextarea}`}
+          className={`${styles.NotesSectionInput} ${styles.NotesSectionTextarea}`}
           value={note}
           onChange={(e) => setNote(e.target.value)}
           rows={3}

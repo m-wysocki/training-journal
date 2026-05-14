@@ -20,15 +20,15 @@ export default function CompletedExercisesDayList({
   onOpenDelete,
 }: CompletedExercisesDayListProps) {
   return (
-    <div className={styles.CompletedExercisesDaysList}>
+    <div className={styles.CompletedExercisesDayList}>
       {groupedByDate.map((group) => (
-        <SurfaceCard as="section" key={group.date} className={styles.CompletedExercisesDayCard}>
-          <h2 className={styles.CompletedExercisesDayTitle}>{formatWeekdayDate(group.date)}</h2>
-          <div className={styles.CompletedExercisesExerciseCategorySections}>
+        <SurfaceCard as="section" key={group.date} className={styles.CompletedExercisesDayListCard}>
+          <h2 className={styles.CompletedExercisesDayListTitle}>{formatWeekdayDate(group.date)}</h2>
+          <div className={styles.CompletedExercisesDayListExerciseCategorySections}>
             {group.exerciseCategories.map((exerciseCategory) => (
-              <section key={`${group.date}-${exerciseCategory.name}`} className={styles.CompletedExercisesExerciseCategorySection}>
-                <div className={styles.CompletedExercisesExerciseCategoryHeader}>
-                  <h3 className={styles.CompletedExercisesExerciseCategoryHeading}>{exerciseCategory.name}</h3>
+              <section key={`${group.date}-${exerciseCategory.name}`} className={styles.CompletedExercisesDayListExerciseCategorySection}>
+                <div className={styles.CompletedExercisesDayListExerciseCategoryHeader}>
+                  <h3 className={styles.CompletedExercisesDayListExerciseCategoryHeading}>{exerciseCategory.name}</h3>
                   <OverflowMenu
                     ariaLabel={`Options for ${exerciseCategory.name}`}
                     items={[
@@ -40,28 +40,28 @@ export default function CompletedExercisesDayList({
                     ]}
                   />
                 </div>
-                <ul className={styles.CompletedExercisesEntriesList}>
+                <ul className={styles.CompletedExercisesDayListEntriesList}>
                   {exerciseCategory.entries.map((entry) => (
-                    <li key={entry.id} className={styles.CompletedExercisesEntryItem}>
-                      <div className={styles.CompletedExercisesEntryRow}>
-                        <div className={styles.CompletedExercisesEntryMain}>
-                          <div className={styles.CompletedExercisesEntryTop}>
-                            <p className={styles.CompletedExercisesExerciseName}>
+                    <li key={entry.id} className={styles.CompletedExercisesDayListEntryItem}>
+                      <div className={styles.CompletedExercisesDayListEntryRow}>
+                        <div className={styles.CompletedExercisesDayListEntryMain}>
+                          <div className={styles.CompletedExercisesDayListEntryTop}>
+                            <p className={styles.CompletedExercisesDayListExerciseName}>
                               {entry.exercise?.name || 'Unknown exercise'}
                             </p>
                           </div>
-                          <p className={styles.CompletedExercisesEntryDetails}>
+                          <p className={styles.CompletedExercisesDayListEntryDetails}>
                             {formatEntryDetails(entry)}
                           </p>
                           {entryComparisons[entry.id]?.length ? (
-                            <div className={styles.CompletedExercisesEntryComparisons} aria-label="Changes since previous session">
+                            <div className={styles.CompletedExercisesDayListEntryComparisons} aria-label="Changes since previous session">
                               {entryComparisons[entry.id].map((metric) => {
                                 const ComparisonIcon = metric.direction === 'up' ? ArrowUp : ArrowDown
 
                                 return (
                                   <span
                                     key={metric.key}
-                                    className={styles.CompletedExercisesComparisonBadge}
+                                    className={styles.CompletedExercisesDayListComparisonBadge}
                                     data-direction={metric.direction}
                                     data-tone={metric.tone}
                                   >
@@ -75,7 +75,7 @@ export default function CompletedExercisesDayList({
                             </div>
                           ) : null}
                           {entry.note?.trim() ? (
-                            <p className={styles.CompletedExercisesEntryNote}>{entry.note.trim()}</p>
+                            <p className={styles.CompletedExercisesDayListEntryNote}>{entry.note.trim()}</p>
                           ) : null}
                         </div>
 

@@ -45,23 +45,23 @@ export default function ExerciseSelectionSection({ form, isExerciseSetupLoading 
       </div>
 
       <div className={styles.ExerciseSelectionSectionBody}>
-        <div className={styles.ExerciseSelectionBadgeField}>
-          <p className={styles.ExerciseSelectionLabel}>Exercise Category</p>
-          <div className={styles.ExerciseSelectionBadgeGroup} role="group" aria-label="Exercise category">
+        <div className={styles.ExerciseSelectionSectionBadgeField}>
+          <p className={styles.ExerciseSelectionSectionLabel}>Exercise Category</p>
+          <div className={styles.ExerciseSelectionSectionBadgeGroup} role="group" aria-label="Exercise category">
             {isExerciseSetupLoading ? (
-              <div className={styles.ExerciseSelectionFormDataSkeleton} aria-label="Loading exercise categories">
+              <div className={styles.ExerciseSelectionSectionFormDataSkeleton} aria-label="Loading exercise categories">
                 <span />
                 <span />
                 <span />
               </div>
             ) : exerciseCategories.length === 0 ? (
-              <p className={styles.ExerciseSelectionBadgeEmpty}>No exercise categories yet.</p>
+              <p className={styles.ExerciseSelectionSectionBadgeEmpty}>No exercise categories yet.</p>
             ) : null}
             {exerciseCategories.map((category) => (
               <button
                 key={category.id}
                 type="button"
-                className={styles.ExerciseSelectionChoiceBadge}
+                className={styles.ExerciseSelectionSectionChoiceBadge}
                 aria-pressed={selectedExerciseCategoryId === category.id}
                 data-selected={selectedExerciseCategoryId === category.id ? 'true' : undefined}
                 onClick={() => {
@@ -78,7 +78,7 @@ export default function ExerciseSelectionSection({ form, isExerciseSetupLoading 
               title="Add Exercise Category"
               description="Enter the name of the new exercise category."
               trigger={(
-                <button type="button" className={styles.ExerciseSelectionAddBadge}>
+                <button type="button" className={styles.ExerciseSelectionSectionAddBadge}>
                   Add
                 </button>
               )}
@@ -86,9 +86,9 @@ export default function ExerciseSelectionSection({ form, isExerciseSetupLoading 
               onPrimaryAction={handleAddExerciseCategory}
               primaryActionDisabled={isAddingExerciseCategory}
             >
-              <div className={styles.ExerciseSelectionDialogBody}>
+              <div className={styles.ExerciseSelectionSectionDialogBody}>
                 <input
-                  className={styles.ExerciseSelectionInput}
+                  className={styles.ExerciseSelectionSectionInput}
                   value={newExerciseCategoryName}
                   onChange={(e) => setNewExerciseCategoryName(e.target.value)}
                   placeholder="e.g. Back"
@@ -104,19 +104,19 @@ export default function ExerciseSelectionSection({ form, isExerciseSetupLoading 
           </div>
         </div>
 
-        <div className={styles.ExerciseSelectionBadgeField}>
-          <p className={styles.ExerciseSelectionLabel}>Exercise</p>
-          <div className={styles.ExerciseSelectionBadgeGroup} role="group" aria-label="Exercise">
+        <div className={styles.ExerciseSelectionSectionBadgeField}>
+          <p className={styles.ExerciseSelectionSectionLabel}>Exercise</p>
+          <div className={styles.ExerciseSelectionSectionBadgeGroup} role="group" aria-label="Exercise">
             {!selectedExerciseCategoryId ? (
-              <p className={styles.ExerciseSelectionBadgeEmpty}>Select an exercise category first.</p>
+              <p className={styles.ExerciseSelectionSectionBadgeEmpty}>Select an exercise category first.</p>
             ) : filteredExercises.length === 0 ? (
-              <p className={styles.ExerciseSelectionBadgeEmpty}>No exercises in this category yet.</p>
+              <p className={styles.ExerciseSelectionSectionBadgeEmpty}>No exercises in this category yet.</p>
             ) : (
               filteredExercises.map((exercise) => (
                 <button
                   key={exercise.id}
                   type="button"
-                  className={styles.ExerciseSelectionChoiceBadge}
+                  className={styles.ExerciseSelectionSectionChoiceBadge}
                   aria-pressed={selectedExerciseId === exercise.id}
                   data-selected={selectedExerciseId === exercise.id ? 'true' : undefined}
                   onClick={() => setSelectedExerciseId(exercise.id)}
@@ -133,7 +133,7 @@ export default function ExerciseSelectionSection({ form, isExerciseSetupLoading 
               trigger={(
                 <button
                   type="button"
-                  className={styles.ExerciseSelectionAddBadge}
+                  className={styles.ExerciseSelectionSectionAddBadge}
                   disabled={!selectedExerciseCategoryId}
                 >
                   Add
@@ -143,9 +143,9 @@ export default function ExerciseSelectionSection({ form, isExerciseSetupLoading 
               onPrimaryAction={handleAddExercise}
               primaryActionDisabled={isAddingExercise}
             >
-              <div className={styles.ExerciseSelectionDialogBody}>
+              <div className={styles.ExerciseSelectionSectionDialogBody}>
                 <input
-                  className={styles.ExerciseSelectionInput}
+                  className={styles.ExerciseSelectionSectionInput}
                   value={newExerciseName}
                   onChange={(e) => setNewExerciseName(e.target.value)}
                   placeholder="e.g. Barbell Row"
@@ -156,7 +156,7 @@ export default function ExerciseSelectionSection({ form, isExerciseSetupLoading 
                     }
                   }}
                 />
-                <label htmlFor="newExerciseType" className={styles.ExerciseSelectionLabel}>
+                <label htmlFor="newExerciseType" className={styles.ExerciseSelectionSectionLabel}>
                   Type
                 </label>
                 <FormSelect

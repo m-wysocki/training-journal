@@ -2,148 +2,147 @@
   display: grid;
   gap: 1rem;
   padding: 1.25rem;
+  &Header {
+    display: grid;
+    gap: 0.25rem;
+    padding-bottom: 0.875rem;
+    border-bottom: 1px solid var(--surface-border);
+  }
+
+  &Title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--foreground);
+  }
+
+  &Description {
+    margin: 0;
+    font-size: 0.875rem;
+    line-height: 1.45;
+    color: var(--text-muted);
+  }
+
+  &Body {
+    display: grid;
+    gap: 0.9rem;
+  }
+
+  &BadgeField {
+    display: grid;
+    gap: 0.625rem;
+  }
+
+  &Label {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+  }
+
+  &BadgeGroup,
+  &FormDataSkeleton {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  &FormDataSkeleton span {
+    width: 6.5rem;
+    height: 2.25rem;
+    border-radius: 999px;
+    background: linear-gradient(
+      90deg,
+      var(--skeleton-start) 0%,
+      var(--skeleton-mid) 50%,
+      var(--skeleton-start) 100%
+    );
+    background-size: 200% 100%;
+    animation: ExerciseSelectionSectionPulse 1.2s ease-in-out infinite;
+  }
+
+  &ChoiceBadge,
+  &AddBadge {
+    min-height: 2.25rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 999px;
+    font: inherit;
+    font-size: 0.875rem;
+    line-height: 1.2;
+    cursor: pointer;
+  }
+
+  &ChoiceBadge {
+    border: 1px solid var(--outline);
+    color: var(--foreground);
+    background: var(--surface);
+    text-align: left;
+  }
+
+  &ChoiceBadge[data-selected='true'] {
+    border-color: var(--primary);
+    color: var(--on-primary);
+    background: var(--primary);
+  }
+
+  &ChoiceBadge:hover {
+    border-color: var(--primary);
+    background: var(--surface-low);
+  }
+
+  &AddBadge {
+    border: 1px dashed var(--outline);
+    color: var(--text-muted);
+    background: var(--surface-low);
+  }
+
+  &AddBadge:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    background: var(--on-primary);
+  }
+
+  &AddBadge:disabled {
+    border-color: var(--outline);
+    color: var(--text-soft);
+    background: var(--surface-low);
+    cursor: not-allowed;
+  }
+
+  &BadgeEmpty {
+    width: 100%;
+    margin: 0;
+    padding: 0.75rem 0.875rem;
+    border: 1px dashed var(--outline);
+    border-radius: 0.75rem;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    background: var(--surface);
+  }
+
+  &DialogBody {
+    display: grid;
+    gap: 1rem;
+  }
+
+  &Input {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    border: 1px solid var(--outline);
+    border-radius: 0.5rem;
+    padding: 0.625rem 0.75rem;
+    font-size: 0.875rem;
+    color: var(--foreground);
+    background: var(--surface);
+  }
+
+  &Input:focus {
+    outline: none;
+    border-color: var(--primary);
+  }
 }
 
-.ExerciseSelectionSectionHeader {
-  display: grid;
-  gap: 0.25rem;
-  padding-bottom: 0.875rem;
-  border-bottom: 1px solid var(--surface-border);
-}
-
-.ExerciseSelectionSectionTitle {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 500;
-  color: var(--foreground);
-}
-
-.ExerciseSelectionSectionDescription {
-  margin: 0;
-  font-size: 0.875rem;
-  line-height: 1.45;
-  color: var(--text-muted);
-}
-
-.ExerciseSelectionSectionBody {
-  display: grid;
-  gap: 0.9rem;
-}
-
-.ExerciseSelectionBadgeField {
-  display: grid;
-  gap: 0.625rem;
-}
-
-.ExerciseSelectionLabel {
-  margin: 0;
-  font-size: 0.875rem;
-  color: var(--text-muted);
-}
-
-.ExerciseSelectionBadgeGroup,
-.ExerciseSelectionFormDataSkeleton {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.ExerciseSelectionFormDataSkeleton span {
-  width: 6.5rem;
-  height: 2.25rem;
-  border-radius: 999px;
-  background: linear-gradient(
-    90deg,
-    var(--skeleton-start) 0%,
-    var(--skeleton-mid) 50%,
-    var(--skeleton-start) 100%
-  );
-  background-size: 200% 100%;
-  animation: ExerciseSelectionPulse 1.2s ease-in-out infinite;
-}
-
-.ExerciseSelectionChoiceBadge,
-.ExerciseSelectionAddBadge {
-  min-height: 2.25rem;
-  padding: 0.5rem 0.75rem;
-  border-radius: 999px;
-  font: inherit;
-  font-size: 0.875rem;
-  line-height: 1.2;
-  cursor: pointer;
-}
-
-.ExerciseSelectionChoiceBadge {
-  border: 1px solid var(--outline);
-  color: var(--foreground);
-  background: var(--surface);
-  text-align: left;
-}
-
-.ExerciseSelectionChoiceBadge[data-selected='true'] {
-  border-color: var(--primary);
-  color: var(--on-primary);
-  background: var(--primary);
-}
-
-.ExerciseSelectionChoiceBadge:hover {
-  border-color: var(--primary);
-  background: var(--surface-low);
-}
-
-.ExerciseSelectionAddBadge {
-  border: 1px dashed var(--outline);
-  color: var(--text-muted);
-  background: var(--surface-low);
-}
-
-.ExerciseSelectionAddBadge:hover {
-  border-color: var(--primary);
-  color: var(--primary);
-  background: var(--on-primary);
-}
-
-.ExerciseSelectionAddBadge:disabled {
-  border-color: var(--outline);
-  color: var(--text-soft);
-  background: var(--surface-low);
-  cursor: not-allowed;
-}
-
-.ExerciseSelectionBadgeEmpty {
-  width: 100%;
-  margin: 0;
-  padding: 0.75rem 0.875rem;
-  border: 1px dashed var(--outline);
-  border-radius: 0.75rem;
-  font-size: 0.875rem;
-  color: var(--text-muted);
-  background: var(--surface);
-}
-
-.ExerciseSelectionDialogBody {
-  display: grid;
-  gap: 1rem;
-}
-
-.ExerciseSelectionInput {
-  width: 100%;
-  min-width: 0;
-  box-sizing: border-box;
-  border: 1px solid var(--outline);
-  border-radius: 0.5rem;
-  padding: 0.625rem 0.75rem;
-  font-size: 0.875rem;
-  color: var(--foreground);
-  background: var(--surface);
-}
-
-.ExerciseSelectionInput:focus {
-  outline: none;
-  border-color: var(--primary);
-}
-
-@keyframes ExerciseSelectionPulse {
+@keyframes ExerciseSelectionSectionPulse {
   0% {
     background-position: 200% 0;
   }
@@ -156,9 +155,9 @@
 @media (max-width: 640px) {
   .ExerciseSelectionSection {
     padding: 1rem;
-  }
 
-  .ExerciseSelectionInput {
-    font-size: 1rem;
+    &Input {
+      font-size: 1rem;
+    }
   }
 }

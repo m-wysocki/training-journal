@@ -1,27 +1,26 @@
-.CompletedExercises {
+.CompletedExercisesClient {
   min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: flex-start;
   padding-block: 2rem;
-}
+  &Container {
+    width: 100%;
+  }
 
-.CompletedExercisesContainer {
-  width: 100%;
-}
-
-.CompletedExercisesEmptyState {
-  padding: 2rem 1rem;
-  border: 1px solid var(--surface-border);
-  border-radius: 1rem;
-  background: var(--surface-low);
-  text-align: center;
-  color: var(--text-muted);
-  box-shadow: var(--soft-shadow);
+  &EmptyState {
+    padding: 2rem 1rem;
+    border: 1px solid var(--surface-border);
+    border-radius: 1rem;
+    background: var(--surface-low);
+    text-align: center;
+    color: var(--text-muted);
+    box-shadow: var(--soft-shadow);
+  }
 }
 
 @media (max-width: 640px) {
-  .CompletedExercises {
+  .CompletedExercisesClient {
     padding-block: 1rem;
   }
 }

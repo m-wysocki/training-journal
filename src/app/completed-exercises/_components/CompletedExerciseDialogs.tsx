@@ -65,9 +65,9 @@ export default function CompletedExerciseDialogs({
         onPrimaryAction={onConfirmCopyCategory}
         primaryActionDisabled={copyLoading || !copyDate || isCopyDateSameAsSource}
       >
-        <div className={styles.CompletedExercisesDialogForm}>
-          <div className={styles.CompletedExercisesField}>
-            <label htmlFor="copyDate" className={styles.CompletedExercisesLabel}>
+        <div className={styles.CompletedExerciseDialogsForm}>
+          <div className={styles.CompletedExerciseDialogsField}>
+            <label htmlFor="copyDate" className={styles.CompletedExerciseDialogsLabel}>
               New date
             </label>
             <DatePicker
@@ -76,7 +76,7 @@ export default function CompletedExerciseDialogs({
               onChange={onSetCopyDate}
             />
             {isCopyDateSameAsSource ? (
-              <p className={styles.CompletedExercisesFieldHint}>Choose a different date than the source workout.</p>
+              <p className={styles.CompletedExerciseDialogsFieldHint}>Choose a different date than the source workout.</p>
             ) : null}
           </div>
         </div>
