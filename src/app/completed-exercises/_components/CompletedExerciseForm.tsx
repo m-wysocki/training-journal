@@ -21,7 +21,7 @@ import { useWorkoutDetailsState } from '../_hooks/useWorkoutDetailsState'
 import CompletedExerciseFormFooter from './CompletedExerciseFormFooter'
 import ExerciseSelectionSection from './ExerciseSelectionSection'
 import NotesSection from './NotesSection'
-import WorkoutDetailsSection from './WorkoutDetailsSection'
+import WorkoutDetailsFormSection from './WorkoutDetailsFormSection/WorkoutDetailsFormSection'
 import styles from './CompletedExerciseForm.module.scss'
 
 export type { CompletedExerciseFormValues }
@@ -117,7 +117,7 @@ export function CompletedExerciseForm({
           <ExerciseSelectionSection form={selection} isExerciseSetupLoading={isExerciseSetupLoading} />
 
           {selection.selectedExercise ? (
-            <WorkoutDetailsSection form={details} />
+            <WorkoutDetailsFormSection form={details} />
           ) : null}
 
           {selection.selectedExercise ? (
