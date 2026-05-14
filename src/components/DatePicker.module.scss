@@ -138,6 +138,11 @@
     background: var(--surface-low);
   }
 
+  &DayButton[data-today='true']:not([data-selected='true']) {
+    border-color: var(--outline);
+    background: var(--surface-low);
+  }
+
   &DayButton[data-selected='true'] {
     border-color: var(--primary);
     color: var(--on-primary);
