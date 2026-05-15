@@ -16,9 +16,11 @@ export const useCompletedExercisesFilters = ({ state, dispatch }: Params) => {
   const router = useRouter()
   const [, startRouteTransition] = useTransition()
 
-  const updateDateRange = (nextDateRange: { dateFrom: string; dateTo: string }) => {
+  const updateDateRange = (nextDateRange: { dateFrom: string; dateTo: string }, keepFiltersOpen = true) => {
     dispatch({ type: 'date_range_changed', payload: nextDateRange })
-    dispatch({ type: 'filters_value_set', payload: { value: 'filters' } })
+    if (!!keepFiltersOpen) {
+      dispatch({ type: 'filters_value_set', payload: { value: 'filters' } })
+    }
     dispatch({ type: 'refresh_started' })
 
     const searchParams = getCompletedExercisesSearchParams(nextDateRange, state.ui.selectedExerciseCategory)
@@ -39,7 +41,7 @@ export const useCompletedExercisesFilters = ({ state, dispatch }: Params) => {
   }
 
   const shiftDateRangeByWeek = (direction: -1 | 1) => {
-    updateDateRange(shiftWeekRange(state.dateRange.dateFrom, direction))
+    updateDateRange(shiftWeekRange(state.dateRange.dateFrom, direction), false)
   }
 
   const setFiltersValue = (value: string) => {
