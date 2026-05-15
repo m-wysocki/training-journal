@@ -84,7 +84,7 @@
     background: var(--primary);
   }
 
-  &ChoiceBadge:hover {
+  &ChoiceBadge:not([data-selected='true']):hover {
     border-color: var(--primary);
     background: var(--surface-low);
   }
