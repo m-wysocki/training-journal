@@ -3,7 +3,16 @@
 import { X } from 'lucide-react'
 import { useState } from 'react'
 
-import styles from './NumericStepper.module.scss'
+import {
+  BaseStepper,
+  StepperButton,
+  blurOnEnter,
+  clamp,
+  StepperClearAdornment,
+  StepperInput,
+  StepperInputShell,
+  StepperUnitAdornment,
+} from '@/components/BaseStepper'
 
 type PaceStepperProps = {
   id: string
@@ -14,8 +23,6 @@ type PaceStepperProps = {
   inputClassName?: string
   disabled?: boolean
 }
-
-const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value))
 
 const formatPaceInput = (paceMinPerKm: number) => {
   const totalSeconds = Math.round(paceMinPerKm * 60)
@@ -97,87 +104,75 @@ export function PaceStepper({
   }
 
   return (
-    <div className={styles.NumericStepper}>
-      <div className={styles.NumericStepperPaceStepper}>
-        <button
-          type="button"
-          className={styles.NumericStepperPaceStepButton}
-          onClick={() => updateBySeconds(-10)}
-          disabled={disabled || value === null || value <= min}
-          aria-label="Decrease pace by 10 seconds"
-        >
-          -10s
-        </button>
-        <button
-          type="button"
-          className={styles.NumericStepperPaceStepButton}
-          onClick={() => updateBySeconds(-1)}
-          disabled={disabled || value === null || value <= min}
-          aria-label="Decrease pace by 1 second"
-        >
-          -1s
-        </button>
-        <div className={styles.NumericStepperInputShell}>
-          <input
+    <BaseStepper
+      variant="pace"
+      leftControls={(
+        <>
+          <StepperButton
+            pace
+            onClick={() => updateBySeconds(-10)}
+            disabled={disabled || value === null || value <= min}
+            aria-label="Decrease pace by 10 seconds"
+          >
+            -10s
+          </StepperButton>
+          <StepperButton
+            pace
+            onClick={() => updateBySeconds(-1)}
+            disabled={disabled || value === null || value <= min}
+            aria-label="Decrease pace by 1 second"
+          >
+            -1s
+          </StepperButton>
+        </>
+      )}
+      inputControl={(
+        <StepperInputShell>
+          <StepperInput
             id={id}
-            className={[
-              styles.NumericStepperValueInput,
-              styles.NumericStepperValueInputWithUnit,
-              inputValue ? styles.NumericStepperValueInputWithClear : '',
-              inputClassName,
-            ]
-              .filter(Boolean)
-              .join(' ')}
+            className={inputClassName}
             type="text"
             inputMode="numeric"
             placeholder="6:30"
             value={inputValue}
+            withUnit
+            withClear={Boolean(inputValue)}
             onChange={(e) => setInputValue(normalizeDraft(e.target.value))}
             onBlur={(e) => commitInputValue(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.currentTarget.blur()
-              }
-            }}
+            onKeyDown={blurOnEnter}
             disabled={disabled}
             aria-label={
               value === null ? 'Empty min/km pace, editable pace' : `${formatPaceInput(value)} min/km, editable pace`
             }
           />
           {inputValue ? (
-            <button
-              type="button"
-              className={styles.NumericStepperClearAdornment}
-              onClick={clearInput}
-              disabled={disabled}
-              aria-label="Clear pace"
-            >
+            <StepperClearAdornment onClick={clearInput} disabled={disabled} aria-label="Clear pace">
               <X size={14} aria-hidden="true" />
-            </button>
+            </StepperClearAdornment>
           ) : null}
-          <span className={styles.NumericStepperUnitAdornment} aria-hidden="true">
-            min/km
-          </span>
-        </div>
-        <button
-          type="button"
-          className={styles.NumericStepperPaceStepButton}
-          onClick={() => updateBySeconds(1)}
-          disabled={disabled || value === null || value >= max}
-          aria-label="Increase pace by 1 second"
-        >
-          +1s
-        </button>
-        <button
-          type="button"
-          className={styles.NumericStepperPaceStepButton}
-          onClick={() => updateBySeconds(10)}
-          disabled={disabled || value === null || value >= max}
-          aria-label="Increase pace by 10 seconds"
-        >
-          +10s
-        </button>
-      </div>
-    </div>
+          <StepperUnitAdornment>min/km</StepperUnitAdornment>
+        </StepperInputShell>
+      )}
+      rightControls={(
+        <>
+          <StepperButton
+            pace
+            onClick={() => updateBySeconds(1)}
+            disabled={disabled || value === null || value >= max}
+            aria-label="Increase pace by 1 second"
+          >
+            +1s
+          </StepperButton>
+          <StepperButton
+            pace
+            onClick={() => updateBySeconds(10)}
+            disabled={disabled || value === null || value >= max}
+            aria-label="Increase pace by 10 seconds"
+          >
+            +10s
+          </StepperButton>
+        </>
+      )}
+    />
   )
 }
