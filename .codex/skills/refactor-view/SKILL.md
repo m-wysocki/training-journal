@@ -91,6 +91,10 @@ Keep logic in place when it is simple and local.
 - Do not rewrite whole files
 - Do not touch unrelated areas
 - Prefer clarity over abstraction
+- If behavior differs only slightly, extend existing functions with a small parameter instead of copying full logic blocks.
+- Avoid duplicating existing sequences (for example `dispatch + navigation + refresh`) across multiple functions.
+- Prefer one shared implementation with clear defaults; split into separate implementations only when differences are substantial.
+- Before finishing, check for near-duplicate logic introduced during the fix and collapse it to one source of truth.
 
 ## Output
 

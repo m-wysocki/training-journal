@@ -71,6 +71,13 @@ When refactoring:
 - Extract reusable visual components when repetition exists.
 - Extract shared logic into hooks or utility functions only when it is reused or clearly improves readability.
 - Keep abstractions local before making them global.
+- If a fix differs from existing logic by only 1-2 steps, extend the existing function with a simple parameter
+  (prefer a boolean with a default) instead of copying the whole flow.
+- Do not duplicate existing `dispatch + navigation + refresh` style sequences in separate functions when the base
+  scenario is the same.
+- Create a separate implementation only when behavior differences are substantial and a shared function would reduce
+  readability.
+- After finishing a fix, quickly check for near-duplicate logic and collapse it into one source of truth.
 - After refactoring, summarize what changed and why.
 
 ## Supabase rules
