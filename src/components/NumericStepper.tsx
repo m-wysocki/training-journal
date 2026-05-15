@@ -2,7 +2,15 @@
 
 import { useState } from 'react'
 
-import styles from './NumericStepper.module.scss'
+import {
+  BaseStepper,
+  StepperButton,
+  blurOnEnter,
+  clamp,
+  StepperInput,
+  StepperInputShell,
+  StepperUnitAdornment,
+} from '@/components/BaseStepper'
 
 type NumericStepperProps = {
   id: string
@@ -16,8 +24,6 @@ type NumericStepperProps = {
   displayValue?: string
   unit?: string
 }
-
-const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value))
 
 const getPrecision = (step: number) => {
   const stepAsString = step.toString()
@@ -84,56 +90,47 @@ export function NumericStepper({
   }
 
   return (
-    <div className={styles.NumericStepper}>
-      <div className={styles.NumericStepperStepper}>
-        <button
-          type="button"
-          className={styles.NumericStepperStepButton}
+    <BaseStepper
+      leftControls={(
+        <StepperButton
           onClick={() => updateByStep(-1)}
           disabled={disabled || value <= min}
           aria-label="Decrease value"
         >
           -
-        </button>
-        <div className={styles.NumericStepperInputShell}>
-          <input
+        </StepperButton>
+      )}
+      inputControl={(
+        <StepperInputShell>
+          <StepperInput
             id={id}
-            className={[styles.NumericStepperValueInput, unit ? styles.NumericStepperValueInputWithUnit : null, inputClassName]
-              .filter(Boolean)
-              .join(' ')}
+            className={inputClassName}
             type="number"
             inputMode={step % 1 === 0 ? 'numeric' : 'decimal'}
             min={min}
             max={max}
             step={step}
             value={draftState.inputValue}
+            withUnit={Boolean(unit)}
             onChange={(e) => handleInputChange(e.target.value)}
             onBlur={(e) => commitInputValue(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.currentTarget.blur()
-              }
-            }}
+            onKeyDown={blurOnEnter}
             disabled={disabled}
             required
             aria-label={displayValue ? `${displayValue}, editable value` : undefined}
           />
-          {unit && (
-            <span className={styles.NumericStepperUnitAdornment} aria-hidden="true">
-              {unit}
-            </span>
-          )}
-        </div>
-        <button
-          type="button"
-          className={styles.NumericStepperStepButton}
+          {unit ? <StepperUnitAdornment>{unit}</StepperUnitAdornment> : null}
+        </StepperInputShell>
+      )}
+      rightControls={(
+        <StepperButton
           onClick={() => updateByStep(1)}
           disabled={disabled || value >= max}
           aria-label="Increase value"
         >
           +
-        </button>
-      </div>
-    </div>
+        </StepperButton>
+      )}
+    />
   )
 }

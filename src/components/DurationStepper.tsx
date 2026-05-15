@@ -2,7 +2,15 @@
 
 import { useState } from 'react'
 
-import styles from './NumericStepper.module.scss'
+import {
+  BaseStepper,
+  StepperButton,
+  blurOnEnter,
+  clamp,
+  StepperInput,
+  StepperInputShell,
+  StepperUnitAdornment,
+} from '@/components/BaseStepper'
 
 type DurationStepperProps = {
   id: string
@@ -14,8 +22,6 @@ type DurationStepperProps = {
   inputClassName?: string
   disabled?: boolean
 }
-
-const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value))
 
 const roundToStep = (value: number, step: number) => Math.round(value / step) * step
 
@@ -91,50 +97,45 @@ export function DurationStepper({
   }
 
   return (
-    <div className={styles.NumericStepper}>
-      <div className={styles.NumericStepperStepper}>
-        <button
-          type="button"
-          className={styles.NumericStepperStepButton}
+    <BaseStepper
+      leftControls={(
+        <StepperButton
           onClick={() => updateByStep(-1)}
           disabled={disabled || value <= min}
           aria-label="Decrease duration by 5 minutes"
         >
           -
-        </button>
-        <div className={styles.NumericStepperInputShell}>
-          <input
+        </StepperButton>
+      )}
+      inputControl={(
+        <StepperInputShell>
+          <StepperInput
             id={id}
-            className={[styles.NumericStepperValueInput, styles.NumericStepperValueInputWithUnit, inputClassName].filter(Boolean).join(' ')}
+            className={inputClassName}
             type="text"
             inputMode="numeric"
             placeholder="00:10"
             value={inputValue}
+            withUnit
             onChange={(e) => setInputValue(normalizeDraft(e.target.value))}
             onBlur={(e) => commitInputValue(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.currentTarget.blur()
-              }
-            }}
+            onKeyDown={blurOnEnter}
             disabled={disabled}
             required
             aria-label={`${formatDurationInput(value)} hh:mm, editable duration`}
           />
-          <span className={styles.NumericStepperUnitAdornment} aria-hidden="true">
-            hh:mm
-          </span>
-        </div>
-        <button
-          type="button"
-          className={styles.NumericStepperStepButton}
+          <StepperUnitAdornment>hh:mm</StepperUnitAdornment>
+        </StepperInputShell>
+      )}
+      rightControls={(
+        <StepperButton
           onClick={() => updateByStep(1)}
           disabled={disabled || value >= max}
           aria-label="Increase duration by 5 minutes"
         >
           +
-        </button>
-      </div>
-    </div>
+        </StepperButton>
+      )}
+    />
   )
 }
