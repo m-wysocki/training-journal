@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import trainingJournalLogo from '../../public/training-journal-logo.png'
@@ -6,9 +7,23 @@ import { getAuthButtonUser } from '@/components/authActions'
 import PageContainer from '@/components/PageContainer'
 import styles from './AppHeader.module.scss'
 
-export default async function AppHeader() {
+async function AppHeaderUser() {
   const user = await getAuthButtonUser()
 
+  return <AppHeaderActions key={user?.id ?? 'anonymous'} initialUser={user} />
+}
+
+function AppHeaderUserFallback() {
+  // Same dimensions as the loaded actions to avoid layout shift on first paint.
+  return (
+    <>
+      <span aria-hidden="true" style={{ width: '2.25rem', height: '2.25rem' }} />
+      <span aria-hidden="true" style={{ width: '2.25rem', height: '2.25rem' }} />
+    </>
+  )
+}
+
+export default function AppHeader() {
   return (
     <header className={styles.AppHeader}>
       <PageContainer className={styles.AppHeaderInner}>
@@ -24,7 +39,9 @@ export default async function AppHeader() {
         </Link>
 
         <div className={styles.AppHeaderActions}>
-          <AppHeaderActions key={user?.id ?? 'anonymous'} initialUser={user} />
+          <Suspense fallback={<AppHeaderUserFallback />}>
+            <AppHeaderUser />
+          </Suspense>
         </div>
       </PageContainer>
     </header>

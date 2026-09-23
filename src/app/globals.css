@@ -1,5 +1,6 @@
 :root {
   /* Canonical tokens */
+  color-scheme: light;
   --background: #f9f9f7;
   --foreground: #1a1c1b;
   --primary: #4a654e;
@@ -29,6 +30,10 @@
   --soft-shadow: 0 10px 30px rgba(139, 168, 142, 0.08);
   --layout-width: 42rem;
 
+}
+
+html {
+  background: #f9f9f7;
 }
 
 body {
